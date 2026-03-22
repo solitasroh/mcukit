@@ -1,0 +1,10 @@
+{
+  "name": "mcukit",
+  "version": "0.1.0",
+  "displayName": "mcukit — AI Native Embedded Development Kit",
+  "description": "PDCA-driven MCU/MPU/WPF development with domain-specific AI agents. Supports STM32, NXP Kinetis K, i.MX6/i.MX6ULL/i.MX28, and C#/WPF.",
+  "engines": {
+    "claude-code": ">=2.1.78"
+  },
+  "outputStyles": "./output-styles/"
+}

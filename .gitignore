@@ -1,0 +1,23 @@
+# mcukit runtime state (session-specific, not versioned)
+.bkit/
+.mcukit/
+
+# Node
+node_modules/
+
+# Build outputs
+build/
+output/
+Debug/
+Release/
+cmake-build-*/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
