@@ -1,0 +1,26 @@
+name: plan-plus
+classification: hybrid
+version: 1.6.1
+description: "plan-plus workflow compliance and output quality evaluation"
+
+evals:
+  - name: trigger-accuracy
+    prompt: prompt-1.md
+    expected: expected-1.md
+    criteria:
+      - "Must trigger correctly on planning keywords"
+      - "Must include brainstorming phases"
+      - "Must produce plan document with all required sections"
+    timeout: 60000
+
+parity_test:
+  enabled: true
+  description: "Tests if model brainstorming matches plan-plus structured approach"
+
+benchmark:
+  model_baseline: "claude-sonnet-4-6"
+  metrics:
+    - trigger_accuracy
+    - process_compliance
+    - output_quality
+    - model_parity
