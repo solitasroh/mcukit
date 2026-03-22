@@ -1,0 +1,22 @@
+name: pdca
+classification: workflow
+version: 1.6.1
+description: "pdca process compliance evaluation"
+
+evals:
+  - name: trigger-accuracy
+    prompt: prompt-1.md
+    expected: expected-1.md
+    criteria:
+      - "Must trigger correctly on relevant keywords"
+      - "Must follow defined process steps"
+    timeout: 60000
+
+parity_test:
+  enabled: false
+
+benchmark:
+  model_baseline: "claude-sonnet-4-6"
+  metrics:
+    - trigger_accuracy
+    - process_compliance

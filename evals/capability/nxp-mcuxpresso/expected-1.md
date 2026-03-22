@@ -1,0 +1,1 @@
+SPI_MasterGetDefaultConfig, SPI_MasterInit, SPI_MasterTransferBlocking 패턴, CLOCK_GetFreq 사용

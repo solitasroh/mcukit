@@ -1,0 +1,23 @@
+name: pm-discovery
+classification: workflow
+version: 1.6.1
+description: "PM Agent Team process compliance evaluation"
+
+evals:
+  - name: trigger-accuracy
+    prompt: prompt-1.md
+    expected: expected-1.md
+    criteria:
+      - "Must trigger correctly on PM-related keywords"
+      - "Must orchestrate 4 PM sub-agents in correct order"
+      - "Must produce PRD document to docs/00-pm/"
+    timeout: 60000
+
+parity_test:
+  enabled: false
+
+benchmark:
+  model_baseline: "claude-sonnet-4-6"
+  metrics:
+    - trigger_accuracy
+    - process_compliance
