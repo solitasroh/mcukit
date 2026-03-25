@@ -24,6 +24,15 @@ mcukit is a Claude Code plugin that provides structured development workflows fo
 /plugin install mcukit@solitasroh-mcukit
 ```
 
+**Updating to latest version:**
+
+```bash
+/plugin uninstall mcukit@solitasroh-mcukit
+/plugin marketplace remove solitasroh-mcukit
+/plugin marketplace add solitasroh/mcukit
+/plugin install mcukit@solitasroh-mcukit
+```
+
 ### Option 2: Manual Clone + Symlink
 
 ```bash
