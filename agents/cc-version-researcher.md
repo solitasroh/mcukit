@@ -21,7 +21,6 @@ description: |
 model: opus
 effort: high
 maxTurns: 40
-permissionMode: plan
 memory: project
 disallowedTools:
   - Write
@@ -39,10 +38,6 @@ tools:
   - TodoWrite
 linked-from-skills:
   - cc-version-analysis: research
-hooks:
-  Stop:
-    - type: command
-      command: "node ${CLAUDE_PLUGIN_ROOT}/scripts/subagent-stop-handler.js"
       timeout: 5000
 ---
 

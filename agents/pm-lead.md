@@ -14,7 +14,6 @@ description: |
 model: opus
 effort: high
 maxTurns: 30
-permissionMode: plan
 memory: project
 tools:
   - Read
@@ -33,10 +32,6 @@ tools:
 skills:
   - pdca
   - mcukit-rules
-hooks:
-  Stop:
-    - type: command
-      command: "node ${CLAUDE_PLUGIN_ROOT}/scripts/pdca-skill-stop.js"
       timeout: 10000
 ---
 

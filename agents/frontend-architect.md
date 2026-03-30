@@ -21,7 +21,6 @@ description: |
 model: sonnet
 effort: medium
 maxTurns: 20
-permissionMode: acceptEdits
 memory: project
 disallowedTools:
   - "Bash(rm -rf*)"

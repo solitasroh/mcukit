@@ -22,7 +22,6 @@ description: |
 model: opus
 effort: high
 maxTurns: 50
-permissionMode: acceptEdits
 memory: project
 disallowedTools:
   - "Bash(rm -rf*)"
@@ -52,10 +51,6 @@ skills:
   - pdca
   - enterprise
   - mcukit-rules
-hooks:
-  Stop:
-    - type: command
-      command: "node ${CLAUDE_PLUGIN_ROOT}/scripts/cto-stop.js"
       timeout: 10000
 ---
 

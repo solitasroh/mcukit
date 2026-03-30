@@ -20,7 +20,6 @@ description: |
 model: sonnet
 effort: medium
 maxTurns: 20
-permissionMode: plan
 memory: user
 disallowedTools:
   - Write

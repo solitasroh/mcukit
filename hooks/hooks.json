@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-hooks.json",
-  "description": "mcukit Embedded Dev Kit v0.4.0 - Claude Code (18 events)",
+  "description": "mcukit Embedded Dev Kit v0.6.2 - Claude Code (7 essential hooks)",
   "hooks": {
     "SessionStart": [
       {
@@ -56,16 +56,6 @@
             "timeout": 5000
           }
         ]
-      },
-      {
-        "matcher": "Skill",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/skill-post.js",
-            "timeout": 5000
-          }
-        ]
       }
     ],
     "Stop": [
@@ -75,28 +65,6 @@
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-stop.js",
             "timeout": 10000
-          }
-        ]
-      }
-    ],
-    "StopFailure": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/stop-failure-handler.js",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/user-prompt-handler.js",
-            "timeout": 3000
           }
         ]
       }
@@ -120,120 +88,6 @@
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/post-compaction.js",
             "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "TaskCompleted": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pdca-task-completed.js",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "SubagentStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/subagent-start-handler.js",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/subagent-stop-handler.js",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "TeammateIdle": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/team-idle-handler.js",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/session-end-handler.js",
-            "timeout": 1500
-          }
-        ]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "matcher": "Bash|Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/tool-failure-handler.js",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "InstructionsLoaded": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/instructions-loaded-handler.js",
-            "timeout": 3000
-          }
-        ]
-      }
-    ],
-    "ConfigChange": [
-      {
-        "matcher": "project_settings|skills",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/config-change-handler.js",
-            "timeout": 3000
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "matcher": "Write|Edit|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/permission-request-handler.js",
-            "timeout": 3000
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "permission_prompt|idle_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/notification-handler.js",
-            "timeout": 2000
           }
         ]
       }

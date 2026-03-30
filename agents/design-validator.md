@@ -25,13 +25,11 @@ imports:
   - ${PLUGIN_ROOT}/templates/shared/api-patterns.md
 context: fork
 mergeResult: false
-permissionMode: plan
 memory: project
 disallowedTools:
   - Write
   - Edit
   - Bash
-# hooks: Managed by hooks/hooks.json (pre-write.js blocks Write) - GitHub #9354 workaround
 tools:
   - Read
   - Glob

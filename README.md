@@ -80,7 +80,7 @@ claude
 |-----------|:-----:|-------------|
 | **Skills** | 50 | Domain knowledge, PDCA workflow, safety, security, delivery |
 | **Agents** | 39 | AI specialists (fw-architect, linux-bsp-expert, wpf-architect, CTO, PM team...) |
-| **Hook Events** | 18 | Lifecycle automation (build, validation, PDCA, team, session...) |
+| **Hook Events** | 7 | Essential lifecycle hooks (session, safety, build, compaction) |
 | **Output Styles** | 4 | Response formatting (learning, pdca-guide, embedded, pdca-embedded) |
 | **Templates** | 38 | PDCA documents, domain specs, pipeline phases, shared patterns |
 | **MCP Servers** | 2 | PDCA status & metrics, code quality & gap analysis |

@@ -29,7 +29,6 @@ skills_preload:
   - phase-2-convention
   - phase-8-review
   - code-review
-permissionMode: plan
 memory: project
 tools:
   - Read
@@ -37,10 +36,6 @@ tools:
   - Grep
   - Task
   - LSP
-hooks:
-  Stop:
-    - type: command
-      command: "node ${CLAUDE_PLUGIN_ROOT}/scripts/analysis-stop.js"
       timeout: 10000
 ---
 

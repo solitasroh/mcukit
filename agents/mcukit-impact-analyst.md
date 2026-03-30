@@ -22,7 +22,6 @@ description: |
 model: opus
 effort: high
 maxTurns: 40
-permissionMode: plan
 memory: project
 disallowedTools:
   - "Bash(rm*)"
@@ -41,10 +40,6 @@ linked-from-skills:
   - cc-version-analysis: analyze
 skills_preload:
   - mcukit-rules
-hooks:
-  Stop:
-    - type: command
-      command: "node ${CLAUDE_PLUGIN_ROOT}/scripts/subagent-stop-handler.js"
       timeout: 5000
 ---
 

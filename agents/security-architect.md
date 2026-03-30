@@ -21,7 +21,6 @@ description: |
 model: opus
 effort: high
 maxTurns: 30
-permissionMode: plan
 memory: project
 disallowedTools:
   - Bash

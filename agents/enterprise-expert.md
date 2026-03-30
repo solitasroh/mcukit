@@ -22,7 +22,6 @@ maxTurns: 30
 linked-from-skills:
   - enterprise: default
   - enterprise: architecture
-permissionMode: acceptEdits
 memory: project
 disallowedTools:
   - "Bash(rm -rf*)"

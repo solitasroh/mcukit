@@ -32,7 +32,6 @@ linked-from-skills:
 skills_preload:
   - pdca
   - mcukit-rules
-permissionMode: acceptEdits
 disallowedTools:
   - Agent
 memory: project
@@ -47,10 +46,6 @@ tools:
   - Task(gap-detector)
   - TodoWrite
   - LSP
-hooks:
-  Stop:
-    - type: command
-      command: "node ${CLAUDE_PLUGIN_ROOT}/scripts/iterator-stop.js"
       timeout: 10000
 ---
 

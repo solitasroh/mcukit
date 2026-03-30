@@ -60,13 +60,14 @@ function run(_input) {
       const pdcaStatus = getPdcaStatusFull();
       contextHierarchy.setSessionContext('sessionStartedAt', new Date().toISOString());
       contextHierarchy.setSessionContext('platform', MCUKIT_PLATFORM);
-      contextHierarchy.setSessionContext('level', detectLevel());
+      const detectedLevel = detectLevel();
+      contextHierarchy.setSessionContext('level', detectedLevel);
       if (pdcaStatus && pdcaStatus.primaryFeature) {
         contextHierarchy.setSessionContext('primaryFeature', pdcaStatus.primaryFeature);
       }
       debugLog('SessionStart', 'Session context initialized', {
         platform: MCUKIT_PLATFORM,
-        level: detectLevel()
+        level: detectedLevel
       });
     } catch (e) {
       debugLog('SessionStart', 'Failed to initialize session context', { error: e.message });
@@ -82,7 +83,7 @@ function run(_input) {
       memoryStore.setMemory('lastSession', {
         startedAt: new Date().toISOString(),
         platform: MCUKIT_PLATFORM,
-        level: detectLevel()
+        level: detectLevel()  // cached by level.js _levelCache
       });
       debugLog('SessionStart', 'Memory store initialized', {
         sessionCount: sessionCount + 1,

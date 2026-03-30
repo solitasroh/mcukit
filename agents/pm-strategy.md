@@ -12,7 +12,6 @@ description: |
 model: sonnet
 effort: medium
 maxTurns: 20
-permissionMode: plan
 memory: project
 tools:
   - Read
@@ -24,10 +23,6 @@ tools:
 disallowedTools:
   - Bash
   - Write
-hooks:
-  Stop:
-    - type: command
-      command: "node ${CLAUDE_PLUGIN_ROOT}/scripts/pdca-skill-stop.js"
       timeout: 10000
 ---
 

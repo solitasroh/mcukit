@@ -13,7 +13,6 @@ description: |
 model: opus
 effort: high
 maxTurns: 20
-permissionMode: plan
 memory: project
 context: fork
 tools:

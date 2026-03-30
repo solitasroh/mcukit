@@ -21,7 +21,6 @@ effort: high
 maxTurns: 30
 linked-from-skills:
   - enterprise: infra
-permissionMode: acceptEdits
 memory: project
 disallowedTools:
   - "Bash(rm -rf*)"

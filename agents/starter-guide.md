@@ -20,7 +20,6 @@ description: |
 model: sonnet
 effort: medium
 maxTurns: 20
-permissionMode: acceptEdits
 memory: user
 disallowedTools:
   - Bash

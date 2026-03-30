@@ -21,7 +21,6 @@ effort: low
 maxTurns: 15
 linked-from-skills:
   - pdca: report
-permissionMode: acceptEdits
 memory: project
 disallowedTools:
   - Bash

@@ -6,7 +6,6 @@ description: |
 model: opus
 effort: high
 maxTurns: 30
-permissionMode: acceptEdits
 memory: project
 context: fork
 tools: [Read, Write, Edit, Glob, Grep, Bash, Task(Explore)]
