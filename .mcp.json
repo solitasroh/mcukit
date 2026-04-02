@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "openproject": {
+      "type": "http",
+      "url": "${user_config.openproject_mcp_url}",
+      "headers": {
+        "X-OpenProject-URL": "${user_config.openproject_url}",
+        "X-OpenProject-API-Key": "${user_config.openproject_api_key}"
+      }
+    }
+  }
+}

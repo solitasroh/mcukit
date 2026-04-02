@@ -6,5 +6,26 @@
   "engines": {
     "claude-code": ">=2.1.78"
   },
-  "outputStyles": "./output-styles/"
+  "outputStyles": "./output-styles/",
+  "userConfig": {
+    "openproject_mcp_url": {
+      "type": "string",
+      "title": "OpenProject MCP Server URL",
+      "description": "OpenProject MCP 서버 주소 (예: http://10.10.20.33:9090/mcp)",
+      "required": true
+    },
+    "openproject_url": {
+      "type": "string",
+      "title": "OpenProject Instance URL",
+      "description": "OpenProject 인스턴스 주소 (예: http://10.10.20.32:8080)",
+      "required": true
+    },
+    "openproject_api_key": {
+      "type": "string",
+      "title": "OpenProject API Key",
+      "description": "본인의 OpenProject API 토큰 (My account → Access tokens)",
+      "required": true,
+      "sensitive": true
+    }
+  }
 }
