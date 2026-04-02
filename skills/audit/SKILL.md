@@ -5,7 +5,7 @@ classification-reason: Audit logging persists regardless of model advancement
 deprecation-risk: none
 description: |
   View audit logs, decision traces, and session history.
-  Browse and search through bkit's audit trail for transparency and debugging.
+  Browse and search through mcukit's audit trail for transparency and debugging.
 
   Use proactively when user wants to review AI decisions, check audit history,
   or investigate what actions were taken during a PDCA cycle.
@@ -54,7 +54,7 @@ task-template: "[Audit] {action}"
 
 Display recent audit log entries.
 
-1. Read today's audit log from `.bkit/audit/YYYY-MM-DD.jsonl`
+1. Read today's audit log from `.mcukit/audit/YYYY-MM-DD.jsonl`
 2. If today's log is empty or has fewer than 20 entries, also read yesterday's log
 3. Parse JSONL entries (one JSON object per line)
 4. Display the last 20 entries in reverse chronological order
@@ -94,7 +94,7 @@ Total entries today: 45
 
 Show decision traces for a specific feature.
 
-1. Read decision trace files from `.bkit/decisions/YYYY-MM-DD.jsonl`
+1. Read decision trace files from `.mcukit/decisions/YYYY-MM-DD.jsonl`
 2. Filter entries matching the specified feature
 3. Display chronological decision chain with rationale
 
@@ -226,7 +226,7 @@ Search audit logs by action type, feature name, or date range.
    - If query matches a feature name, filter by feature
    - If query matches a date (YYYY-MM-DD), filter by date
    - Otherwise, perform full-text search across all fields
-2. Read relevant JSONL files from `.bkit/audit/`
+2. Read relevant JSONL files from `.mcukit/audit/`
 3. Apply filters and return matching entries (max 50 results)
 4. Display results in chronological order
 
@@ -249,9 +249,9 @@ Search audit logs by action type, feature name, or date range.
 
 | Path | Format | Purpose |
 |------|--------|---------|
-| `.bkit/audit/YYYY-MM-DD.jsonl` | JSONL | Daily audit log entries |
-| `.bkit/audit/summary/` | JSON | Pre-computed daily/weekly summaries |
-| `.bkit/decisions/YYYY-MM-DD.jsonl` | JSONL | Decision trace entries |
+| `.mcukit/audit/YYYY-MM-DD.jsonl` | JSONL | Daily audit log entries |
+| `.mcukit/audit/summary/` | JSON | Pre-computed daily/weekly summaries |
+| `.mcukit/decisions/YYYY-MM-DD.jsonl` | JSONL | Decision trace entries |
 
 ## Module Dependencies
 

@@ -189,7 +189,7 @@ Claude: 1. Compare code with design documents
 
 ## Document Structure Rules
 
-### bkit-system/ (Current Implementation Reference)
+### mcukit-system/ (Current Implementation Reference)
 ```
 - Update together with code changes
 - Always reflects "current codebase state"

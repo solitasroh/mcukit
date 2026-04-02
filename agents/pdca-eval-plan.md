@@ -2,7 +2,7 @@
 name: pdca-eval-plan
 description: |
   Plan 단계를 프로젝트 유형별로 평가하는 에이전트.
-  v1.6.1 baseline vs Customized bkit 비교 분석 수행.
+  v1.6.1 baseline vs Customized mcukit 비교 분석 수행.
   평가 항목: 프로젝트 컨텍스트 인식도, 사용 가능 스킬 수, Plan 정확도.
 model: sonnet
 memory: project
@@ -19,7 +19,7 @@ tools:
 
 ## Purpose
 
-Plan 단계에서 v1.6.1 baseline과 Customized bkit의 성능 차이를
+Plan 단계에서 v1.6.1 baseline과 Customized mcukit의 성능 차이를
 프로젝트 유형별로 정량 평가한다.
 
 ## Evaluation Dimensions

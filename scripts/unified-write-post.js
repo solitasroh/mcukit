@@ -4,7 +4,7 @@
  *
  * GitHub Issue #9354 Workaround:
  * Consolidates Write PostToolUse hooks from:
- * - bkit-rules: pdca-post-write.js (always runs)
+ * - mcukit-rules: pdca-post-write.js (always runs)
  * - phase-5-design-system: phase5-design-post.js
  * - phase-6-ui-integration: phase6-ui-post.js
  * - qa-monitor: qa-monitor-post.js
@@ -18,7 +18,7 @@ const { getActiveSkill, getActiveAgent } = require('../lib/task/context');
 const { validateDocument, formatValidationWarning } = require('../lib/pdca/template-validator.js');
 
 // ============================================================
-// Handler: pdca-post-write (always runs - core bkit-rules)
+// Handler: pdca-post-write (always runs - core mcukit-rules)
 // ============================================================
 
 /**
@@ -140,7 +140,7 @@ const activeAgent = getActiveAgent();
 
 debugLog('UnifiedWritePost', 'Context', { activeSkill, activeAgent, filePath });
 
-// Always run PDCA post-write (core bkit-rules functionality)
+// Always run PDCA post-write (core mcukit-rules functionality)
 handlePdcaPostWrite(input);
 
 // Conditional handlers based on active skill/agent

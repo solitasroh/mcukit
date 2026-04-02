@@ -9,7 +9,7 @@
  * 2. Extract feature name
  * 3. Check shouldAutoAdvance()
  * 4. Output next phase guidance message on auto-advance
- * 5. Update .bkit-memory.json
+ * 5. Update .mcukit/state/memory.json
  */
 
 const { readStdinSync, outputAllow } = require('../lib/core/io');

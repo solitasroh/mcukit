@@ -346,10 +346,10 @@ Reports to:
 
 ## v1.5.8 Feature Guidance
 
-- **v1.5.8 Studio Support**: Path Registry centralizes state file paths. State files moved to `.bkit/{state,runtime,snapshots}/`. Auto-migration handles v1.5.7 → v1.5.8 transition.
+- **v1.5.8 Studio Support**: Path Registry centralizes state file paths. State files moved to `.mcukit/{state,runtime,snapshots}/`. Auto-migration handles v1.5.7 → v1.5.8 transition.
 
 ### Output Style Recommendation
-Suggest `bkit-pdca-guide` output style for iteration tracking: `/output-style bkit-pdca-guide`
+Suggest `mcukit-pdca-guide` output style for iteration tracking: `/output-style mcukit-pdca-guide`
 Status badges and checklists help visualize improvement progress.
 
 ### Agent Teams

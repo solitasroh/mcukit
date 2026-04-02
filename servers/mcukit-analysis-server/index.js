@@ -2,7 +2,7 @@
 'use strict';
 
 /**
- * bkit-analysis-server: Code analysis, gap detection, checkpoints, and audit MCP server.
+ * mcukit-analysis-server: Code analysis, gap detection, checkpoints, and audit MCP server.
  *
  * Lightweight JSON-RPC 2.0 over stdio — no external dependencies.
  * Reads .mcukit/ state, checkpoints, and audit files.
@@ -16,20 +16,22 @@ const readline = require('readline');
 // Utilities
 // ---------------------------------------------------------------------------
 
-const ROOT = process.env.BKIT_ROOT || process.cwd();
-const BKIT_DIR = path.join(ROOT, '.bkit');
+const ROOT = process.env.MCUKIT_ROOT || process.cwd();
 const DOCS_DIR = path.join(ROOT, 'docs');
 
+// Import centralized path definitions (SSOT)
+const { STATE_PATHS } = require('../../lib/core/paths');
+
 function statePath(filename) {
-  return path.join(BKIT_DIR, 'state', filename);
+  return path.join(path.dirname(STATE_PATHS.pdcaStatus()), filename);
 }
 
 function auditDir() {
-  return path.join(BKIT_DIR, 'audit');
+  return STATE_PATHS.auditDir();
 }
 
 function checkpointsDir() {
-  return path.join(BKIT_DIR, 'checkpoints');
+  return STATE_PATHS.checkpointsDir();
 }
 
 function readJsonOrNull(filePath) {
@@ -264,7 +266,7 @@ function handleRegressionRules(args) {
     });
 
     // Ensure state directory exists before writing
-    const stateDir = path.join(BKIT_DIR, 'state');
+    const stateDir = path.dirname(STATE_PATHS.pdcaStatus());
     if (!fs.existsSync(stateDir)) {
       fs.mkdirSync(stateDir, { recursive: true });
     }
@@ -386,7 +388,7 @@ function handleMessage(msg) {
     case 'initialize':
       return jsonRpcOk(id, {
         protocolVersion: '2024-11-05',
-        serverInfo: { name: 'bkit-analysis-server', version: '2.0.0' },
+        serverInfo: { name: 'mcukit-analysis-server', version: '2.1.0' },
         capabilities: { tools: {} },
       });
 
@@ -434,4 +436,4 @@ rl.on('close', () => {
   process.exit(0);
 });
 
-process.stderr.write('[bkit-analysis-server] Started (pid=' + process.pid + ')\n');
+process.stderr.write('[mcukit-analysis-server] Started (pid=' + process.pid + ')\n');

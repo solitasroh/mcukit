@@ -1,4 +1,4 @@
-# bkit Template Selection Guide
+# mcukit Template Selection Guide
 
 > Quick reference for choosing the right template for your task
 

@@ -14,7 +14,7 @@
 const path = require('path');
 
 const { debugLog } = require('../lib/core/debug');
-const { readBkitMemory, writeBkitMemory } = require('../lib/pdca/status');
+const { readMemory, writeMemory } = require('../lib/pdca/status');
 
 /**
  * Generate phase completion message
@@ -78,7 +78,7 @@ async function main() {
     console.log(formatOutput(result));
 
     // Update pipeline status - mark as complete
-    const memory = readBkitMemory();
+    const memory = readMemory();
     if (memory) {
       if (!memory.pipelineStatus) {
         memory.pipelineStatus = {};
@@ -103,7 +103,7 @@ async function main() {
         memory.pdcaStatus.lastUpdated = new Date().toISOString();
       }
 
-      writeBkitMemory(memory);
+      writeMemory(memory);
     }
 
   } catch (e) {

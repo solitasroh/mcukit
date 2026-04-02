@@ -9,4 +9,4 @@ detect the target PDCA phase, and execute the Plan phase workflow.
 
 Context: No existing Plan document for user-auth. A PRD file exists
 at docs/00-pm/user-auth.prd.md from a previous /pdca pm run.
-The project .bkit-memory.json currently shows phase "pm" for user-auth.
+The project .mcukit-memory.json currently shows phase "pm" for user-auth.

@@ -2,7 +2,7 @@
 name: pdca-eval-design
 description: |
   Design 단계를 프로젝트 유형별로 평가하는 에이전트.
-  v1.6.1 baseline vs Customized bkit 비교 분석 수행.
+  v1.6.1 baseline vs Customized mcukit 비교 분석 수행.
   평가 항목: 설계 정확도, 도메인 특화 가이드 적용, phase skill 활용도.
 model: sonnet
 memory: project
@@ -19,7 +19,7 @@ tools:
 
 ## Purpose
 
-Design 단계에서 v1.6.1 baseline과 Customized bkit의 성능 차이를
+Design 단계에서 v1.6.1 baseline과 Customized mcukit의 성능 차이를
 프로젝트 유형별로 정량 평가한다.
 
 ## Evaluation Dimensions

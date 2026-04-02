@@ -62,7 +62,7 @@ task-template: "[Init-Enterprise] {feature}"
 3. Create CLAUDE.md (Level: Enterprise specified)
 4. docs/ 5-category structure
 5. infra/terraform/, infra/k8s/ base templates
-6. Initialize .bkit-memory.json
+6. Initialize .mcukit/state/memory.json
 
 ### guide (Development Guide)
 - AI Native 10-Day development cycle
@@ -405,14 +405,14 @@ Rule: Area-specific CLAUDE.md overrides project-level rules
 
 ---
 
-## bkit Features for Enterprise Level (v1.5.1)
+## mcukit Features for Enterprise Level (v1.5.1)
 
-### Output Style: bkit-enterprise (Recommended)
+### Output Style: mcukit-enterprise (Recommended)
 
 For CTO-level architecture perspectives, activate the enterprise style:
 
 ```
-/output-style bkit-enterprise
+/output-style mcukit-enterprise
 ```
 
 This provides:
@@ -440,6 +440,6 @@ Enterprise projects support full Agent Teams for parallel PDCA execution:
 
 ### Agent Memory (Auto-Active)
 
-All bkit agents automatically remember project context across sessions.
+All mcukit agents automatically remember project context across sessions.
 Enterprise agents use `project` scope memory, ensuring architecture decisions
 and infrastructure patterns persist across development sessions.

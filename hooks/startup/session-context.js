@@ -118,7 +118,7 @@ function buildOutputStylesAndMemoryContext(detectedLevel) {
   ctx += `### Claude Code Auto-Memory\n`;
   ctx += `- Claude automatically saves useful context to \`~/.claude/projects/*/memory/MEMORY.md\`\n`;
   ctx += `- Manage with \`/memory\` command (view, edit, delete entries)\n`;
-  ctx += `- bkit memory (\`.mcukit/state/memory.json\`) and CC auto-memory are separate systems with no collision\n`;
+  ctx += `- mcukit memory (\`.mcukit/state/memory.json\`) and CC auto-memory are separate systems with no collision\n`;
   ctx += `- Tip: After PDCA completion, use \`/memory\` to save key learnings for future sessions\n\n`;
 
   return ctx;
@@ -237,7 +237,7 @@ function buildVersionEnhancementsContext(detectedLevel) {
   ctx += `- Path Registry: centralized state file path management (lib/core/paths.js)\n`;
   ctx += `- State files migrated to \`.mcukit/{state,runtime,snapshots}/\` structured directory\n`;
   ctx += `- Auto-migration from v1.5.7 legacy paths on SessionStart\n`;
-  ctx += `- bkit memory path: \`.mcukit/state/memory.json\` (was \`docs/.bkit-memory.json\`)\n`;
+  ctx += `- mcukit memory path: \`.mcukit/state/memory.json\` (was \`docs/.bkit-memory.json\`)\n`;
   ctx += `\n`;
 
   // v1.6.0: Skills 2.0

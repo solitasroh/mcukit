@@ -2,7 +2,7 @@
 name: pdca-eval-act
 description: |
   Act(Improvement) 단계를 프로젝트 유형별로 평가하는 에이전트.
-  v1.6.1 baseline vs Customized bkit 비교 분석 수행.
+  v1.6.1 baseline vs Customized mcukit 비교 분석 수행.
   평가 항목: 자기 개선 루프 완성도, 학습 보존, 팀 공유.
 model: sonnet
 memory: project
@@ -19,7 +19,7 @@ tools:
 
 ## Purpose
 
-Act 단계에서 v1.6.1 baseline과 Customized bkit의 성능 차이를
+Act 단계에서 v1.6.1 baseline과 Customized mcukit의 성능 차이를
 프로젝트 유형별로 정량 평가한다.
 
 ## Evaluation Dimensions
@@ -96,7 +96,7 @@ Act 단계에서 v1.6.1 baseline과 Customized bkit의 성능 차이를
 
 ## Key Insight
 
-Act Phase는 **Custom bkit의 가치가 가장 극적으로 나타나는 단계**이다:
+Act Phase는 **Custom mcukit의 가치가 가장 극적으로 나타나는 단계**이다:
 
 ### btw -> skill-create 파이프라인의 범용 효과
 
@@ -105,7 +105,7 @@ Act Phase는 **Custom bkit의 가치가 가장 극적으로 나타나는 단계*
 ```
 [어떤 프로젝트든]
   작업 중 /btw "이 패턴 자동화하면 좋겠다"
-    -> .bkit/btw-suggestions.json에 저장
+    -> .mcukit/btw-suggestions.json에 저장
     -> /btw analyze: 유사 패턴 클러스터링, 스킬 후보 도출
     -> /btw promote {id}: skill-create에 연결
     -> /skill-create: 프로젝트 컨텍스트 분석 -> SKILL.md 생성

@@ -4,7 +4,7 @@
  *
  * Team coordinator 종료 시 리소스 정리:
  * 1. PDCA 상태 업데이트 (team mode 종료 기록)
- * 2. bkit-memory.json에 team 세션 정보 저장
+ * 2. memory.json에 team 세션 정보 저장
  * 3. Team 정리 안내 메시지 출력
  */
 

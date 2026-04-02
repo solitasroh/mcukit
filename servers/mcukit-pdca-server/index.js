@@ -2,7 +2,7 @@
 'use strict';
 
 /**
- * bkit-pdca-server: PDCA status, documents, and metrics MCP server.
+ * mcukit-pdca-server: PDCA status, documents, and metrics MCP server.
  *
  * Lightweight JSON-RPC 2.0 over stdio — no external dependencies.
  * Reads .mcukit/ state files and docs/ markdown files.
@@ -16,9 +16,11 @@ const readline = require('readline');
 // Utilities
 // ---------------------------------------------------------------------------
 
-const ROOT = process.env.BKIT_ROOT || process.cwd();
-const BKIT_DIR = path.join(ROOT, '.bkit');
+const ROOT = process.env.MCUKIT_ROOT || process.cwd();
 const DOCS_DIR = path.join(ROOT, 'docs');
+
+// Import centralized path definitions (SSOT)
+const { STATE_PATHS } = require('../../lib/core/paths');
 
 const PHASE_MAP = {
   plan: '01-plan',
@@ -28,11 +30,11 @@ const PHASE_MAP = {
 };
 
 function statePath(filename) {
-  return path.join(BKIT_DIR, 'state', filename);
+  return path.join(path.dirname(STATE_PATHS.pdcaStatus()), filename);
 }
 
 function auditPath(filename) {
-  return path.join(BKIT_DIR, 'audit', filename);
+  return path.join(STATE_PATHS.auditDir(), filename);
 }
 
 function docsPath(phase, feature) {
@@ -200,19 +202,19 @@ const TOOLS = [
 
 const RESOURCES = [
   {
-    uri: 'bkit://pdca/status',
+    uri: 'mcukit://pdca/status',
     name: 'PDCA Current Status',
     description: 'Current PDCA status from pdca-status.json.',
     mimeType: 'application/json',
   },
   {
-    uri: 'bkit://quality/metrics',
+    uri: 'mcukit://quality/metrics',
     name: 'Latest Quality Metrics',
     description: 'Latest quality metrics (M1-M10).',
     mimeType: 'application/json',
   },
   {
-    uri: 'bkit://audit/latest',
+    uri: 'mcukit://audit/latest',
     name: 'Latest Audit Log',
     description: 'Today\'s audit log entries (last 20).',
     mimeType: 'application/json',
@@ -225,7 +227,7 @@ const RESOURCES = [
 
 const ACTIVE_PHASES = new Set(['pm', 'plan', 'design', 'do', 'check', 'act', 'report']);
 
-function handleBkitPdcaStatus(args) {
+function handlePdcaStatus(args) {
   const { feature } = args || {};
   const status = readJsonOrNull(statePath('pdca-status.json'));
   if (!status) return okResponse({ version: null, lastUpdated: null, primaryFeature: null, activeFeatures: [], summary: { total: 0, byPhase: {} } });
@@ -256,7 +258,7 @@ function handleBkitPdcaStatus(args) {
   });
 }
 
-function handleBkitPdcaHistory(args) {
+function handlePdcaHistory(args) {
   const { feature, limit = 50, since } = args || {};
   const status = readJsonOrNull(statePath('pdca-status.json'));
   if (!status) return okResponse({ total: 0, filtered: 0, items: [] });
@@ -272,7 +274,7 @@ function handleBkitPdcaHistory(args) {
   return okResponse({ total, filtered, items: history.slice(-limit) });
 }
 
-function handleBkitFeatureList(args) {
+function handleFeatureList(args) {
   const { status = 'all', phase } = args || {};
   const data = readJsonOrNull(statePath('pdca-status.json'));
   if (!data) return okResponse({ total: 0, features: [] });
@@ -295,7 +297,7 @@ function handleBkitFeatureList(args) {
   return okResponse({ total: list.length, features: list });
 }
 
-function handleBkitFeatureDetail(args) {
+function handleFeatureDetail(args) {
   const { feature } = args || {};
   if (!feature) return errResponse('INVALID_ARGS', 'feature is required');
 
@@ -337,7 +339,7 @@ function handleDocRead(phase, args) {
   });
 }
 
-function handleBkitMetricsGet(args) {
+function handleMetricsGet(args) {
   const { feature } = args || {};
   const data = readJsonOrNull(statePath('quality-metrics.json'));
   if (!data) {
@@ -364,7 +366,7 @@ function handleBkitMetricsGet(args) {
   return okResponse(data);
 }
 
-function handleBkitMetricsHistory(args) {
+function handleMetricsHistory(args) {
   const { metric, limit = 30 } = args || {};
   const data = readJsonOrNull(statePath('quality-history.json'));
   if (!data) return okResponse({ metric: metric || null, total: 0, items: [] });
@@ -388,7 +390,7 @@ function handleResourcePdcaStatus() {
   const data = readJsonOrNull(statePath('pdca-status.json')) || {};
   return {
     contents: [{
-      uri: 'bkit://pdca/status',
+      uri: 'mcukit://pdca/status',
       mimeType: 'application/json',
       text: JSON.stringify(data, null, 2),
     }],
@@ -399,7 +401,7 @@ function handleResourceQualityMetrics() {
   const data = readJsonOrNull(statePath('quality-metrics.json')) || { metrics: {} };
   return {
     contents: [{
-      uri: 'bkit://quality/metrics',
+      uri: 'mcukit://quality/metrics',
       mimeType: 'application/json',
       text: JSON.stringify(data, null, 2),
     }],
@@ -420,7 +422,7 @@ function handleResourceAuditLatest() {
 
   return {
     contents: [{
-      uri: 'bkit://audit/latest',
+      uri: 'mcukit://audit/latest',
       mimeType: 'application/json',
       text: JSON.stringify({ date: today, total: entries.length, entries: entries.slice(-20) }, null, 2),
     }],
@@ -432,22 +434,22 @@ function handleResourceAuditLatest() {
 // ---------------------------------------------------------------------------
 
 const TOOL_HANDLERS = {
-  mcukit_pdca_status: handleBkitPdcaStatus,
-  mcukit_pdca_history: handleBkitPdcaHistory,
-  mcukit_feature_list: handleBkitFeatureList,
-  mcukit_feature_detail: handleBkitFeatureDetail,
+  mcukit_pdca_status: handlePdcaStatus,
+  mcukit_pdca_history: handlePdcaHistory,
+  mcukit_feature_list: handleFeatureList,
+  mcukit_feature_detail: handleFeatureDetail,
   mcukit_plan_read: (args) => handleDocRead('plan', args),
   mcukit_design_read: (args) => handleDocRead('design', args),
   mcukit_analysis_read: (args) => handleDocRead('analysis', args),
   mcukit_report_read: (args) => handleDocRead('report', args),
-  mcukit_metrics_get: handleBkitMetricsGet,
-  mcukit_metrics_history: handleBkitMetricsHistory,
+  mcukit_metrics_get: handleMetricsGet,
+  mcukit_metrics_history: handleMetricsHistory,
 };
 
 const RESOURCE_HANDLERS = {
-  'bkit://pdca/status': handleResourcePdcaStatus,
-  'bkit://quality/metrics': handleResourceQualityMetrics,
-  'bkit://audit/latest': handleResourceAuditLatest,
+  'mcukit://pdca/status': handleResourcePdcaStatus,
+  'mcukit://quality/metrics': handleResourceQualityMetrics,
+  'mcukit://audit/latest': handleResourceAuditLatest,
 };
 
 // ---------------------------------------------------------------------------
@@ -473,7 +475,7 @@ function handleMessage(msg) {
     case 'initialize':
       return jsonRpcOk(id, {
         protocolVersion: '2024-11-05',
-        serverInfo: { name: 'bkit-pdca-server', version: '2.0.0' },
+        serverInfo: { name: 'mcukit-pdca-server', version: '2.1.0' },
         capabilities: { tools: {}, resources: {} },
       });
 
@@ -537,4 +539,4 @@ rl.on('close', () => {
   process.exit(0);
 });
 
-process.stderr.write('[bkit-pdca-server] Started (pid=' + process.pid + ')\n');
+process.stderr.write('[mcukit-pdca-server] Started (pid=' + process.pid + ')\n');

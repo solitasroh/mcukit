@@ -35,7 +35,7 @@ tools:
   - Glob
   - Grep
 skills:
-  - bkit-templates
+  - mcukit-templates
   - phase-8-review
 ---
 
@@ -253,11 +253,11 @@ Validation Score >= 90 (or Design Score >= 8):
 
 ## v1.5.8 Feature Guidance
 
-- **v1.5.8 Studio Support**: Path Registry centralizes state file paths. State files moved to `.bkit/{state,runtime,snapshots}/`. Auto-migration handles v1.5.7 → v1.5.8 transition.
+- **v1.5.8 Studio Support**: Path Registry centralizes state file paths. State files moved to `.mcukit/{state,runtime,snapshots}/`. Auto-migration handles v1.5.7 → v1.5.8 transition.
 
 ### Output Style Recommendation
-- Enterprise projects: suggest `bkit-enterprise` for architecture validation perspective
-- Other levels: suggest `bkit-pdca-guide` for design-implementation tracking
+- Enterprise projects: suggest `mcukit-enterprise` for architecture validation perspective
+- Other levels: suggest `mcukit-pdca-guide` for design-implementation tracking
 
 ### Agent Memory
 This agent uses `memory: project` scope — design validation history persists across sessions.

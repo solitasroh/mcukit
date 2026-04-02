@@ -1,16 +1,92 @@
 /**
- * mcukit Embedded Dev Kit - SessionStart: Migration Module (v2.0.0)
+ * mcukit Embedded Dev Kit - SessionStart: Migration Module (v2.1.0)
  *
- * Handles state file migration from legacy paths (docs/) to .mcukit/ structured paths.
+ * Handles state file migration:
+ * 1. Legacy docs/ flat paths → .mcukit/ structured paths (v1.5.7→v1.5.9)
+ * 2. Legacy .bkit/ directory → .mcukit/ directory (v2.1.0, bkit-gstack-sync)
+ *
  * Includes LEGACY_PATHS detection, auto-migration, and version schema upgrades.
  */
 
 const fs = require('fs');
+const path = require('path');
 const { debugLog } = require('../../lib/core/debug');
 
 /**
+ * Migrate .bkit/ → .mcukit/ (v2.1.0)
+ * Copies newer files from .bkit/ subdirs into .mcukit/, then removes .bkit/.
+ * Uses newer-wins strategy: only overwrite if source mtime > target mtime.
+ * @param {object} result - Migration result accumulator
+ */
+function migrateBkitDir(result) {
+  const { getMcukitRoot } = require('../../lib/core/paths');
+  const projectRoot = process.cwd();
+  const bkitDir = path.join(projectRoot, '.bkit');
+  const mcukitDir = path.join(projectRoot, getMcukitRoot());
+
+  if (!fs.existsSync(bkitDir)) return;
+
+  const subdirs = ['state', 'runtime', 'audit', 'checkpoints', 'decisions', 'snapshots', 'workflows'];
+
+  for (const sub of subdirs) {
+    const srcDir = path.join(bkitDir, sub);
+    const dstDir = path.join(mcukitDir, sub);
+    if (!fs.existsSync(srcDir)) continue;
+
+    try {
+      if (!fs.existsSync(dstDir)) {
+        fs.mkdirSync(dstDir, { recursive: true });
+      }
+
+      const entries = fs.readdirSync(srcDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isFile()) continue;
+        const srcFile = path.join(srcDir, entry.name);
+        const dstFile = path.join(dstDir, entry.name);
+
+        // Newer-wins: skip if dest is newer or equal
+        if (fs.existsSync(dstFile)) {
+          const srcStat = fs.statSync(srcFile);
+          const dstStat = fs.statSync(dstFile);
+          if (dstStat.mtimeMs >= srcStat.mtimeMs) continue;
+        }
+
+        fs.copyFileSync(srcFile, dstFile);
+
+        // Rewrite .bkit/ path references inside JSON files
+        if (entry.name.endsWith('.json')) {
+          try {
+            const content = fs.readFileSync(dstFile, 'utf8');
+            if (content.includes('.bkit/')) {
+              const rewritten = content.replace(/\.bkit\//g, '.mcukit/');
+              fs.writeFileSync(dstFile, rewritten, 'utf8');
+            }
+          } catch (_) { /* non-critical */ }
+        }
+      }
+      result.migrated.push(`bkit/${sub}`);
+    } catch (e) {
+      debugLog('SessionStart', `bkit migration failed: ${sub}`, { error: e.message });
+      result.errors.push(`bkit/${sub}`);
+    }
+  }
+
+  // Remove .bkit/ after successful migration
+  if (result.errors.filter(e => e.startsWith('bkit/')).length === 0) {
+    try {
+      fs.rmSync(bkitDir, { recursive: true, force: true });
+      debugLog('SessionStart', 'Removed legacy .bkit/ directory');
+      result.migrated.push('bkit-cleanup');
+    } catch (e) {
+      debugLog('SessionStart', 'Failed to remove .bkit/', { error: e.message });
+    }
+  }
+}
+
+/**
  * Run legacy path migration.
- * Migrates state files from docs/ flat paths to .mcukit/ structured paths.
+ * Migrates state files from docs/ flat paths to .mcukit/ structured paths,
+ * then migrates .bkit/ → .mcukit/ if .bkit/ still exists.
  * @param {object} _input - Hook input (unused, reserved for future use)
  * @returns {{ migrated: string[], errors: string[] }} Migration result
  */
@@ -63,6 +139,13 @@ function run(_input) {
   } catch (e) {
     debugLog('SessionStart', 'Path migration skipped', { error: e.message });
     result.errors.push('init');
+  }
+
+  // v2.1.0: Migrate .bkit/ → .mcukit/ (bkit-gstack-sync)
+  try {
+    migrateBkitDir(result);
+  } catch (e) {
+    debugLog('SessionStart', 'bkit dir migration skipped', { error: e.message });
   }
 
   return result;

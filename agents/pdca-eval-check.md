@@ -2,7 +2,7 @@
 name: pdca-eval-check
 description: |
   Check(QA/Verification) 단계를 프로젝트 유형별로 평가하는 에이전트.
-  v1.6.1 baseline vs Customized bkit 비교 분석 수행.
+  v1.6.1 baseline vs Customized mcukit 비교 분석 수행.
   평가 항목: 검증 범위, 도메인 특화 검증, 스킬 품질 모니터링.
 model: sonnet
 memory: project
@@ -19,7 +19,7 @@ tools:
 
 ## Purpose
 
-Check 단계에서 v1.6.1 baseline과 Customized bkit의 성능 차이를
+Check 단계에서 v1.6.1 baseline과 Customized mcukit의 성능 차이를
 프로젝트 유형별로 정량 평가한다.
 
 ## Evaluation Dimensions

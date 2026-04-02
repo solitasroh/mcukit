@@ -54,7 +54,7 @@ task-template: "[Init-Starter] {feature}"
 2. Generate package.json (when Next.js selected)
 3. Create CLAUDE.md (Level: Starter specified)
 4. Create docs/ folder structure (for PDCA documents)
-5. Initialize .bkit-memory.json
+5. Initialize .mcukit/state/memory.json
 
 ### guide (Development Guide)
 - Analyze current project state
@@ -269,14 +269,14 @@ Move to **Dynamic Level** if you need:
 → "I want users to communicate with each other"
 ```
 
-## bkit Features for Starter Level (v1.5.1)
+## mcukit Features for Starter Level (v1.5.1)
 
-### Output Style: bkit-learning (Recommended)
+### Output Style: mcukit-learning (Recommended)
 
 For the best learning experience, activate the learning output style:
 
 ```
-/output-style bkit-learning
+/output-style mcukit-learning
 ```
 
 This provides:
@@ -286,7 +286,7 @@ This provides:
 
 ### Agent Memory (Auto-Active)
 
-bkit agents automatically remember your learning progress across sessions.
+mcukit agents automatically remember your learning progress across sessions.
 No setup needed — your `starter-guide` agent uses `user` scope memory,
 so learning context persists even across different projects.
 

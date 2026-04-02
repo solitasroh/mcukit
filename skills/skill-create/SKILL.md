@@ -38,7 +38,7 @@ If `/skill-create {name}`:
 3. Ask user to confirm/modify
 
 If `/skill-create from-btw {btw-id}`:
-1. Read btw suggestion from `.bkit/btw-suggestions.json`
+1. Read btw suggestion from `.mcukit/state/btw-suggestions.json`
 2. Use suggestion text as seed for skill description
 3. Use suggestion context for project context
 
@@ -126,7 +126,7 @@ All generated skills go to: `.claude/skills/project/{name}/SKILL.md`
 
 This location:
 - Is git-trackable for team sharing
-- Takes precedence over bkit core skills (2-layer architecture)
+- Takes precedence over mcukit core skills (2-layer architecture)
 - Is auto-loaded by Claude Code's skill discovery
 
 ## Naming Conventions

@@ -55,7 +55,7 @@ task-template: "[Init-Dynamic] {feature}"
 3. Create CLAUDE.md (Level: Dynamic specified)
 4. Create docs/ folder structure
 5. src/lib/bkend.ts client template
-6. Initialize .bkit-memory.json
+6. Initialize .mcukit/state/memory.json
 
 ### guide (Development Guide)
 - bkend.ai auth/data configuration guide
@@ -367,14 +367,14 @@ Move to **Enterprise Level** if you need:
 → "I need complex backend logic"
 ```
 
-## bkit Features for Dynamic Level (v1.5.1)
+## mcukit Features for Dynamic Level (v1.5.1)
 
-### Output Style: bkit-pdca-guide (Recommended)
+### Output Style: mcukit-pdca-guide (Recommended)
 
 For optimal PDCA workflow experience, activate the PDCA guide style:
 
 ```
-/output-style bkit-pdca-guide
+/output-style mcukit-pdca-guide
 ```
 
 This provides:
@@ -398,7 +398,7 @@ Dynamic projects support Agent Teams for parallel PDCA execution:
 
 ### Agent Memory (Auto-Active)
 
-All bkit agents automatically remember project context across sessions.
+All mcukit agents automatically remember project context across sessions.
 No setup needed — agents use `project` scope memory for this codebase.
 
 ---

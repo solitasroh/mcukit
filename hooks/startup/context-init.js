@@ -35,7 +35,7 @@ function run(_input) {
   const importResolver = safeRequire('../../lib/import-resolver.js');
   const contextFork = safeRequire('../../lib/context-fork.js');
 
-  // v2.0.0: Ensure all bkit directories exist (audit/, checkpoints/, decisions/, workflows/, etc.)
+  // v2.0.0: Ensure all mcukit directories exist (audit/, checkpoints/, decisions/, workflows/, etc.)
   try {
     const { ensureMcukitDirs } = require('../../lib/core/paths');
     ensureMcukitDirs();
