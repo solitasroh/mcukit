@@ -1,6 +1,6 @@
 # mcukit 사용 가이드
 
-> **mcukit v0.6.0** — AI Native 임베디드 개발 키트
+> **mcukit v0.7.0** — AI Native 임베디드 개발 키트
 >
 > MCU / MPU(Embedded Linux) / WPF 3개 도메인을 위한 PDCA 기반 AI 개발 워크플로
 
@@ -117,7 +117,7 @@ claude
 /skill-status
 ```
 
-v0.6.0에서 추가된 스킬 6개(`/freeze`, `/guard`, `/reframe`, `/arch-lock`, `/security-review`, `/ship`)가 목록에 표시되면 업데이트가 완료된 것입니다.
+v0.7.0에서 추가된 스킬 4개(`/benchmark`, `/deploy`, `/investigate`, `/retro`)와 self-healing 에이전트가 목록에 표시되면 업데이트가 완료된 것입니다.
 
 ---
 
@@ -642,11 +642,35 @@ Features Completed:
 ------------------------------------------------------
 ```
 
+### 8.3 Living Context System (v0.7.0 신규)
+
+mcukit v0.7.0에서 추가된 Living Context System은 7개 모듈로 구성된 런타임 컨텍스트 분석 시스템입니다.
+
+| 모듈 | 역할 |
+|------|------|
+| `context-loader` | 프로젝트 컨텍스트 수집 및 캐싱 |
+| `impact-analyzer` | 코드 변경의 영향 범위 분석 |
+| `invariant-checker` | 아키텍처 불변 조건 검증 |
+| `scenario-runner` | 시나리오 기반 검증 실행 |
+| `self-healing` | 일반적 실패 패턴 자동 감지 및 복구 |
+| `ops-metrics` | 운영 메트릭 수집 및 분석 |
+| `decision-record` | 의사결정 기록 및 추적 |
+
+Living Context System은 PDCA 사이클 전반에 걸쳐 자동으로 동작하며, 별도의 명령 없이 에이전트가 활용합니다.
+
+### 8.4 `.bkit/` → `.mcukit/` 자동 마이그레이션
+
+기존 bkit 기반 상태 디렉토리(`.bkit/`)가 감지되면 세션 시작 시 자동으로 `.mcukit/`으로 마이그레이션합니다.
+
+- **Newer-wins 전략**: 양쪽 모두 존재하는 파일은 최신 파일이 우선
+- **JSON 콘텐츠 변환**: JSON 파일 내 `.bkit/` 경로 참조를 `.mcukit/`으로 자동 변환
+- **원본 제거**: 마이그레이션 성공 후 `.bkit/` 디렉토리 삭제
+
 ---
 
 ## 9. 도메인별 전문 에이전트
 
-mcukit은 40개의 AI 에이전트를 제공합니다. 키워드를 입력하면 자동으로 적합한 에이전트가 활성화됩니다.
+mcukit은 40개의 AI 에이전트와 54개의 스킬을 제공합니다. 키워드를 입력하면 자동으로 적합한 에이전트가 활성화됩니다.
 
 ### 9.1 MCU 전문 에이전트
 
@@ -683,6 +707,7 @@ mcukit은 40개의 AI 에이전트를 제공합니다. 키워드를 입력하면
 | `security-architect` | 보안 아키텍처 + STRIDE | 보안, security, 취약점 |
 | `design-validator` | 설계 문서 검증 + 점수 | 설계 검증, validate design |
 | `cto-lead` | CTO 레벨 팀 오케스트레이션 | team, 팀 구성, CTO |
+| `self-healing` | 자동 오류 감지 및 복구 | self-healing, 자동 복구 |
 
 ---
 
@@ -719,7 +744,16 @@ mcukit은 40개의 AI 에이전트를 제공합니다. 키워드를 입력하면
 | `xaml-design` | WPF | XAML UI 디자인/스타일 가이드 |
 | `serial-bridge` | MCU+WPF | MCU↔WPF 시리얼 통신 브릿지 |
 
-### 10.4 딜리버리/유틸리티 스킬
+### 10.4 Ops/분석 스킬 (v0.7.0 신규)
+
+| 스킬 | 명령 | 설명 |
+|------|------|------|
+| `benchmark` | `/benchmark {feature}` | 성능 측정 및 회귀 추적 |
+| `deploy` | `/deploy {action}` | 배포 워크플로 관리 |
+| `investigate` | `/investigate {issue}` | 버그/인시던트 근본 원인 분석 |
+| `retro` | `/retro {feature}` | PDCA 사이클 구조화 회고 |
+
+### 10.5 딜리버리/유틸리티 스킬
 
 | 스킬 | 명령 | 설명 |
 |------|------|------|
@@ -795,4 +829,7 @@ MIT
 
 ## 기반 기술
 
-PDCA 코어 엔진은 [bkit-claude-code](https://github.com/popup-studio-ai/bkit-claude-code) (Apache 2.0, POPUP STUDIO)에서 포팅되었습니다. v0.6.0 안전/품질 기능은 [gstack](https://github.com/garrytan/gstack) (Garry Tan)의 패턴을 임베디드 도메인에 적응한 것입니다.
+- PDCA 코어 엔진: [bkit-claude-code](https://github.com/popup-studio-ai/bkit-claude-code) (Apache 2.0, POPUP STUDIO)
+- 안전/품질/Ops 패턴: [gstack](https://github.com/garrytan/gstack) (MIT, Garry Tan)
+
+자세한 라이선스 귀속은 [NOTICE.md](../NOTICE.md)를 참고하세요.

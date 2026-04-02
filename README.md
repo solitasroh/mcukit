@@ -78,14 +78,15 @@ claude
 
 | Component | Count | Description |
 |-----------|:-----:|-------------|
-| **Skills** | 50 | Domain knowledge, PDCA workflow, safety, security, delivery |
-| **Agents** | 39 | AI specialists (fw-architect, linux-bsp-expert, wpf-architect, CTO, PM team...) |
+| **Skills** | 54 | Domain knowledge, PDCA workflow, safety, security, delivery, ops |
+| **Agents** | 40 | AI specialists (fw-architect, linux-bsp-expert, wpf-architect, self-healing, CTO, PM team...) |
 | **Hook Events** | 7 | Essential lifecycle hooks (session, safety, build, compaction) |
 | **Output Styles** | 4 | Response formatting (learning, pdca-guide, embedded, pdca-embedded) |
-| **Templates** | 38 | PDCA documents, domain specs, pipeline phases, shared patterns |
-| **MCP Servers** | 2 | PDCA status & metrics, code quality & gap analysis |
+| **Templates** | 27 | PDCA documents, domain specs, pipeline phases, shared patterns |
+| **Lib Modules** | 108 | Core engine, PDCA state machine, Living Context System, quality metrics |
+| **MCP Servers** | 2 | PDCA status & metrics (10 tools), code quality & gap analysis (6 tools) |
+| **Evals** | 21 | Skill evaluation prompts (workflow, capability, hybrid) |
 | **Refs** | 5 | Code pattern references (HAL, SDK, DTS, Yocto, MVVM) |
-| **Integration Tests** | 76 | All passing |
 
 ## Key Features
 
@@ -113,6 +114,15 @@ claude
 - **STRIDE Security Review**: Domain-specific threat modeling (`/security-review`)
 - **GitLab MR Automation**: `glab` CLI-based merge request creation (`/ship mr`)
 
+### Living Context & Ops (v0.7.0)
+- **Living Context System**: 7 modules for runtime context analysis (context-loader, impact-analyzer, invariant-checker, scenario-runner, self-healing, ops-metrics, decision-record)
+- **Self-Healing Agent**: Auto-detect and recover from common failure patterns
+- **Benchmark Skill**: Performance measurement and regression tracking (`/benchmark`)
+- **Deploy Skill**: Deployment workflow management (`/deploy`)
+- **Investigate Skill**: Root cause analysis for bugs and incidents (`/investigate`)
+- **Retro Skill**: Structured retrospective for PDCA cycles (`/retro`)
+- **Auto Migration**: `.bkit/` → `.mcukit/` state directory migration with JSON content rewrite
+
 ## Requirements
 
 - Claude Code v2.1.78 or later
@@ -124,4 +134,7 @@ MIT
 
 ## Based On
 
-Core PDCA engine ported from [bkit-claude-code](https://github.com/popup-studio-ai/bkit-claude-code) (Apache 2.0) by POPUP STUDIO.
+- Core PDCA engine ported from [bkit-claude-code](https://github.com/popup-studio-ai/bkit-claude-code) (Apache 2.0) by POPUP STUDIO
+- Safety/quality patterns adapted from [gstack](https://github.com/garrytan/gstack) (MIT) by Garry Tan
+
+See [NOTICE.md](NOTICE.md) for full attribution.

@@ -1,8 +1,8 @@
 {
   "name": "mcukit",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "displayName": "mcukit — AI Native Embedded Development Kit",
-  "description": "PDCA-driven MCU/MPU/WPF development with domain-specific AI agents. Supports STM32, NXP Kinetis K, i.MX6/i.MX6ULL/i.MX28, and C#/WPF. One Kit, Three Domains.",
+  "description": "PDCA-driven MCU/MPU/WPF development with 40 agents, 54 skills, Living Context System. Supports STM32, NXP Kinetis K, i.MX6/i.MX6ULL/i.MX28, and C#/WPF. One Kit, Three Domains.",
   "author": {
     "name": "solitasroh"
   },

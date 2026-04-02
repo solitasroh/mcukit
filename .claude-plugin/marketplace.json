@@ -11,8 +11,8 @@
     {
       "name": "mcukit",
       "source": "./",
-      "description": "PDCA-driven MCU/MPU/WPF development with domain-specific AI agents",
-      "version": "0.6.2",
+      "description": "PDCA-driven MCU/MPU/WPF development with 40 agents, 54 skills, Living Context System",
+      "version": "0.7.0",
       "author": {
         "name": "solitasroh"
       },
