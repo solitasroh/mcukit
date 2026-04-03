@@ -65,7 +65,129 @@ class CreateOrderUseCase {
 
 ---
 
-## 2. OOP Principles — Practical Application
+## 2. Architecture Selection Guide
+
+### When to use which architecture?
+
+| Project Characteristic | Architecture | Why |
+|----------------------|--------------|-----|
+| Small app, <10 use cases | **Simple layered** | Over-engineering kills velocity |
+| Medium app, clear domain rules | **Clean Architecture** | Business logic isolated from frameworks |
+| Many independent features, rapid delivery | **Vertical Slice** | Feature = folder, zero cross-feature coupling |
+| Large app with future microservice split | **Modular Monolith** | Module boundaries = future service boundaries |
+| Heavy external integrations (APIs, DBs, queues) | **Hexagonal (Ports & Adapters)** | Swap adapters without touching core |
+| Mix of complex + simple features | **Hybrid** | Complex features → Clean, simple CRUD → Vertical Slice |
+
+### Clean Architecture — Practical Directory Structure
+
+```
+src/
+├── Domain/                    # Pure business logic, ZERO dependencies
+│   ├── Entities/              # Order, User, Product (rich, not anemic)
+│   ├── ValueObjects/          # Money, Email, Address (immutable, self-validating)
+│   ├── Events/                # OrderConfirmedEvent (domain events)
+│   ├── Interfaces/            # IOrderRepository, IEmailSender (ports)
+│   └── Exceptions/            # DomainException, BusinessRuleViolation
+│
+├── Application/               # Use cases, orchestration
+│   ├── Orders/                # Feature-grouped
+│   │   ├── Commands/          # CreateOrderCommand + Handler
+│   │   ├── Queries/           # GetOrderQuery + Handler
+│   │   └── DTOs/              # OrderDto, CreateOrderRequest
+│   ├── Common/
+│   │   ├── Behaviors/         # ValidationBehavior, LoggingBehavior (pipeline)
+│   │   └── Interfaces/        # IUnitOfWork, ICurrentUser
+│   └── DependencyInjection.cs
+│
+├── Infrastructure/            # External world adapters
+│   ├── Persistence/           # EF DbContext, Repositories
+│   ├── ExternalServices/      # EmailSender, PaymentGateway
+│   ├── Identity/              # Auth provider implementation
+│   └── DependencyInjection.cs
+│
+└── Presentation/              # Entry point (API, UI)
+    ├── Controllers/           # or Endpoints/ (minimal API)
+    ├── Middleware/             # Exception handling, auth
+    └── Program.cs             # Composition root
+```
+
+### Vertical Slice — Feature-First Directory
+
+```
+src/
+├── Features/
+│   ├── Orders/
+│   │   ├── CreateOrder.cs     # Request + Handler + Validator + Response — ALL IN ONE
+│   │   ├── GetOrder.cs
+│   │   ├── CancelOrder.cs
+│   │   └── OrderEntity.cs     # Entity lives with its feature
+│   ├── Users/
+│   │   ├── RegisterUser.cs
+│   │   └── GetUserProfile.cs
+│   └── Shared/                # Cross-feature abstractions only
+│       ├── IRepository.cs
+│       └── Result.cs
+└── Program.cs
+```
+
+### Hexagonal (Ports & Adapters) — Core + Ports + Adapters
+
+```
+src/
+├── Core/                      # Business logic
+│   ├── Domain/                # Entities, Value Objects
+│   └── Ports/                 # Interfaces (what the core NEEDS)
+│       ├── Inbound/           # ICreateOrderUseCase (driven by)
+│       └── Outbound/          # IOrderRepository, IEmailPort (drives)
+│
+├── Adapters/
+│   ├── Inbound/               # REST controller, CLI, gRPC (drives the core)
+│   │   └── OrderController.cs
+│   └── Outbound/              # DB, Email, Queue (driven by the core)
+│       ├── PostgresOrderRepo.cs
+│       └── SmtpEmailAdapter.cs
+│
+└── Config/                    # Wiring adapters to ports
+    └── DependencyInjection.cs
+```
+
+### How layers communicate — Data Flow
+
+```
+Request (HTTP/CLI/Event)
+    ↓
+[Presentation] — validates input, maps to command/query DTO
+    ↓
+[Application] — orchestrates use case, calls domain + infrastructure via interfaces
+    ↓
+[Domain] — enforces business rules, raises domain events
+    ↑
+[Infrastructure] — implements interfaces defined by domain (repository, email, etc.)
+    ↓
+Response (DTO → JSON/View)
+
+KEY RULES:
+- Data crosses boundaries via DTOs or primitive types, never domain entities
+- Domain NEVER imports from Application/Infrastructure/Presentation
+- Infrastructure implements Domain interfaces (Dependency Inversion)
+- Application coordinates, Domain decides, Infrastructure executes
+```
+
+### Adding a new feature — Decision Checklist
+
+When asked to add a new feature, follow this checklist:
+
+1. **Does it change business rules?** → Domain layer (entity method, value object)
+2. **Does it orchestrate multiple steps?** → Application layer (use case / handler)
+3. **Does it need external I/O?** → Infrastructure layer (implement domain interface)
+4. **Does it need a new UI/API endpoint?** → Presentation layer
+5. **Does it need a new interface?** → Define in Domain, implement in Infrastructure
+6. **Is it cross-cutting (logging, validation, auth)?** → Pipeline behavior / middleware
+7. **Is it a new independent feature?** → Consider vertical slice (own folder)
+
+---
+
+## 3. OOP Principles — Practical Application
 
 ### 2.1 Composition Over Inheritance
 
@@ -132,7 +254,7 @@ class NotificationService {
 
 ---
 
-## 3. Design Pattern Selection
+## 4. Design Pattern Selection
 
 Use a pattern when it eliminates a structural problem. Do NOT use one when a simple conditional suffices.
 
@@ -182,7 +304,7 @@ class GzipCompressor:
 
 ---
 
-## 4. Code Smells & Anti-Patterns
+## 5. Code Smells & Anti-Patterns
 
 | Smell | Symptom | Fix |
 |-------|---------|-----|
@@ -223,7 +345,7 @@ function createOrder(price: Money, email: Email) {
 
 ---
 
-## 5. Sizing Limits (Enforced by PostToolUse Hook)
+## 6. Sizing Limits (Enforced by PostToolUse Hook)
 
 | Metric | Limit | Action When Exceeded |
 |--------|-------|---------------------|
@@ -235,7 +357,7 @@ function createOrder(price: Money, email: Email) {
 
 ---
 
-## 6. Self-Check (Run Before Completing Any Code Task)
+## 7. Self-Check (Run Before Completing Any Code Task)
 
 1. Does each function/class have a single, nameable responsibility?
 2. Could I add a new variant without editing existing code?
@@ -247,7 +369,7 @@ function createOrder(price: Money, email: Email) {
 
 ---
 
-## 7. Reference Repositories
+## 8. Reference Repositories
 
 Study these repos for excellent code structure in each language:
 
