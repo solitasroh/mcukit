@@ -12,6 +12,7 @@ description: |
 user-invocable: false
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 imports:
+  - ${PLUGIN_ROOT}/refs/code-quality/common.md
   - ${PLUGIN_ROOT}/refs/code-quality/cpp.md
   - ${PLUGIN_ROOT}/refs/code-quality/csharp.md
 ---

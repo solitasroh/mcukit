@@ -30,6 +30,7 @@ allowed-tools:
 imports:
   - ${PLUGIN_ROOT}/templates/pipeline/phase-8-review.template.md
   - ${PLUGIN_ROOT}/skills/rkit-rules/SKILL.md
+  - ${PLUGIN_ROOT}/refs/code-quality/common.md
   - ${PLUGIN_ROOT}/refs/code-quality/cpp.md
   - ${PLUGIN_ROOT}/refs/code-quality/csharp.md
 next-skill: null
