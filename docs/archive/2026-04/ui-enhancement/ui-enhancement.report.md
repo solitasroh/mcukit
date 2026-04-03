@@ -1,7 +1,7 @@
 # ui-enhancement Completion Report
 
 > **Feature**: ui-enhancement
-> **Project**: mcukit v0.7.0
+> **Project**: rkit v0.7.0
 > **Date**: 2026-04-03
 > **Author**: soojang.roh
 
@@ -52,7 +52,7 @@
 
 - 3가지 옵션 → **Option B (Clean)** 선택: engines/ + components/ 완전 분리
 - 컴포넌트 인터페이스: `{ terminal(), context(), renderXxx() }`
-- config-loader: mcukit.config.json ui 섹션 로드 + 기본값 병합
+- config-loader: rkit.config.json ui 섹션 로드 + 기본값 병합
 
 ### 2.3 Do
 

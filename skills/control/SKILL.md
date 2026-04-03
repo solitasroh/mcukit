@@ -4,7 +4,7 @@ classification: workflow
 classification-reason: Automation control persists regardless of model advancement
 deprecation-risk: none
 description: |
-  Control mcukit automation level and view system status.
+  Control rkit automation level and view system status.
   Manage L0-L4 automation levels, trust score, and active guardrails.
 
   Use proactively when user wants to adjust automation behavior, check trust score,
@@ -37,7 +37,7 @@ task-template: "[Control] {action}"
 
 # Control Skill
 
-> User-invocable skill for managing mcukit automation level and system status.
+> User-invocable skill for managing rkit automation level and system status.
 
 ## Arguments
 
@@ -66,8 +66,8 @@ task-template: "[Control] {action}"
 
 Display the current automation control state.
 
-1. Read runtime control state from `.mcukit/runtime/control-state.json`
-2. Read trust score from `.mcukit/state/trust-score.json`
+1. Read runtime control state from `.rkit/runtime/control-state.json`
+2. Read trust score from `.rkit/state/trust-score.json`
 3. Read active guardrails from `lib/control/` configuration
 4. Read freeze status from `lib/control/freeze-manager.js`
 5. Read guard mode status from `lib/control/guard-mode.js`
@@ -75,7 +75,7 @@ Display the current automation control state.
 
 **Output Format**:
 ```
---- mcukit Control Panel ----------------------------
+--- rkit Control Panel ----------------------------
 Automation Level : L2 (Semi-Auto)
 Trust Score      : 72/100
 Active Guardrails: 8/8
@@ -101,10 +101,10 @@ Guardrails:
 Set the automation level manually.
 
 1. Validate input is a number 0-4
-2. Read current level from `.mcukit/runtime/control-state.json`
+2. Read current level from `.rkit/runtime/control-state.json`
 3. If escalating (going higher), warn user about reduced oversight
 4. If de-escalating, apply immediately without confirmation
-5. Update `.mcukit/runtime/control-state.json` with new level
+5. Update `.rkit/runtime/control-state.json` with new level
 6. Write audit log entry via `lib/audit/audit-logger.js`
 7. Display confirmation with new level details
 
@@ -124,7 +124,7 @@ Level decreases are immediate (safe direction).
 
 Pause all automation immediately.
 
-1. Save current level to `.mcukit/runtime/control-state.json` as `previousLevel`
+1. Save current level to `.rkit/runtime/control-state.json` as `previousLevel`
 2. Set level to L0 (Manual)
 3. Set `paused: true` flag
 4. Write audit log: `automation_paused`
@@ -134,7 +134,7 @@ Pause all automation immediately.
 
 Resume automation to the previous level before pause.
 
-1. Read `previousLevel` from `.mcukit/runtime/control-state.json`
+1. Read `previousLevel` from `.rkit/runtime/control-state.json`
 2. If not paused, display: "Automation is not paused."
 3. Restore level to `previousLevel`
 4. Clear `paused` flag
@@ -145,7 +145,7 @@ Resume automation to the previous level before pause.
 
 Show trust score details and contributing factors.
 
-1. Read trust score from `.mcukit/state/trust-score.json`
+1. Read trust score from `.rkit/state/trust-score.json`
 2. Calculate score breakdown:
    - PDCA completion rate (0-25 points)
    - Match rate average (0-25 points)
@@ -179,8 +179,8 @@ Level Recommendation: L2 (Semi-Auto)
 
 | File | Purpose |
 |------|---------|
-| `.mcukit/runtime/control-state.json` | Runtime control state (level, paused, previousLevel) |
-| `.mcukit/state/trust-score.json` | Trust score and contributing metrics |
+| `.rkit/runtime/control-state.json` | Runtime control state (level, paused, previousLevel) |
+| `.rkit/state/trust-score.json` | Trust score and contributing metrics |
 
 ## Module Dependencies
 

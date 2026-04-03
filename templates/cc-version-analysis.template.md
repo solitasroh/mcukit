@@ -1,23 +1,23 @@
 ---
 template: cc-version-analysis
 version: 1.0
-description: CC version impact analysis and mcukit improvement report template
+description: CC version impact analysis and rkit improvement report template
 variables:
   - feature: Feature name (cc-version-analysis identifier)
   - date: Creation date (YYYY-MM-DD)
   - author: Author (typically CTO Team + Agent count)
   - from_version: Baseline CC version
   - to_version: Target CC version
-  - project: mcukit project name
-  - version: mcukit version
+  - project: rkit project name
+  - version: rkit version
 ---
 
-# CC v{from_version} → v{to_version} 영향 분석 및 mcukit 개선 보고서
+# CC v{from_version} → v{to_version} 영향 분석 및 rkit 개선 보고서
 
 > **Status**: ✅ Complete / 🔄 In Progress
 >
 > **Project**: {project}
-> **mcukit Version**: {version}
+> **rkit Version**: {version}
 > **Author**: {author}
 > **Date**: {date}
 > **PDCA Cycle**: #{cycle_number}
@@ -55,7 +55,7 @@ variables:
 
 | 관점 | 내용 |
 |------|------|
-| **문제** | CC CLI v{to_version} 업그레이드에 따른 mcukit 호환성 및 개선 기회 파악 필요 |
+| **문제** | CC CLI v{to_version} 업그레이드에 따른 rkit 호환성 및 개선 기회 파악 필요 |
 | **해결 방법** | 체계적 3-Phase 분석 (조사 → 영향 분석 → 브레인스토밍) |
 | **기능/UX 효과** | {specific effects} |
 | **핵심 가치** | {core value delivered} |
@@ -67,7 +67,7 @@ variables:
 | Phase | 문서 | 상태 |
 |-------|------|------|
 | Research | CC 버전 변경사항 조사 | ✅ / 🔄 |
-| Impact | mcukit 영향 분석 | ✅ / 🔄 |
+| Impact | rkit 영향 분석 | ✅ / 🔄 |
 | Plan | [{feature}.plan.md](../01-plan/features/{feature}.plan.md) | ✅ / 🔄 |
 | Report | 본 문서 | 🔄 작성 완료 |
 
@@ -83,17 +83,17 @@ variables:
 
 ### 3.2 Breaking Changes
 
-| 변경사항 | 영향도 | mcukit 영향 | 마이그레이션 필요 |
+| 변경사항 | 영향도 | rkit 영향 | 마이그레이션 필요 |
 |---------|--------|----------|-----------------|
 
 ### 3.3 신규 기능
 
-| 기능 | 설명 | mcukit ENH 기회 |
+| 기능 | 설명 | rkit ENH 기회 |
 |------|------|--------------|
 
 ### 3.4 버그 수정
 
-| 이슈 | 설명 | mcukit 영향 |
+| 이슈 | 설명 | rkit 영향 |
 |------|------|----------|
 
 ### 3.5 시스템 프롬프트 변경
@@ -103,12 +103,12 @@ variables:
 
 ### 3.6 Hook 이벤트 변경
 
-| 이벤트 | 상태 | mcukit 사용 여부 |
+| 이벤트 | 상태 | rkit 사용 여부 |
 |--------|------|---------------|
 
 ---
 
-## 4. mcukit 영향 분석
+## 4. rkit 영향 분석
 
 ### 4.1 영향 요약
 
@@ -120,7 +120,7 @@ variables:
 
 ### 4.2 ENH 기회 목록
 
-| ENH | Priority | CC 기능 | mcukit 영향 | 영향 파일 |
+| ENH | Priority | CC 기능 | rkit 영향 | 영향 파일 |
 |-----|----------|--------|----------|----------|
 | ENH-{N} | P{0-3} | {feature} | {impact} | {files} |
 
@@ -140,7 +140,7 @@ variables:
 
 ### 5.1 호환성 매트릭스
 
-| CC 버전 | mcukit 호환 | 테스트 결과 | 비고 |
+| CC 버전 | rkit 호환 | 테스트 결과 | 비고 |
 |---------|----------|-----------|------|
 
 ### 5.2 연속 호환 릴리스
@@ -212,12 +212,12 @@ v2.1.34 ────────────────────────
 
 ### 8.1 관련 Open Issues
 
-| Issue # | 제목 | 영향도 | mcukit 대응 |
+| Issue # | 제목 | 영향도 | rkit 대응 |
 |---------|------|--------|----------|
 
 ### 8.2 관련 Closed Issues (이번 버전)
 
-| Issue # | 제목 | 해결 버전 | mcukit 영향 |
+| Issue # | 제목 | 해결 버전 | rkit 영향 |
 |---------|------|----------|----------|
 
 ---
@@ -228,7 +228,7 @@ v2.1.34 ────────────────────────
 
 - **호환성**: ✅ PASS / ❌ FAIL
 - **업그레이드 권장**: YES / NO / CONDITIONAL
-- **mcukit 버전 업데이트 필요**: YES (v{next_version}) / NO
+- **rkit 버전 업데이트 필요**: YES (v{next_version}) / NO
 
 ### 9.2 핵심 권고사항
 
@@ -239,6 +239,6 @@ v2.1.34 ────────────────────────
 ### 9.3 다음 단계
 
 - [ ] ENH P0 항목 즉시 구현
-- [ ] mcukit.config.json CC 추천 버전 업데이트
+- [ ] rkit.config.json CC 추천 버전 업데이트
 - [ ] MEMORY.md CC 버전 히스토리 업데이트
 - [ ] 연속 호환 릴리스 카운트 업데이트

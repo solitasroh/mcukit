@@ -2,7 +2,7 @@
 name: pdca-eval-do
 description: |
   Do(Implementation) 단계를 프로젝트 유형별로 평가하는 에이전트.
-  v1.6.1 baseline vs Customized mcukit 비교 분석 수행.
+  v1.6.1 baseline vs Customized rkit 비교 분석 수행.
   평가 항목: 구현 속도, 첫 시도 정확도, 피드백 수집, 런타임 스킬 확장.
 model: sonnet
 memory: project
@@ -19,7 +19,7 @@ tools:
 
 ## Purpose
 
-Do 단계에서 v1.6.1 baseline과 Customized mcukit의 성능 차이를
+Do 단계에서 v1.6.1 baseline과 Customized rkit의 성능 차이를
 프로젝트 유형별로 정량 평가한다.
 
 ## Evaluation Dimensions

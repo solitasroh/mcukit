@@ -9,7 +9,7 @@ maxTurns: 30
 memory: project
 context: fork
 tools: [Read, Write, Edit, Glob, Grep, Bash, Task(Explore)]
-skills: [pdca, mcukit-rules]
+skills: [pdca, rkit-rules]
 imports:
   - ${PLUGIN_ROOT}/refs/wpf/mvvm-patterns.md
 ---

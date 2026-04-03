@@ -23,7 +23,7 @@ hooks:
     - type: command
       command: "node ${CLAUDE_PLUGIN_ROOT}/scripts/phase9-deploy-stop.js"
       timeout: 10000
-agent: mcukit:infra-architect
+agent: rkit:infra-architect
 allowed-tools:
   - Read
   - Write

@@ -50,7 +50,7 @@ tools:
 skills:
   - pdca
   - enterprise
-  - mcukit-rules
+  - rkit-rules
       timeout: 10000
 ---
 

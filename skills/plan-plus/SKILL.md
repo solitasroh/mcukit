@@ -5,7 +5,7 @@ classification-reason: Combines workflow automation with capability-dependent fe
 deprecation-risk: low
 description: |
   Plan Plus — Brainstorming-Enhanced PDCA Planning.
-  Combines intent discovery from brainstorming methodology with mcukit PDCA's structured planning.
+  Combines intent discovery from brainstorming methodology with rkit PDCA's structured planning.
   Produces higher-quality Plan documents by exploring user intent, comparing alternatives,
   and applying YAGNI review before document generation.
 
@@ -50,7 +50,7 @@ hooks:
 
 # Plan Plus — Brainstorming-Enhanced PDCA Planning
 
-> Combines brainstorming's intent discovery with mcukit PDCA's structured planning to produce
+> Combines brainstorming's intent discovery with rkit PDCA's structured planning to produce
 > higher-quality Plan documents through collaborative dialogue.
 
 ## Overview
@@ -102,7 +102,7 @@ Before asking any questions, explore the current project state:
 1. Read CLAUDE.md, package.json, pom.xml, etc. for project information
 2. Check recent 5 git commits (understand current work direction)
 3. Check existing `docs/01-plan/` documents (prevent duplication)
-4. Check `.mcukit/state/memory.json` (check ongoing PDCA status)
+4. Check `.rkit/state/memory.json` (check ongoing PDCA status)
 
 > Share exploration results briefly: "I've reviewed the current project state: ..."
 
@@ -193,7 +193,7 @@ Generate the Plan document using `plan-plus.template.md` with results from Phase
 
 After document generation, update PDCA status:
 - Create Task: `[Plan] {feature}`
-- Update .mcukit/state/memory.json: phase = "plan"
+- Update .rkit/state/memory.json: phase = "plan"
 
 ### Phase 6: Next Steps
 

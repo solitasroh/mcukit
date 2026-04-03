@@ -31,6 +31,6 @@
 ## Step 5: Output and PDCA Integration
 21. Save PRD document to docs/00-pm/team-collaboration.prd.md
 22. Create Task: [PM] team-collaboration
-23. Update .mcukit/state/memory.json: set phase = "pm" for feature team-collaboration
+23. Update .rkit/state/memory.json: set phase = "pm" for feature team-collaboration
 24. Guide user to next step: /pdca plan team-collaboration (PRD auto-referenced in Plan)
 25. Explain that Plan document quality will be significantly improved with PM-backed data

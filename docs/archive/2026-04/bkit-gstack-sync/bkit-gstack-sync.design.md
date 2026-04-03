@@ -2,7 +2,7 @@
 
 > **Summary**: bkit 흔적 완전 제거 + lib/context/ 임베디드 재작성 + MCP 서버 재작성 + gstack 영감 스킬 3개 신규 설계
 >
-> **Project**: mcukit
+> **Project**: rkit
 > **Version**: 0.6.2 → 0.7.0
 > **Author**: soojang.roh
 > **Date**: 2026-04-02
@@ -16,7 +16,7 @@
 
 ### 1.1 Design Goals
 
-1. **bkit 완전 독립**: 코드베이스에서 bkit 참조를 완전히 제거하여 mcukit이 독립 프로젝트로 진화 가능하게 함
+1. **bkit 완전 독립**: 코드베이스에서 bkit 참조를 완전히 제거하여 rkit이 독립 프로젝트로 진화 가능하게 함
 2. **임베디드 특화 컨텍스트 시스템**: bkit v2.0.6의 Living Context System을 웹 중심 로직 없이 MCU/MPU/WPF 전용으로 재설계
 3. **MCP 서버 경로 중앙화**: paths.js를 MCP 서버에서도 import하여 경로 관리 일원화
 4. **gstack 임베디드 도구**: `/benchmark`, `/investigate`, `/retro`를 3도메인 프리셋으로 신규 설계
@@ -36,17 +36,17 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     mcukit Plugin                            │
+│                     rkit Plugin                            │
 │                                                              │
 │  ┌──────────┐  ┌───────────────┐  ┌──────────────────────┐  │
 │  │ paths.js │◀─│ MCP Servers   │  │ lib/context/         │  │
-│  │ (SSOT)   │  │ mcukit-pdca   │  │ (NEW: embedded-only) │  │
-│  │          │◀─│ mcukit-analysis│  │                      │  │
+│  │ (SSOT)   │  │ rkit-pdca   │  │ (NEW: embedded-only) │  │
+│  │          │◀─│ rkit-analysis│  │                      │  │
 │  └────┬─────┘  └───────────────┘  └──────────┬───────────┘  │
 │       │                                       │              │
 │       ▼                                       ▼              │
 │  ┌─────────┐  ┌────────────┐  ┌──────────────────────────┐  │
-│  │.mcukit/ │  │ domain/    │  │ skills/ (NEW x4)         │  │
+│  │.rkit/ │  │ domain/    │  │ skills/ (NEW x4)         │  │
 │  │ state/  │  │ detector.js│──│ benchmark, investigate,  │  │
 │  │ runtime/│  │            │  │ retro, deploy            │  │
 │  │ audit/  │  └────────────┘  └──────────────────────────┘  │
@@ -86,20 +86,20 @@ Plan Document ──→ context-loader.js ──→ Context Anchor (5줄 요약)
 
 #### 3.1.1 런타임 경로 통일
 
-**현재 상태**: `paths.js`는 이미 `.mcukit/`을 사용하지만, MCP 서버와 일부 스크립트가 `.bkit/`을 하드코딩
+**현재 상태**: `paths.js`는 이미 `.rkit/`을 사용하지만, MCP 서버와 일부 스크립트가 `.bkit/`을 하드코딩
 
 **변경 계획**:
 
 | 파일 | 현재 | 변경 |
 |------|------|------|
-| `servers/mcukit-pdca-server/index.js` | `const BKIT_DIR = path.join(ROOT, '.bkit')` | `const { STATE_PATHS } = require('../../lib/core/paths')` |
-| `servers/mcukit-analysis-server/index.js` | `const BKIT_DIR = path.join(ROOT, '.bkit')` | `const { STATE_PATHS } = require('../../lib/core/paths')` |
-| `servers/*/package.json` | `"name": "bkit-*-server"` | `"name": "mcukit-*-server"` |
+| `servers/rkit-pdca-server/index.js` | `const BKIT_DIR = path.join(ROOT, '.bkit')` | `const { STATE_PATHS } = require('../../lib/core/paths')` |
+| `servers/rkit-analysis-server/index.js` | `const BKIT_DIR = path.join(ROOT, '.bkit')` | `const { STATE_PATHS } = require('../../lib/core/paths')` |
+| `servers/*/package.json` | `"name": "bkit-*-server"` | `"name": "rkit-*-server"` |
 
 MCP 서버의 `statePath()`, `auditPath()`, `checkpointsDir()` 함수를 paths.js의 `STATE_PATHS`로 교체:
 
 ```javascript
-// BEFORE (servers/mcukit-pdca-server/index.js)
+// BEFORE (servers/rkit-pdca-server/index.js)
 const ROOT = process.env.BKIT_ROOT || process.cwd();
 const BKIT_DIR = path.join(ROOT, '.bkit');
 function statePath(filename) { return path.join(BKIT_DIR, 'state', filename); }
@@ -121,9 +121,9 @@ const RESOURCES = [
 
 // AFTER
 const RESOURCES = [
-  { uri: 'mcukit://pdca/status', ... },
-  { uri: 'mcukit://quality/metrics', ... },
-  { uri: 'mcukit://audit/latest', ... },
+  { uri: 'rkit://pdca/status', ... },
+  { uri: 'rkit://quality/metrics', ... },
+  { uri: 'rkit://audit/latest', ... },
 ];
 ```
 
@@ -142,7 +142,7 @@ const RESOURCES = [
 | `handleBkitMetricsGet()` | `handleMetricsGet()` |
 | `handleBkitMetricsHistory()` | `handleMetricsHistory()` |
 
-> MCP 도구 이름(mcukit_pdca_status 등)은 이미 mcukit 접두사이므로 변경 불필요.
+> MCP 도구 이름(rkit_pdca_status 등)은 이미 rkit 접두사이므로 변경 불필요.
 
 #### 3.1.4 lib/pdca/status.js 함수명 치환
 
@@ -153,15 +153,15 @@ const RESOURCES = [
 
 호출자 전수 검색 후 일괄 치환. `lib/common.js` bridge에서도 re-export 갱신.
 
-#### 3.1.5 .bkit/ → .mcukit/ 데이터 마이그레이션
+#### 3.1.5 .bkit/ → .rkit/ 데이터 마이그레이션
 
 `hooks/startup/migration.js`에 v0.7.0 마이그레이션 추가:
 
 ```javascript
-// v0.7.0: .bkit/ → .mcukit/ final migration
+// v0.7.0: .bkit/ → .rkit/ final migration
 function migrateBkitToMcukit(projectDir) {
   const bkitDir = path.join(projectDir, '.bkit');
-  const mcukitDir = path.join(projectDir, '.mcukit');
+  const rkitDir = path.join(projectDir, '.rkit');
 
   if (!fs.existsSync(bkitDir)) return { migrated: false, reason: 'no .bkit/' };
 
@@ -170,7 +170,7 @@ function migrateBkitToMcukit(projectDir) {
 
   for (const sub of subdirs) {
     const src = path.join(bkitDir, sub);
-    const dest = path.join(mcukitDir, sub);
+    const dest = path.join(rkitDir, sub);
     if (!fs.existsSync(src)) continue;
     if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
 
@@ -186,10 +186,10 @@ function migrateBkitToMcukit(projectDir) {
   }
 
   // pdca-status.json 내부 경로 치환
-  const statusPath = path.join(mcukitDir, 'state', 'pdca-status.json');
+  const statusPath = path.join(rkitDir, 'state', 'pdca-status.json');
   if (fs.existsSync(statusPath)) {
     let content = fs.readFileSync(statusPath, 'utf8');
-    content = content.replace(/\.bkit\//g, '.mcukit/');
+    content = content.replace(/\.bkit\//g, '.rkit/');
     fs.writeFileSync(statusPath, content);
   }
 
@@ -226,14 +226,14 @@ This project includes code derived from the following open source projects:
 
 | 스킬 | 치환 대상 |
 |------|----------|
-| `audit/SKILL.md` | `.bkit/audit/` → `.mcukit/audit/`, `.bkit/decisions/` → `.mcukit/decisions/` |
-| `control/SKILL.md` | `.bkit/runtime/control-state.json` → `.mcukit/runtime/...` |
+| `audit/SKILL.md` | `.bkit/audit/` → `.rkit/audit/`, `.bkit/decisions/` → `.rkit/decisions/` |
+| `control/SKILL.md` | `.bkit/runtime/control-state.json` → `.rkit/runtime/...` |
 | `rollback/SKILL.md` | `.bkit/checkpoints/`, `.bkit/state/pdca-status.json` |
-| `btw/SKILL.md` | `.bkit/btw-suggestions.json` → `.mcukit/state/btw-suggestions.json` |
-| `plan-plus/SKILL.md` | `bkit PDCA's structured planning` → `mcukit PDCA's structured planning` |
+| `btw/SKILL.md` | `.bkit/btw-suggestions.json` → `.rkit/state/btw-suggestions.json` |
+| `plan-plus/SKILL.md` | `bkit PDCA's structured planning` → `rkit PDCA's structured planning` |
 | `skill-status/SKILL.md` | `bkit core skills`, marketplace 경로 |
-| `cc-version-analysis/SKILL.md` | `bkit` 키워드 28회+ → `mcukit` |
-| `claude-code-learning/SKILL.md` | `bkit-learning`, `bkit-pdca-guide`, `bkit-enterprise` → `mcukit-*` |
+| `cc-version-analysis/SKILL.md` | `bkit` 키워드 28회+ → `rkit` |
+| `claude-code-learning/SKILL.md` | `bkit-learning`, `bkit-pdca-guide`, `bkit-enterprise` → `rkit-*` |
 | `dynamic/SKILL.md` | `gstack /cso`, `.bkit-memory.json` |
 | `enterprise/SKILL.md` | `.bkit-memory.json`, `bkit-enterprise` |
 | `starter/SKILL.md` | `.bkit-memory.json`, `bkit-learning` |
@@ -244,30 +244,30 @@ This project includes code derived from the following open source projects:
 
 | 에이전트 | 치환 대상 |
 |----------|----------|
-| `mcukit-impact-analyst.md` | `name: bkit-impact-analyst` → `name: mcukit-impact-analyst` |
+| `rkit-impact-analyst.md` | `name: bkit-impact-analyst` → `name: rkit-impact-analyst` |
 | `pdca-eval-plan.md` | `v1.6.1 baseline vs Customized bkit` → `vs baseline` |
-| `gap-detector.md` | `.bkit/{state,runtime,snapshots}/` → `.mcukit/...` |
-| `pdca-iterator.md` | `.bkit/{state,runtime,snapshots}/` → `.mcukit/...` |
-| `skill-needs-extractor.md` | `bkit-marketplace` 경로 → mcukit 경로 |
-| `cc-version-researcher.md` | bkit 관련성 분석 항목 → mcukit |
+| `gap-detector.md` | `.bkit/{state,runtime,snapshots}/` → `.rkit/...` |
+| `pdca-iterator.md` | `.bkit/{state,runtime,snapshots}/` → `.rkit/...` |
+| `skill-needs-extractor.md` | `bkit-marketplace` 경로 → rkit 경로 |
+| `cc-version-researcher.md` | bkit 관련성 분석 항목 → rkit |
 
 **템플릿 (7개)**:
 
 | 템플릿 | 치환 대상 |
 |--------|----------|
-| `TEMPLATE-GUIDE.md` | `"bkit Template Selection Guide"` → `"mcukit Template Selection Guide"` |
-| `convention.template.md` | `"Generated by bkit PDCA System"` → `"Generated by mcukit PDCA System"` |
-| `iteration-report.template.md` | `"Generated by bkit Evaluator-Optimizer Pattern"` → `mcukit` |
-| `cc-version-analysis.template.md` | bkit 관련 섹션 → mcukit |
-| `schema.template.md` | bkit 참조 → mcukit |
-| `CLAUDE.template.md` | bkit 참조 → mcukit |
-| `pm-prd.template.md` | bkit 참조 → mcukit |
+| `TEMPLATE-GUIDE.md` | `"bkit Template Selection Guide"` → `"rkit Template Selection Guide"` |
+| `convention.template.md` | `"Generated by bkit PDCA System"` → `"Generated by rkit PDCA System"` |
+| `iteration-report.template.md` | `"Generated by bkit Evaluator-Optimizer Pattern"` → `rkit` |
+| `cc-version-analysis.template.md` | bkit 관련 섹션 → rkit |
+| `schema.template.md` | bkit 참조 → rkit |
+| `CLAUDE.template.md` | bkit 참조 → rkit |
+| `pm-prd.template.md` | bkit 참조 → rkit |
 
 **lib 코드**:
 
 | 파일 | 치환 대상 |
 |------|----------|
-| `lib/common.js` | `"bkit Common Module - Migration Bridge"` → `"mcukit Common Module"` |
+| `lib/common.js` | `"bkit Common Module - Migration Bridge"` → `"rkit Common Module"` |
 | `lib/audit/audit-logger.js` | `"Design Reference: docs/.../bkit-v200-..."` → 제거 |
 | `lib/audit/decision-tracer.js` | 동일 |
 | `lib/control/guard-mode.js` | `"Inspired by gstack's /guard"` → 제거, NOTICE.md |
@@ -278,10 +278,10 @@ This project includes code derived from the following open source projects:
 | 파일 | 치환 대상 |
 |------|----------|
 | `scripts/pre-write.js` | `"gstack-inspired"` 주석 → 제거 |
-| `scripts/unified-write-post.js` | `"bkit-rules"` → `"mcukit-rules"` |
-| `scripts/instructions-loaded-handler.js` | `"bkit core rules"` → `"mcukit core rules"` |
+| `scripts/unified-write-post.js` | `"bkit-rules"` → `"rkit-rules"` |
+| `scripts/instructions-loaded-handler.js` | `"bkit core rules"` → `"rkit core rules"` |
 | `scripts/team-stop.js` | `"bkit-memory.json"` → `"memory.json"` |
-| `scripts/pdca-task-completed.js` | `".bkit-memory.json"` → `.mcukit/state/memory.json` |
+| `scripts/pdca-task-completed.js` | `".bkit-memory.json"` → `.rkit/state/memory.json` |
 
 ---
 
@@ -405,7 +405,7 @@ const HEALING_STRATEGIES = {
 ```javascript
 /**
  * ADR (Architecture Decision Record) 구조화 기록
- * 저장: .mcukit/decisions/{timestamp}-{title}.json
+ * 저장: .rkit/decisions/{timestamp}-{title}.json
  */
 function recordDecision({ title, context, decision, consequences, domain }) {
   // ...
@@ -416,7 +416,7 @@ function recordDecision({ title, context, decision, consequences, domain }) {
 
 ### 3.3 Phase 3: lib/pdca/session-guide.js 이식
 
-bkit v2.0.5의 Context Anchor 개념을 mcukit에 적응:
+bkit v2.0.5의 Context Anchor 개념을 rkit에 적응:
 
 | 함수 | 역할 |
 |------|------|
@@ -425,7 +425,7 @@ bkit v2.0.5의 Context Anchor 개념을 mcukit에 적응:
 | `analyzeModules(feature)` | Design 문서에서 모듈 분리 분석 |
 | `suggestSessions(modules)` | 세션 범위 추천 |
 
-**mcukit 특화 확장**:
+**rkit 특화 확장**:
 - MCU: 메모리 예산을 Context Anchor에 포함 (`BUDGET: Flash 45KB/64KB, RAM 12KB/20KB`)
 - MPU: 타겟 보드/커널 버전 포함 (`TARGET: i.MX6ULL EVK, Linux 5.15`)
 - WPF: .NET 버전/MVVM 프레임워크 포함 (`STACK: .NET 8, CommunityToolkit.Mvvm`)
@@ -452,7 +452,7 @@ allowed-tools: [Read, Bash, Glob, Grep]
 ## MCU Benchmark Protocol
 1. `arm-none-eabi-size build/*.elf` → Flash/RAM 절대값
 2. Flash/RAM 사용 비율 계산 (링커스크립트 파싱)
-3. 이전 벤치마크와 비교 (`.mcukit/state/benchmark-history.json`)
+3. 이전 벤치마크와 비교 (`.rkit/state/benchmark-history.json`)
 4. 임계값 경고 (Flash > 85%, RAM > 75%)
 
 ## MPU Benchmark Protocol
@@ -528,11 +528,11 @@ allowed-tools: [Read, Write, Glob, Grep]
 2. **What Went Well**: 잘 된 점 (AI 지원 효과, 도메인 스킬 활용도)
 3. **What Could Improve**: 개선점 (반복 원인, 컨텍스트 손실, 도구 부족)
 4. **Action Items**: 구체적 개선 조치
-5. **Lessons Learned**: `.mcukit/state/learnings.json`에 기록
+5. **Lessons Learned**: `.rkit/state/learnings.json`에 기록
 
 ## Output
 - `docs/04-report/{feature}.retro.md` — 회고 문서
-- `.mcukit/state/learnings.json` — 학습 사항 축적
+- `.rkit/state/learnings.json` — 학습 사항 축적
 ```
 
 #### 3.4.4 /deploy — 임베디드 배포
@@ -599,7 +599,7 @@ memory:
 1. 에러 메시지 파싱 → 도메인 감지 (MCU/MPU/WPF)
 2. 도메인별 HEALING_STRATEGIES에서 매칭
 3. 수정 시도 (최대 3회)
-4. 수정 결과를 `.mcukit/decisions/` 에 ADR로 기록
+4. 수정 결과를 `.rkit/decisions/` 에 ADR로 기록
 5. 실패 시 사람에게 에스컬레이션
 
 ## 제한사항
@@ -613,9 +613,9 @@ memory:
 
 | Step | Phase | Task | Files | Est. |
 |------|-------|------|-------|------|
-| 1 | P0 | `.bkit/` → `.mcukit/` 마이그레이션 로직 | `hooks/startup/migration.js` | 소 |
-| 2 | P0 | MCP pdca-server 재작성 (paths.js import, 함수명, URI) | `servers/mcukit-pdca-server/index.js`, `package.json` | 중 |
-| 3 | P0 | MCP analysis-server 재작성 | `servers/mcukit-analysis-server/index.js`, `package.json` | 중 |
+| 1 | P0 | `.bkit/` → `.rkit/` 마이그레이션 로직 | `hooks/startup/migration.js` | 소 |
+| 2 | P0 | MCP pdca-server 재작성 (paths.js import, 함수명, URI) | `servers/rkit-pdca-server/index.js`, `package.json` | 중 |
+| 3 | P0 | MCP analysis-server 재작성 | `servers/rkit-analysis-server/index.js`, `package.json` | 중 |
 | 4 | P0 | `lib/pdca/status.js` 함수명 치환 + 호출자 갱신 | `lib/pdca/status.js`, `lib/common.js` | 소 |
 | 5 | P0 | `NOTICE.md` 라이선스 출처 파일 작성 | `NOTICE.md` | 소 |
 | 6 | P1 | `lib/context/` 7개 모듈 + index.js 신규 작성 | 8개 파일 | 대 |
@@ -644,13 +644,13 @@ memory:
 | 함수명 검증 | `readBkit/writeBkit` 잔류 0건 | `grep -rn "Bkit" lib/` |
 | 스킬 로딩 | 55개 스킬 (기존 51 + 신규 4) | `skill-status` 확인 |
 | 에이전트 로딩 | 40개 에이전트 (기존 39 + 신규 1) | 에이전트 목록 확인 |
-| 마이그레이션 | `.bkit/` → `.mcukit/` 데이터 무손실 | diff 비교 |
+| 마이그레이션 | `.bkit/` → `.rkit/` 데이터 무손실 | diff 비교 |
 | PDCA 워크플로우 | Plan→Design→Do→Check 전체 흐름 | `/pdca status` 정상 출력 |
 
 ### 5.2 Test Cases (Key)
 
-- [ ] SessionStart에서 `.bkit/` 자동 마이그레이션 후 `.mcukit/` 정상 참조
-- [ ] MCP `mcukit://pdca/status` 리소스 정상 반환
+- [ ] SessionStart에서 `.bkit/` 자동 마이그레이션 후 `.rkit/` 정상 참조
+- [ ] MCP `rkit://pdca/status` 리소스 정상 반환
 - [ ] `/benchmark` 스킬에서 도메인 자동 감지 후 적절한 프로토콜 실행
 - [ ] `/investigate` 스킬에서 MCU HardFault 레지스터 파싱 가이드 출력
 - [ ] Context Anchor가 Design→Do 전환 시 자동 삽입

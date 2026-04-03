@@ -64,7 +64,7 @@ Learning content by level:
 - **Level 2**: Automation - Commands, Hooks, Permission management
 - **Level 3**: Specialization - Agents, Skills, MCP integration
 - **Level 4**: Team Optimization - GitHub Action, Team rule standardization
-- **Level 5**: PDCA Methodology - mcukit methodology learning
+- **Level 5**: PDCA Methodology - rkit methodology learning
 
 ### setup
 
@@ -208,22 +208,22 @@ Use /pdca skill to learn PDCA methodology.
 Customize how Claude responds based on your project level.
 
 Available styles:
-  mcukit-learning     Best for beginners (learning points, TODO markers)
-  mcukit-pdca-guide   Best for PDCA workflows (status badges, checklists)
-  mcukit-enterprise   Best for architects (tradeoff analysis, cost impact)
+  rkit-learning     Best for beginners (learning points, TODO markers)
+  rkit-pdca-guide   Best for PDCA workflows (status badges, checklists)
+  rkit-enterprise   Best for architects (tradeoff analysis, cost impact)
 
 Usage:
   /output-style              Select interactively
-  /output-style mcukit-learning  Apply directly
+  /output-style rkit-learning  Apply directly
 
 Auto-recommendation:
-  Starter → mcukit-learning
-  Dynamic → mcukit-pdca-guide
-  Enterprise → mcukit-enterprise
+  Starter → rkit-learning
+  Dynamic → rkit-pdca-guide
+  Enterprise → rkit-enterprise
 
 ## Agent Memory
 
-All mcukit agents automatically remember context across sessions.
+All rkit agents automatically remember context across sessions.
 No configuration needed.
 
 Memory scopes:

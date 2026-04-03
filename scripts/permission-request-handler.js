@@ -5,7 +5,7 @@
  *
  * - L2+ (semi-auto/full-auto): Auto-approve known safe PDCA operations
  * - Always deny dangerous operations regardless of level
- * - Auto-approve writes to docs/ and .mcukit/ at L2+
+ * - Auto-approve writes to docs/ and .rkit/ at L2+
  *
  * Input: { tool_name, tool_input, permission_suggestions }
  * Output: { decision: { behavior: 'allow'|'deny'|null, updatedInput: null } }
@@ -42,8 +42,8 @@ const ALWAYS_DENY_PATTERNS = [
 // Safe write target directories (startsWith match)
 const SAFE_WRITE_DIRS = [
   'docs/',
-  '.mcukit/',
-  '.mcukit\\',
+  '.rkit/',
+  '.rkit\\',
 ];
 
 let input;

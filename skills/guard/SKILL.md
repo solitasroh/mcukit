@@ -74,7 +74,7 @@ Guard mode is a single toggle that activates three safety mechanisms simultaneou
 
 ### status
 
-1. Read guard mode state from `.mcukit/state/guard-mode.json`
+1. Read guard mode state from `.rkit/state/guard-mode.json`
 2. Read freeze status from freeze-manager
 3. Display formatted status
 
@@ -140,8 +140,8 @@ Auto-suggested when entering Do phase on MCU/MPU/WPF projects:
 
 | File | Purpose |
 |------|---------|
-| `.mcukit/state/guard-mode.json` | Guard mode state (active, domain, previousLevel) |
-| `.mcukit/state/freeze-list.json` | Frozen file patterns (managed by freeze-manager) |
+| `.rkit/state/guard-mode.json` | Guard mode state (active, domain, previousLevel) |
+| `.rkit/state/freeze-list.json` | Frozen file patterns (managed by freeze-manager) |
 
 ## Module Dependencies
 

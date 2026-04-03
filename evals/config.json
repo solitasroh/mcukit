@@ -11,7 +11,7 @@
   },
   "skills": {
     "workflow": [
-      "mcukit-rules", "mcukit-templates", "pdca", "development-pipeline",
+      "rkit-rules", "rkit-templates", "pdca", "development-pipeline",
       "phase-2-convention", "phase-8-review", "zero-script-qa", "code-review",
       "pm-discovery", "cc-version-analysis", "misra-c"
     ],

@@ -1,5 +1,5 @@
 /**
- * mcukit Embedded Dev Kit - SessionStart: Context Initialization Module (v2.0.0)
+ * rkit Embedded Dev Kit - SessionStart: Context Initialization Module (v2.0.0)
  *
  * Handles Context Hierarchy, Memory Store, Import Resolver initialization,
  * and Context Fork cleanup (stale forks).
@@ -35,7 +35,7 @@ function run(_input) {
   const importResolver = safeRequire('../../lib/import-resolver.js');
   const contextFork = safeRequire('../../lib/context-fork.js');
 
-  // v2.0.0: Ensure all mcukit directories exist (audit/, checkpoints/, decisions/, workflows/, etc.)
+  // v2.0.0: Ensure all rkit directories exist (audit/, checkpoints/, decisions/, workflows/, etc.)
   try {
     const { ensureMcukitDirs } = require('../../lib/core/paths');
     ensureMcukitDirs();
@@ -103,7 +103,7 @@ function run(_input) {
         const { CONFIG_PATHS } = require('../../lib/core/paths');
         const { content, errors } = importResolver.resolveImports(
           { imports: startupImports },
-          CONFIG_PATHS.mcukitConfig()
+          CONFIG_PATHS.rkitConfig()
         );
         if (errors.length > 0) {
           debugLog('SessionStart', 'Startup import errors', { errors });

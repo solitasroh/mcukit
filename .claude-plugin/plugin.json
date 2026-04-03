@@ -1,8 +1,8 @@
 {
-  "name": "mcukit",
+  "name": "rkit",
   "version": "0.7.0",
-  "displayName": "mcukit — AI Native Embedded Development Kit",
-  "description": "PDCA-driven MCU/MPU/WPF development with 40 agents, 54 skills, Living Context System. Supports STM32, NXP Kinetis K, i.MX6/i.MX6ULL/i.MX28, and C#/WPF.",
+  "displayName": "rkit — AI Native Embedded Development Kit",
+  "description": "PDCA-driven MCU/MPU/WPF development with 40 agents, 69 skills, STM32MP Yocto workflow, OpenProject integration.",
   "engines": {
     "claude-code": ">=2.1.78"
   },

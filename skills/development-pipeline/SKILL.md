@@ -19,7 +19,7 @@ description: |
   pipeline di sviluppo, fase, ordine di sviluppo, da dove iniziare, cosa fare prima
 
   Do NOT use for: ongoing implementation, existing feature work, or bug fixes.
-agent: mcukit:pipeline-guide
+agent: rkit:pipeline-guide
 allowed-tools:
   - Read
   - Write

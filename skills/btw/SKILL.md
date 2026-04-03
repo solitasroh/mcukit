@@ -27,7 +27,7 @@ allowed-tools:
 
 ### `/btw {suggestion}` - Record a suggestion
 
-1. Read `.mcukit/state/btw-suggestions.json` (create if not exists)
+1. Read `.rkit/state/btw-suggestions.json` (create if not exists)
 2. Generate next ID: `btw-NNN` (zero-padded, sequential)
 3. Create suggestion entry:
    ```json
@@ -37,7 +37,7 @@ allowed-tools:
      "suggestion": "{user input}",
      "context": {
        "file": "{current working file if identifiable}",
-       "pdcaPhase": "{current PDCA phase from .mcukit/state/memory.json or null}",
+       "pdcaPhase": "{current PDCA phase from .rkit/state/memory.json or null}",
        "feature": "{current feature or null}"
      },
      "category": "auto-detect",
@@ -57,7 +57,7 @@ allowed-tools:
 
 ### `/btw list` - List all suggestions
 
-1. Read `.mcukit/state/btw-suggestions.json`
+1. Read `.rkit/state/btw-suggestions.json`
 2. Display table:
    ```
    ID       | Status   | Category       | Suggestion (truncated)
@@ -69,11 +69,11 @@ allowed-tools:
 
 ### `/btw analyze` - Analyze suggestions for skill candidates
 
-1. Read all pending suggestions from `.mcukit/state/btw-suggestions.json`
+1. Read all pending suggestions from `.rkit/state/btw-suggestions.json`
 2. Group by category and find patterns:
    - Cluster similar suggestions (keyword overlap)
    - Count frequency of similar topics
-   - Identify suggestions that map to existing mcukit skills vs. new skill needs
+   - Identify suggestions that map to existing rkit skills vs. new skill needs
 3. For each skill candidate:
    - Estimate skill classification: workflow vs capability
    - Suggest skill name and description
@@ -96,7 +96,7 @@ allowed-tools:
 
 ### `/btw promote {id}` - Promote suggestion to skill creation
 
-1. Find suggestion by ID in `.mcukit/state/btw-suggestions.json`
+1. Find suggestion by ID in `.rkit/state/btw-suggestions.json`
 2. Validate status is "pending" (cannot promote already promoted/dismissed)
 3. Update suggestion:
    - `status`: "promoted"
@@ -108,7 +108,7 @@ allowed-tools:
 
 ### `/btw stats` - Show statistics
 
-1. Read `.mcukit/state/btw-suggestions.json`
+1. Read `.rkit/state/btw-suggestions.json`
 2. Calculate and display:
    ```
    /btw Statistics
@@ -121,7 +121,7 @@ allowed-tools:
    Top keywords: @Flow(3), DataProxy(2), validation(2)
    ```
 
-## Data File: `.mcukit/state/btw-suggestions.json`
+## Data File: `.rkit/state/btw-suggestions.json`
 
 Initialize with this structure if file does not exist:
 
@@ -150,6 +150,6 @@ Initialize with this structure if file does not exist:
 
 ## Integration Points
 
-- **PDCA Context**: Reads `.mcukit/state/memory.json` for current phase/feature
+- **PDCA Context**: Reads `.rkit/state/memory.json` for current phase/feature
 - **skill-create**: `/btw promote` triggers skill-create workflow
 - **skill-needs-extractor**: `/btw analyze` results feed into gap analysis

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * mcukit Embedded Dev Kit - SessionStart Hook (v0.1.0)
+ * rkit Embedded Dev Kit - SessionStart Hook (v0.1.0)
  *
  * Orchestrator delegates to startup modules:
  *   1. migration   - Legacy path migration
@@ -47,7 +47,7 @@ try {
   debugLog('SessionStart', 'Context init failed', { error: e.message });
 }
 
-// --- 4. ★ Domain Detection (mcukit-specific) ---
+// --- 4. ★ Domain Detection (rkit-specific) ---
 let domainResult = { domain: 'unknown', confidence: 0, markers: [] };
 try {
   const { detectDomain, detectPlatform, saveDomainCache } = require('../lib/domain/detector');
@@ -145,7 +145,7 @@ if (domainResult.domain !== 'unknown') {
 
 // --- Output ---
 const response = {
-  systemMessage: `mcukit Embedded Dev Kit v0.1.0 activated (Claude Code)`,
+  systemMessage: `rkit Embedded Dev Kit v0.1.0 activated (Claude Code)`,
   hookSpecificOutput: {
     hookEventName: 'SessionStart',
     onboardingType: onboardingContext.onboardingData.type,

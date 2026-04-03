@@ -15,8 +15,8 @@ description: |
 
   Do NOT use for: production code, API development, or existing component modifications.
 agents:
-  default: mcukit:pipeline-guide
-  frontend: mcukit:frontend-architect
+  default: rkit:pipeline-guide
+  frontend: rkit:frontend-architect
 allowed-tools:
   - Read
   - Write

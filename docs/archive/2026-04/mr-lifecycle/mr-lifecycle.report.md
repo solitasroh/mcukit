@@ -1,7 +1,7 @@
 # mr-lifecycle Completion Report
 
 > **Feature**: mr-lifecycle
-> **Project**: mcukit v0.7.0
+> **Project**: rkit v0.7.0
 > **Date**: 2026-04-03
 > **Author**: soojang.roh
 
@@ -132,7 +132,7 @@
 | `/pdca` 패턴 통합 skill | `/mr` 단일 진입점 | 사용자 학습 비용 최소화, 일관된 UX |
 | MR은 PDCA 비공식 구간 | 상태 머신 미변경 | 기존 20개 전이 호환, 1인 개발 호환 |
 | Conventional Comments | 업계 표준 채택 | `[Critical]` 독자 형식 대신 검증된 표준 |
-| 도메인 decorator 6개 | mcukit 고유 확장 | MCU(safety/memory/timing/misra), MPU(dt-binding), WPF(mvvm) |
+| 도메인 decorator 6개 | rkit 고유 확장 | MCU(safety/memory/timing/misra), MPU(dt-binding), WPF(mvvm) |
 | AI 보조 원칙 | 제안만, 사람 확인 | 자동 실행 위험 방지 |
 | Template 별도 파일 | imports 참조 | 재사용 + 유지보수 용이 |
 
@@ -142,7 +142,7 @@
 
 ### 5.1 업계 조사
 
-| 조사 대상 | 발견 | mcukit 적용 |
+| 조사 대상 | 발견 | rkit 적용 |
 |-----------|------|------------|
 | CodeRabbit, Qodo, Copilot | MR description + 1차 리뷰 자동화 있음 | 기본 기능 포함 |
 | 모든 상용 도구 | comment→fix→reply→resolve 루프 미자동화 | **차별화 포인트** |
@@ -152,7 +152,7 @@
 | Embedded Artistry | Hardware/Memory/Toolchain 섹션 | MCU/MPU Impact 섹션 |
 | Linux Kernel | Signed-off-by, Fixes: 태그 | [OP#N] prefix 설계 참조 |
 
-### 5.2 mcukit 고유 혁신
+### 5.2 rkit 고유 혁신
 
 | 혁신 | 설명 |
 |------|------|

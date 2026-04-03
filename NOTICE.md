@@ -1,6 +1,6 @@
 # NOTICE
 
-mcukit - AI Native Embedded Development Kit
+rkit - AI Native Embedded Development Kit
 
 ## Upstream Projects
 
@@ -12,7 +12,7 @@ This project incorporates code from the following open source projects:
 - **License**: Apache License 2.0
 - **Portions used**: PDCA state machine, quality gates, MCP server architecture,
   agent orchestration patterns, hook system, template engine
-- **Migration**: v2.0.3 → mcukit v2.0.0 (2026-03)
+- **Migration**: v2.0.3 → rkit v2.0.0 (2026-03)
 
 ### gstack (Garry Tan's Claude Code Skills)
 
@@ -24,5 +24,5 @@ This project incorporates code from the following open source projects:
 
 ## License
 
-mcukit is released under its own license terms. See LICENSE for details.
+rkit is released under its own license terms. See LICENSE for details.
 The upstream projects retain their original licenses as noted above.

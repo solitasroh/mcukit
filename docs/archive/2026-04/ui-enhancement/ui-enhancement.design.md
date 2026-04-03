@@ -2,7 +2,7 @@
 
 > **Summary**: Option B (Clean) — TerminalRenderer/ContextRenderer 분리 + config-loader + 도메인 컴포넌트
 >
-> **Project**: mcukit
+> **Project**: rkit
 > **Version**: 0.7.0
 > **Author**: soojang.roh
 > **Date**: 2026-04-03
@@ -41,7 +41,7 @@ lib/ui/
 │   ├── impact-view.js   ← { terminal(), context() }
 │   ├── budget-gauge.js  ← MCU Flash/RAM 게이지 (신규)
 │   └── sparkline.js     ← 트렌드 차트 (신규)
-├── config-loader.js     ← mcukit.config.json ui 섹션 로더
+├── config-loader.js     ← rkit.config.json ui 섹션 로더
 ├── ansi.js              ← 기존 유지 (하위 호환, engines/terminal.js가 활용)
 └── index.js             ← 신규 API + 하위 호환 API
 ```
@@ -250,7 +250,7 @@ sparkline.context([60, 72, 85, 91, 96])
 
 ### 4.1 `config-loader.js`
 
-mcukit.config.json의 `ui` 섹션을 로드하고 기본값과 병합.
+rkit.config.json의 `ui` 섹션을 로드하고 기본값과 병합.
 
 ```javascript
 const { loadUiConfig } = require('./config-loader');

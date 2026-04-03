@@ -23,7 +23,7 @@ tools:
   - Grep
   - Bash
   - Task(Explore)
-skills: [pdca, mcukit-rules]
+skills: [pdca, rkit-rules]
 imports:
   - ${PLUGIN_ROOT}/refs/stm32/hal-patterns.md
 disallowedTools:

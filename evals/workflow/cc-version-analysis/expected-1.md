@@ -9,18 +9,18 @@
 ## Step 2: Change Classification
 1. Categorize each change by impact area: hooks, agents, skills, CLI, MCP, permissions
 2. Assign severity levels: breaking (requires code change), notable (behavioral shift), minor (cosmetic)
-3. Cross-reference with mcukit's hook definitions in settings.json
+3. Cross-reference with rkit's hook definitions in settings.json
 4. Identify changes that affect tool permission model or sandbox behavior
 
 ## Step 3: Architecture Impact Analysis
-1. Map each CC change to specific mcukit components that may be affected
+1. Map each CC change to specific rkit components that may be affected
 2. Evaluate hooks system compatibility: PreToolUse/PostToolUse contract stability
 3. Assess agent team spawning: verify sub-agent parallel execution still works
 4. Check skill loading: trigger matching, SKILL.md parsing, slash command routing
 5. Review MCP server integration: bkit-pdca and bkit-analysis connection handling
 
 ## Step 4: Compatibility Testing
-1. Verify mcukit skill auto-detection works correctly on the new CC version
+1. Verify rkit skill auto-detection works correctly on the new CC version
 2. Test freeze/guard/deploy safety hooks fire as expected
 3. Confirm pm-discovery agent team completes without timeout or orphan agents
 4. Validate PDCA workflow end-to-end: plan -> design -> do -> analyze -> report
@@ -29,6 +29,6 @@
 ## Step 5: Impact Report Generation
 1. Output a comprehensive impact report with risk assessment matrix
 2. Result classification: safe to upgrade / upgrade with caution / block upgrade
-3. List all required mcukit code changes before upgrading (if any)
+3. List all required rkit code changes before upgrading (if any)
 4. Document ENH (enhancement) opportunities enabled by new CC features
 5. Expected Output format: markdown report with summary table, detailed findings, and action items

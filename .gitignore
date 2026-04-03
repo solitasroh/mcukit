@@ -1,6 +1,7 @@
-# mcukit runtime state (session-specific, not versioned)
+# rkit runtime state (session-specific, not versioned)
 .bkit/
 .mcukit/
+.rkit/
 
 # Node
 node_modules/

@@ -1,8 +1,8 @@
 # openproject-integration Planning Document
 
-> **Summary**: rt-op-plugin의 OpenProject MCP 연동을 mcukit에 통합하고, 다양한 개발 케이스에서 PDCA↔OP 워크플로를 연결
+> **Summary**: rt-op-plugin의 OpenProject MCP 연동을 rkit에 통합하고, 다양한 개발 케이스에서 PDCA↔OP 워크플로를 연결
 >
-> **Project**: mcukit
+> **Project**: rkit
 > **Version**: 0.7.0
 > **Author**: soojang.roh
 > **Date**: 2026-04-02
@@ -15,7 +15,7 @@
 | Perspective | Content |
 |-------------|---------|
 | **Problem** | OpenProject 연동이 별도 플러그인으로 분리되어 있고, 신규 기능/버그 수정/리팩토링 등 다양한 개발 케이스에서 PDCA와 태스크 관리가 단절됨 |
-| **Solution** | rt-op-plugin을 mcukit skill로 통합하고, 케이스별 PDCA↔OP 연동 패턴을 conventions skill에 정의 |
+| **Solution** | rt-op-plugin을 rkit skill로 통합하고, 케이스별 PDCA↔OP 연동 패턴을 conventions skill에 정의 |
 | **Function/UX Effect** | 신규 기능은 Plan→OP태스크 자동 제안, 버그는 OP Bug→PDCA 바로 시작, 완료 시 시간 기록까지 자연스럽게 흐름 |
 | **Core Value** | 어떤 개발 케이스든 PDCA 사이클과 OpenProject 추적이 끊김 없이 연결되는 단일 워크플로 |
 
@@ -25,7 +25,7 @@
 
 ### 1.1 Purpose
 
-mcukit PDCA 워크플로와 OpenProject 프로젝트 관리를 단일 플러그인에서 연결한다. 신규 기능 개발, 버그 수정, 리팩토링, OP 기반 작업 등 **다양한 개발 케이스**에서 자연스러운 워크플로를 제공한다.
+rkit PDCA 워크플로와 OpenProject 프로젝트 관리를 단일 플러그인에서 연결한다. 신규 기능 개발, 버그 수정, 리팩토링, OP 기반 작업 등 **다양한 개발 케이스**에서 자연스러운 워크플로를 제공한다.
 
 ### 1.2 Background
 
@@ -155,7 +155,7 @@ PDCA 없이 간단히 처리하고 OP만 업데이트하는 흐름.
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
-| NFR-01 | 선택적 확장 | OP 미설정 시 기존 mcukit 기능에 영향 없음. OP 관련 skill은 MCP 미연결 시 graceful 안내 |
+| NFR-01 | 선택적 확장 | OP 미설정 시 기존 rkit 기능에 영향 없음. OP 관련 skill은 MCP 미연결 시 graceful 안내 |
 | NFR-02 | 보안 | API 키는 userConfig sensitive 필드. 코드/로그 노출 금지 |
 | NFR-03 | 아키텍처 일관성 | skills/ 구조 사용 (commands/ 미사용) |
 | NFR-04 | 제안 방식 | 모든 OP 연동은 **자동 실행이 아닌 제안**. 사용자 확인 후 실행 |
@@ -166,7 +166,7 @@ PDCA 없이 간단히 처리하고 OP만 업데이트하는 흐름.
 
 ### 4.1 In Scope
 
-| Source (rt-op-plugin) | Target (mcukit) | 변환 |
+| Source (rt-op-plugin) | Target (rkit) | 변환 |
 |----------------------|-----------------|------|
 | `skills/openproject-conventions/SKILL.md` | `skills/openproject-conventions/SKILL.md` | 6개 케이스별 PDCA↔OP 매핑 추가 |
 | `commands/op-status.md` | `skills/op-status/SKILL.md` | command → skill 변환 |
@@ -190,9 +190,9 @@ PDCA 없이 간단히 처리하고 OP만 업데이트하는 흐름.
 
 ### 5.1 command → skill 변환
 
-| 비교 항목 | commands/ (rt-op-plugin) | skills/ (mcukit) |
+| 비교 항목 | commands/ (rt-op-plugin) | skills/ (rkit) |
 |-----------|------------------------|-----------------|
-| mcukit 일관성 | 새 디렉토리 필요 | 기존 54개 skill과 동일 |
+| rkit 일관성 | 새 디렉토리 필요 | 기존 54개 skill과 동일 |
 | 자동 트리거 | 불가 | `Triggers:` frontmatter |
 | **결론** | — | **채택** |
 
@@ -300,4 +300,4 @@ openproject-conventions skill에 포함할 케이스별 규칙:
 | `/pdca plan` 완료 후 → OP 태스크 생성 제안 발생 | A | Pass |
 | OP Bug 조회 후 → PDCA Plan 시작 제안 발생 | B | Pass |
 | `/pdca report` 완료 후 → OP Closed + 시간 기록 제안 | A, B, C, F | Pass |
-| OP 미설정 시 → mcukit PDCA 정상 동작 | — | Pass |
+| OP 미설정 시 → rkit PDCA 정상 동작 | — | Pass |

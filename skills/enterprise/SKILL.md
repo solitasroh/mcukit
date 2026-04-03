@@ -24,11 +24,11 @@ description: |
   Do NOT use for: simple websites, MVPs, or projects without infrastructure requirements.
 argument-hint: "[init|guide|help]"
 agents:
-  default: mcukit:enterprise-expert
-  infra: mcukit:infra-architect
-  architecture: mcukit:enterprise-expert
-  security: mcukit:security-architect
-  team: mcukit:cto-lead
+  default: rkit:enterprise-expert
+  infra: rkit:infra-architect
+  architecture: rkit:enterprise-expert
+  security: rkit:security-architect
+  team: rkit:cto-lead
 allowed-tools:
   - Read
   - Write
@@ -62,7 +62,7 @@ task-template: "[Init-Enterprise] {feature}"
 3. Create CLAUDE.md (Level: Enterprise specified)
 4. docs/ 5-category structure
 5. infra/terraform/, infra/k8s/ base templates
-6. Initialize .mcukit/state/memory.json
+6. Initialize .rkit/state/memory.json
 
 ### guide (Development Guide)
 - AI Native 10-Day development cycle
@@ -405,14 +405,14 @@ Rule: Area-specific CLAUDE.md overrides project-level rules
 
 ---
 
-## mcukit Features for Enterprise Level (v1.5.1)
+## rkit Features for Enterprise Level (v1.5.1)
 
-### Output Style: mcukit-enterprise (Recommended)
+### Output Style: rkit-enterprise (Recommended)
 
 For CTO-level architecture perspectives, activate the enterprise style:
 
 ```
-/output-style mcukit-enterprise
+/output-style rkit-enterprise
 ```
 
 This provides:
@@ -440,6 +440,6 @@ Enterprise projects support full Agent Teams for parallel PDCA execution:
 
 ### Agent Memory (Auto-Active)
 
-All mcukit agents automatically remember project context across sessions.
+All rkit agents automatically remember project context across sessions.
 Enterprise agents use `project` scope memory, ensuring architecture decisions
 and infrastructure patterns persist across development sessions.

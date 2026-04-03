@@ -2,7 +2,7 @@
 
 > **Summary**: Option C (Pragmatic) — 2 skill + 2 template + 2 수정. /pdca 패턴 일관성 유지
 >
-> **Project**: mcukit
+> **Project**: rkit
 > **Version**: 0.7.0
 > **Author**: soojang.roh
 > **Date**: 2026-04-02
@@ -16,7 +16,7 @@
 ### 1.1 파일 구조
 
 ```
-mcukit/
+rkit/
 ├── skills/
 │   ├── mr-conventions/SKILL.md       ← capability (auto-trigger)
 │   ├── mr/SKILL.md                   ← user-invocable (7 sub-commands)
@@ -470,7 +470,7 @@ discussion body (선택)
 - (non-blocking): 머지 차단 안 함
 - (if-minor): 사소한 경우에만 적용
 
-### mcukit 도메인
+### rkit 도메인
 - (safety): ISR, 스택, watchdog 관련 [MCU]
 - (memory): Flash/RAM 예산 관련 [MCU]
 - (timing): 실시간성/타이밍 관련 [MCU/MPU]

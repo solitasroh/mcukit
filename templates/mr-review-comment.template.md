@@ -40,7 +40,7 @@ discussion body (선택)
 | `(non-blocking)` | 머지 차단 안 함 |
 | `(if-minor)` | 사소한 변경이면 적용, 아니면 무시 |
 
-### mcukit 도메인 (6개)
+### rkit 도메인 (6개)
 
 | Decorator | 의미 | 도메인 |
 |-----------|------|--------|

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-hooks.json",
-  "description": "mcukit Embedded Dev Kit v0.6.2 - Claude Code (7 essential hooks)",
+  "description": "rkit Embedded Dev Kit v0.6.2 - Claude Code (7 essential hooks)",
   "hooks": {
     "SessionStart": [
       {

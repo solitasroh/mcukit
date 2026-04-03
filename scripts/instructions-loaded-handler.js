@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * instructions-loaded-handler.js - InstructionsLoaded Hook Handler
- * Logs instruction loading events and verifies mcukit core rules.
+ * Logs instruction loading events and verifies rkit core rules.
  *
  * Input: { file_path, memory_type, load_reason }
  * Output: none (audit only)
@@ -52,12 +52,12 @@ try {
   debugLog('InstructionsLoaded', 'Audit write failed (non-critical)', { error: e.message });
 }
 
-// Step 2: Verify mcukit core rules loaded (CLAUDE.md check)
+// Step 2: Verify rkit core rules loaded (CLAUDE.md check)
 try {
   if (filePath && filePath.includes('CLAUDE.md')) {
     const fileName = path.basename(filePath);
     const dirName = path.basename(path.dirname(filePath));
-    const isBkitClaudeMd = dirName === '.claude' || filePath.includes('mcukit');
+    const isBkitClaudeMd = dirName === '.claude' || filePath.includes('rkit');
 
     debugLog('InstructionsLoaded', 'CLAUDE.md loaded', {
       fileName,

@@ -2,7 +2,7 @@
 name: skill-needs-extractor
 description: |
   PRD 분석 결과에서 프로젝트 특화 스킬 니즈를 자동 추출하고,
-  기존 mcukit 28개 core 스킬과 매칭하여 갭 분석을 수행하는 에이전트.
+  기존 rkit 28개 core 스킬과 매칭하여 갭 분석을 수행하는 에이전트.
   pm-lead Phase 4 완료 후 자동 호출되어 skill-create 파이프라인에 연결.
 model: sonnet
 effort: medium
@@ -19,7 +19,7 @@ tools:
 
 ## Purpose
 
-PRD 문서를 분석하여 프로젝트에 필요한 스킬을 도출하고, 기존 mcukit core 스킬과의 갭을 식별한다.
+PRD 문서를 분석하여 프로젝트에 필요한 스킬을 도출하고, 기존 rkit core 스킬과의 갭을 식별한다.
 
 ## Extraction Process
 
@@ -38,7 +38,7 @@ For each functional requirement and technical pattern, determine:
 1. **Is this a recurring pattern?** (used across multiple features)
 2. **Does this require domain knowledge?** (project-specific conventions)
 3. **Would automation save significant time?** (>5 min per occurrence)
-4. **Is there an existing mcukit skill that covers this?**
+4. **Is there an existing rkit skill that covers this?**
 
 Skill need criteria:
 - Pattern appears 3+ times in codebase
@@ -48,7 +48,7 @@ Skill need criteria:
 
 ### Step 3: Match Against Core Skills
 
-Scan mcukit core skills at `~/.claude/plugins/cache/bkit-marketplace/bkit/*/skills/`:
+Scan rkit core skills at `~/.claude/plugins/cache/bkit-marketplace/bkit/*/skills/`:
 1. Read each SKILL.md frontmatter
 2. Compare skill descriptions with extracted needs
 3. Classify each need as:
@@ -66,7 +66,7 @@ For GAP items, analyze the project codebase:
 
 ### Step 5: Generate Output
 
-Write extraction result to `.mcukit/skill-needs.json`:
+Write extraction result to `.rkit/skill-needs.json`:
 
 ```json
 {
@@ -123,6 +123,6 @@ or `/btw promote` for items already in btw suggestions.
 ## Integration
 
 - **Input**: PRD from `docs/00-pm/{feature}.prd.md`
-- **Output**: `.mcukit/skill-needs.json`
+- **Output**: `.rkit/skill-needs.json`
 - **Downstream**: skill-create skill consumes the needs for auto-generation
 - **Called by**: pm-lead (Phase 4 extension) or manually via agent invocation

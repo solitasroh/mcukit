@@ -22,7 +22,7 @@ description: |
 
   Do NOT use for: static websites, Enterprise-grade systems requiring custom infrastructure.
 argument-hint: "[init|guide|help]"
-agent: mcukit:bkend-expert
+agent: rkit:bkend-expert
 allowed-tools:
   - Read
   - Write
@@ -55,7 +55,7 @@ task-template: "[Init-Dynamic] {feature}"
 3. Create CLAUDE.md (Level: Dynamic specified)
 4. Create docs/ folder structure
 5. src/lib/bkend.ts client template
-6. Initialize .mcukit/state/memory.json
+6. Initialize .rkit/state/memory.json
 
 ### guide (Development Guide)
 - bkend.ai auth/data configuration guide
@@ -367,14 +367,14 @@ Move to **Enterprise Level** if you need:
 → "I need complex backend logic"
 ```
 
-## mcukit Features for Dynamic Level (v1.5.1)
+## rkit Features for Dynamic Level (v1.5.1)
 
-### Output Style: mcukit-pdca-guide (Recommended)
+### Output Style: rkit-pdca-guide (Recommended)
 
 For optimal PDCA workflow experience, activate the PDCA guide style:
 
 ```
-/output-style mcukit-pdca-guide
+/output-style rkit-pdca-guide
 ```
 
 This provides:
@@ -398,7 +398,7 @@ Dynamic projects support Agent Teams for parallel PDCA execution:
 
 ### Agent Memory (Auto-Active)
 
-All mcukit agents automatically remember project context across sessions.
+All rkit agents automatically remember project context across sessions.
 No setup needed — agents use `project` scope memory for this codebase.
 
 ---

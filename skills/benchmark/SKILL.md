@@ -62,7 +62,7 @@ Extract `ORIGIN` and `LENGTH` for FLASH and RAM regions.
 
 ### 2.4 Delta Comparison
 
-Load previous benchmark from `.mcukit/state/benchmark-history.json`:
+Load previous benchmark from `.rkit/state/benchmark-history.json`:
 
 ```json
 {
@@ -207,7 +207,7 @@ Status values:
 
 After each benchmark run:
 
-1. **Save** results to `.mcukit/state/benchmark-history.json`
+1. **Save** results to `.rkit/state/benchmark-history.json`
 2. **Trend**: Compare last 5 entries, report if usage is trending upward
 3. **Alert**: If 3 consecutive benchmarks show increasing usage, warn about resource pressure
 4. **Largest growth**: Identify the commit/change that caused the biggest delta

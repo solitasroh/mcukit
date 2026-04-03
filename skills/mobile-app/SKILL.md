@@ -16,7 +16,7 @@ description: |
   applicazione mobile, app mobile, sviluppo mobile
 
   Do NOT use for: web-only projects, backend-only development, or desktop apps.
-agent: mcukit:pipeline-guide
+agent: rkit:pipeline-guide
 allowed-tools:
   - Read
   - Write

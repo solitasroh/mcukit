@@ -45,7 +45,7 @@ try {
 
   for (const { pattern, reason } of erasePatterns) {
     if (cmdLower.includes(pattern)) {
-      outputBlock(`[mcukit] ${reason} Manual confirmation required.`);
+      outputBlock(`[rkit] ${reason} Manual confirmation required.`);
       process.exit(0);
     }
   }
@@ -57,14 +57,14 @@ try {
     if (binMatch) {
       const binPath = binMatch[1];
       if (!fs.existsSync(binPath)) {
-        outputBlock(`[mcukit] Binary file not found: ${binPath}`);
+        outputBlock(`[rkit] Binary file not found: ${binPath}`);
         process.exit(0);
       }
 
       // Check binary size vs typical flash size (warn if > 2MB)
       const stat = fs.statSync(binPath);
       if (stat.size > 2 * 1024 * 1024) {
-        outputBlock(`[mcukit] Binary size ${(stat.size / 1024 / 1024).toFixed(1)}MB seems too large for MCU flash. Verify target.`);
+        outputBlock(`[rkit] Binary size ${(stat.size / 1024 / 1024).toFixed(1)}MB seems too large for MCU flash. Verify target.`);
         process.exit(0);
       }
     }
@@ -77,7 +77,7 @@ try {
       const addr = parseInt(addrMatch[1], 16);
       // STM32 flash typically starts at 0x08000000
       if (addr !== 0x08000000 && addr < 0x08000000) {
-        outputBlock(`[mcukit] Unusual flash address 0x${addrMatch[1]}. STM32 flash starts at 0x08000000.`);
+        outputBlock(`[rkit] Unusual flash address 0x${addrMatch[1]}. STM32 flash starts at 0x08000000.`);
         process.exit(0);
       }
     }

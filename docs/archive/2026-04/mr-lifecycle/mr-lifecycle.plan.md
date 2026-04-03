@@ -2,7 +2,7 @@
 
 > **Summary**: GitLab MR 전체 라이프사이클을 AI 자동화와 함께 PDCA 워크플로에 자연스럽게 통합
 >
-> **Project**: mcukit
+> **Project**: rkit
 > **Version**: 0.7.0
 > **Author**: soojang.roh
 > **Date**: 2026-04-02
@@ -50,7 +50,7 @@ Plan → Design → Do → Check(AI, ≥90%)
 
 ### 1.3 상용 도구 대비 차별화
 
-| 기능 | CodeRabbit | Qodo | Copilot PR | **mcukit /mr** |
+| 기능 | CodeRabbit | Qodo | Copilot PR | **rkit /mr** |
 |------|:---------:|:----:|:----------:|:--------------:|
 | MR description 자동 생성 | O | O | O | O (PDCA Report 기반) |
 | 코드 리뷰 comment | O | O | O | O (**도메인 특화**: MISRA, DTS, MVVM) |
@@ -444,7 +444,7 @@ None
 
 ### 5.2 Review Comment Template
 
-리뷰 comment는 Conventional Comments 형식을 기반으로, mcukit 도메인 decorator를 확장한다.
+리뷰 comment는 Conventional Comments 형식을 기반으로, rkit 도메인 decorator를 확장한다.
 
 **형식:**
 ```
@@ -467,7 +467,7 @@ discussion body (선택)
 | `chore` | 단순 정리 | Yes | `chore: include 순서 정렬` |
 | `note` | 참고 정보 | No | `note: 이 레지스터는 errata에 언급된 workaround입니다` |
 
-**Decorators (표준 3개 + mcukit 도메인 6개):**
+**Decorators (표준 3개 + rkit 도메인 6개):**
 
 | Decorator | 의미 | 적용 |
 |-----------|------|------|

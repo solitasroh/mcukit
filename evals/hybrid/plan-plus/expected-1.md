@@ -4,7 +4,7 @@
 - Reads project files (CLAUDE.md, package.json) to understand the existing stack
 - Checks recent git commits for current work direction
 - Reviews existing docs/01-plan/ documents to prevent duplicate planning
-- Checks .mcukit-memory.json for ongoing PDCA status
+- Checks .rkit-memory.json for ongoing PDCA status
 - Shares a brief summary of exploration results before proceeding
 
 ### 2. Phase 1: Intent Discovery via AskUserQuestion
@@ -50,4 +50,4 @@
 - Does NOT invoke any implementation skill before plan approval
 - Maintains the planning-only boundary even for features that seem simple
 - Ends with clear next step guidance pointing to /pdca design {feature}
-- Updates PDCA status in .mcukit-memory.json with phase set to plan
+- Updates PDCA status in .rkit-memory.json with phase set to plan

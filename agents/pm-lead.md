@@ -31,7 +31,7 @@ tools:
   - WebSearch
 skills:
   - pdca
-  - mcukit-rules
+  - rkit-rules
       timeout: 10000
 ---
 

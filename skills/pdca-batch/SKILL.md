@@ -58,7 +58,7 @@ task-template: "[Batch] {action}"
 
 Show all active PDCA features and their current status.
 
-1. Read `.mcukit/state/pdca-status.json`
+1. Read `.rkit/state/pdca-status.json`
 2. Filter to active features (exclude archived/completed unless `--all` flag)
 3. For each feature, display: phase, matchRate, iterationCount, last updated
 4. Show summary: total active, total completed, total archived

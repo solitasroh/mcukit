@@ -17,7 +17,7 @@ description: |
 
   Do NOT use for: unit testing, static analysis, or projects without Docker setup.
 context: fork
-agent: mcukit:qa-monitor
+agent: rkit:qa-monitor
 user-invocable: true
 hooks:
   Stop:

@@ -1,5 +1,5 @@
 /**
- * mcukit Embedded Dev Kit - SessionStart: Restore Module (v2.0.0)
+ * rkit Embedded Dev Kit - SessionStart: Restore Module (v2.0.0)
  *
  * Handles PLUGIN_DATA restoration, corrupted file detection,
  * and backup integrity verification.

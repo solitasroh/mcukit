@@ -46,7 +46,7 @@ task-template: "[Freeze] {action}"
 
 ## How It Works
 
-1. Frozen file patterns are stored in `.mcukit/state/freeze-list.json`
+1. Frozen file patterns are stored in `.rkit/state/freeze-list.json`
 2. The `pre-write.js` hook checks every Write/Edit operation against frozen patterns
 3. If a file matches a frozen pattern, the operation is **blocked** with explanation
 4. Freeze state persists across sessions until explicitly unfrozen

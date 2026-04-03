@@ -4,10 +4,10 @@
 
 | 관점 | 내용 |
 |------|------|
-| **Problem** | 벤치마크 29개 스킬 중 9개만 통과(31%), mcukit 도메인 eval 11개는 placeholder 수준이며 config에 미등록, bkit 공통 웹 스킬이 mcukit과 무관하게 포함되어 있다 |
-| **Solution** | config.json을 mcukit 도메인 전용으로 재구성하고, 기존 placeholder eval 업그레이드 + 누락 eval 신규 작성으로 벤치마크 통과율 100% 달성 |
-| **Function UX Effect** | `node evals/runner.js --benchmark` 실행 시 mcukit 관련 전체 스킬이 통과하여 도메인 특화 품질 기준선 확보 |
-| **Core Value** | mcukit 임베디드 개발 도메인에 집중된 자동화 품질 검증 체계 완성 |
+| **Problem** | 벤치마크 29개 스킬 중 9개만 통과(31%), rkit 도메인 eval 11개는 placeholder 수준이며 config에 미등록, bkit 공통 웹 스킬이 rkit과 무관하게 포함되어 있다 |
+| **Solution** | config.json을 rkit 도메인 전용으로 재구성하고, 기존 placeholder eval 업그레이드 + 누락 eval 신규 작성으로 벤치마크 통과율 100% 달성 |
+| **Function UX Effect** | `node evals/runner.js --benchmark` 실행 시 rkit 관련 전체 스킬이 통과하여 도메인 특화 품질 기준선 확보 |
+| **Core Value** | rkit 임베디드 개발 도메인에 집중된 자동화 품질 검증 체계 완성 |
 
 ## 1. 배경 및 목표
 
@@ -25,20 +25,20 @@
 | 유형 | 스킬 | 원인 |
 |------|------|------|
 | **Workflow eval 누락** | `zero-script-qa`, `cc-version-analysis` | eval 파일 미작성 |
-| **Capability: bkit 공통 (제거 대상)** | `starter`, `dynamic`, `enterprise`, `mobile-app`, `claude-code-learning`, `bkend-quickstart`, `bkend-auth`, `bkend-data`, `bkend-cookbook`, `bkend-storage` | mcukit 도메인과 무관한 웹 개발 스킬 |
-| **Capability: mcukit 관련 eval 누락** | `phase-1-schema`, `phase-3-mockup`, `phase-4-api`, `phase-5-design-system`, `phase-6-ui-integration`, `phase-7-seo-security`, `phase-9-deployment`, `desktop-app` | eval 파일 미작성 (mcukit 도메인 적용 필요) |
+| **Capability: bkit 공통 (제거 대상)** | `starter`, `dynamic`, `enterprise`, `mobile-app`, `claude-code-learning`, `bkend-quickstart`, `bkend-auth`, `bkend-data`, `bkend-cookbook`, `bkend-storage` | rkit 도메인과 무관한 웹 개발 스킬 |
+| **Capability: rkit 관련 eval 누락** | `phase-1-schema`, `phase-3-mockup`, `phase-4-api`, `phase-5-design-system`, `phase-6-ui-integration`, `phase-7-seo-security`, `phase-9-deployment`, `desktop-app` | eval 파일 미작성 (rkit 도메인 적용 필요) |
 | **Config 미등록 (placeholder)** | `stm32-hal`, `freertos`, `wpf-mvvm`, `imx-bsp`, `kernel-driver`, `nxp-mcuxpresso`, `serial-bridge`, `cmake-embedded`, `communication`, `xaml-design`, `yocto-build`, `misra-c` | eval 파일 존재하나 단일 라인 placeholder + config 미등록 |
 
 ### 1.3 목표
 
 - **벤치마크 통과율 100%** (현재 31% → 100%)
-- config.json에서 bkit 공통 웹 스킬 제거, mcukit 도메인 스킬로 재구성
+- config.json에서 bkit 공통 웹 스킬 제거, rkit 도메인 스킬로 재구성
 - 기존 placeholder eval 12개 업그레이드 (substantive content)
 - 신규 eval 10개 작성 (workflow 2 + capability 8)
-- 모든 eval은 mcukit 도메인(MCU/MPU/Desktop) 관점 적용
+- 모든 eval은 rkit 도메인(MCU/MPU/Desktop) 관점 적용
 - 향후 Qt/QML 도메인 추가에 대비한 확장 가능 구조
 
-## 2. mcukit 도메인 정의
+## 2. rkit 도메인 정의
 
 ### 2.1 현재 지원 도메인
 
@@ -57,14 +57,14 @@
 
 ### 2.3 Desktop 도메인 범위 재정의
 
-기존 `desktop-app` 스킬은 Electron/Tauri 웹 기반이었으나, mcukit에서는 **C# 기반 Windows 데스크탑 앱**으로 재정의:
+기존 `desktop-app` 스킬은 Electron/Tauri 웹 기반이었으나, rkit에서는 **C# 기반 Windows 데스크탑 앱**으로 재정의:
 
 | 프레임워크 | 대상 | 비고 |
 |-----------|------|------|
 | **WPF** (.NET 8) | 현재 주력 | MVVM, XAML, CommunityToolkit |
 | **WinUI3** (.NET 8) | 차세대 | Windows App SDK, XAML Islands |
-| ~~Electron~~ | 제외 | 웹 기반, mcukit 도메인 외 |
-| ~~Tauri~~ | 제외 | 웹 기반, mcukit 도메인 외 |
+| ~~Electron~~ | 제외 | 웹 기반, rkit 도메인 외 |
+| ~~Tauri~~ | 제외 | 웹 기반, rkit 도메인 외 |
 | **Qt** (향후) | 확장 예정 | C++/QML 기반, 크로스 플랫폼 |
 
 ## 3. 작업 범위
@@ -75,7 +75,7 @@
 - `starter`, `dynamic`, `enterprise`, `mobile-app`, `claude-code-learning`
 - `bkend-quickstart`, `bkend-auth`, `bkend-data`, `bkend-cookbook`, `bkend-storage`
 
-**추가 (mcukit 도메인 스킬 12개):**
+**추가 (rkit 도메인 스킬 12개):**
 - MCU: `stm32-hal`, `freertos`, `nxp-mcuxpresso`
 - MPU: `imx-bsp`, `kernel-driver`, `yocto-build`
 - Desktop: `wpf-mvvm`, `xaml-design`
@@ -86,7 +86,7 @@
 
 | 분류 | 스킬 수 | 스킬 목록 |
 |------|---------|----------|
-| **Workflow** | 11 | mcukit-rules, mcukit-templates, pdca, development-pipeline, phase-2-convention, phase-8-review, zero-script-qa, code-review, pm-discovery, cc-version-analysis, misra-c |
+| **Workflow** | 11 | rkit-rules, rkit-templates, pdca, development-pipeline, phase-2-convention, phase-8-review, zero-script-qa, code-review, pm-discovery, cc-version-analysis, misra-c |
 | **Capability** | 19 | phase-1-schema, phase-3-mockup, phase-4-api, phase-5-design-system, phase-6-ui-integration, phase-7-seo-security, phase-9-deployment, desktop-app, stm32-hal, freertos, nxp-mcuxpresso, imx-bsp, kernel-driver, yocto-build, wpf-mvvm, xaml-design, cmake-embedded, communication, serial-bridge |
 | **Hybrid** | 1 | plan-plus |
 | **합계** | **31** | |
@@ -115,11 +115,11 @@
 | 스킬 | prompt 시나리오 |
 |------|----------------|
 | `zero-script-qa` | MCU UART 통신 펌웨어의 Docker 로그 기반 QA 테스트 |
-| `cc-version-analysis` | CC 버전 업그레이드 시 mcukit 영향 분석 |
+| `cc-version-analysis` | CC 버전 업그레이드 시 rkit 영향 분석 |
 
-### 3.4 Capability eval 신규 작성 (8개, mcukit 도메인 적용)
+### 3.4 Capability eval 신규 작성 (8개, rkit 도메인 적용)
 
-| 스킬 | mcukit 도메인 적용 | prompt 시나리오 |
+| 스킬 | rkit 도메인 적용 | prompt 시나리오 |
 |------|-------------------|----------------|
 | `phase-1-schema` | 임베디드 데이터 구조 | MCU 레지스터 맵 + UART 프레임 프로토콜 스키마 정의 |
 | `phase-3-mockup` | Desktop 모니터링 UI | MCU 센서 데이터 실시간 모니터링 WPF/WinUI3 대시보드 목업 |
@@ -192,7 +192,7 @@ config.json에 추가만 하면 벤치마크에 자동 포함되는 구조.
 ## 7. 제약사항
 
 - eval은 정적 파일 기반 (CI 실행 가능, 외부 의존성 없음)
-- mcukit 도메인(MCU/MPU/Desktop) 스킬만 포함, bkit 공통 웹 스킬 제외
+- rkit 도메인(MCU/MPU/Desktop) 스킬만 포함, bkit 공통 웹 스킬 제외
 - Desktop 도메인은 C# 기반(WPF/WinUI3)만 포함, 웹 기반(Electron/Tauri) 제외
 - 향후 Qt 도메인 추가를 고려한 config 구조 유지
 - MCU/MPU/Desktop 3개 도메인 균등 반영

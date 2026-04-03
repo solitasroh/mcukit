@@ -20,7 +20,7 @@ tools:
   - Edit
   - Glob
   - Grep
-skills: [pdca, mcukit-rules]
+skills: [pdca, rkit-rules]
 imports:
   - ${PLUGIN_ROOT}/refs/stm32/hal-patterns.md
   - ${PLUGIN_ROOT}/refs/stm32/peripheral-map.md

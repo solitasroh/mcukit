@@ -1,5 +1,5 @@
 {
-  "name": "solitasroh-mcukit",
+  "name": "solitasroh-rkit",
   "owner": {
     "name": "solitasroh"
   },
@@ -9,16 +9,16 @@
   },
   "plugins": [
     {
-      "name": "mcukit",
+      "name": "rkit",
       "source": "./",
-      "description": "PDCA-driven MCU/MPU/WPF development with 40 agents, 54 skills, Living Context System",
+      "description": "PDCA-driven MCU/MPU/WPF development with 40 agents, 69 skills, STM32MP Yocto workflow, OpenProject integration",
       "version": "0.7.0",
       "author": {
         "name": "solitasroh"
       },
-      "repository": "https://github.com/solitasroh/mcukit",
+      "repository": "https://github.com/solitasroh/rkit",
       "license": "MIT",
-      "keywords": ["pdca", "embedded", "mcu", "mpu", "wpf", "stm32", "imx6", "dotnet"],
+      "keywords": ["pdca", "embedded", "mcu", "mpu", "wpf", "stm32", "stm32mp", "imx6", "dotnet", "yocto", "openproject"],
       "category": "embedded-development"
     }
   ]

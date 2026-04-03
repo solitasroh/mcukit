@@ -9,7 +9,7 @@ maxTurns: 20
 memory: project
 context: fork
 tools: [Read, Write, Edit, Glob, Grep]
-skills: [pdca, mcukit-rules]
+skills: [pdca, rkit-rules]
 ---
 
 # XAML Expert

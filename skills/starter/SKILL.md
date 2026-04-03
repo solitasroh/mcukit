@@ -22,7 +22,7 @@ description: |
 
   Do NOT use for: fullstack apps with backend, authentication features, or database needs.
 argument-hint: "[init|guide|help]"
-agent: mcukit:starter-guide
+agent: rkit:starter-guide
 allowed-tools:
   - Read
   - Write
@@ -54,7 +54,7 @@ task-template: "[Init-Starter] {feature}"
 2. Generate package.json (when Next.js selected)
 3. Create CLAUDE.md (Level: Starter specified)
 4. Create docs/ folder structure (for PDCA documents)
-5. Initialize .mcukit/state/memory.json
+5. Initialize .rkit/state/memory.json
 
 ### guide (Development Guide)
 - Analyze current project state
@@ -269,14 +269,14 @@ Move to **Dynamic Level** if you need:
 → "I want users to communicate with each other"
 ```
 
-## mcukit Features for Starter Level (v1.5.1)
+## rkit Features for Starter Level (v1.5.1)
 
-### Output Style: mcukit-learning (Recommended)
+### Output Style: rkit-learning (Recommended)
 
 For the best learning experience, activate the learning output style:
 
 ```
-/output-style mcukit-learning
+/output-style rkit-learning
 ```
 
 This provides:
@@ -286,7 +286,7 @@ This provides:
 
 ### Agent Memory (Auto-Active)
 
-mcukit agents automatically remember your learning progress across sessions.
+rkit agents automatically remember your learning progress across sessions.
 No setup needed — your `starter-guide` agent uses `user` scope memory,
 so learning context persists even across different projects.
 

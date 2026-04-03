@@ -16,7 +16,7 @@ description: |
   applicazione desktop, app desktop
 
   Do NOT use for: web-only projects, mobile apps, or server-side development.
-agent: mcukit:pipeline-guide
+agent: rkit:pipeline-guide
 allowed-tools:
   - Read
   - Write

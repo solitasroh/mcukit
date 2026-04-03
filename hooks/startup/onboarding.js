@@ -1,5 +1,5 @@
 /**
- * mcukit Embedded Dev Kit - SessionStart: Onboarding Module (v2.0.0)
+ * rkit Embedded Dev Kit - SessionStart: Onboarding Module (v2.0.0)
  *
  * Handles onboarding message generation, level detection,
  * output style suggestion, first-time user detection, and startup import loading.
@@ -90,7 +90,7 @@ function enhancedOnboarding() {
         question: 'How can I help you?',
         header: 'Help Type',
         options: [
-          { label: 'Learn mcukit', description: 'Introduction and 9-phase pipeline' },
+          { label: 'Learn rkit', description: 'Introduction and 9-phase pipeline' },
           { label: 'Learn Claude Code', description: 'Settings and usage' },
           { label: 'Start new project', description: 'Project initialization' },
           { label: 'Start freely', description: 'Proceed without guide' }
@@ -155,13 +155,13 @@ function getTriggerKeywordTable() {
 ### Agent Triggers
 | Keywords | Agent | Action |
 |----------|-------|--------|
-| verify, 검증, 確認, 验证, verificar, vérifier, prüfen, verificare | mcukit:gap-detector | Run Gap analysis |
-| improve, 개선, 改善, 改进, mejorar, améliorer, verbessern, migliorare | mcukit:pdca-iterator | Auto-improvement iteration |
-| analyze, 분석, 分析, 品質, analizar, analyser, analysieren, analizzare | mcukit:code-analyzer | Code quality analysis |
-| report, 보고서, 報告, 报告, informe, rapport, Bericht, rapporto | mcukit:report-generator | Generate completion report |
-| help, 도움, 助けて, 帮助, ayuda, aide, Hilfe, aiuto | mcukit:starter-guide | Beginner guide |
-| bkend, BaaS, backend service, 백엔드 서비스, バックエンドサービス, 后端服务 | mcukit:bkend-expert | Backend/BaaS expert |
-| pm, PRD, product discovery, PM 분석, 제품 기획, PM分析, PM-Analyse, analisi PM | mcukit:pm-lead | PM Agent Team analysis |
+| verify, 검증, 確認, 验证, verificar, vérifier, prüfen, verificare | rkit:gap-detector | Run Gap analysis |
+| improve, 개선, 改善, 改进, mejorar, améliorer, verbessern, migliorare | rkit:pdca-iterator | Auto-improvement iteration |
+| analyze, 분석, 分析, 品質, analizar, analyser, analysieren, analizzare | rkit:code-analyzer | Code quality analysis |
+| report, 보고서, 報告, 报告, informe, rapport, Bericht, rapporto | rkit:report-generator | Generate completion report |
+| help, 도움, 助けて, 帮助, ayuda, aide, Hilfe, aiuto | rkit:starter-guide | Beginner guide |
+| bkend, BaaS, backend service, 백엔드 서비스, バックエンドサービス, 后端服务 | rkit:bkend-expert | Backend/BaaS expert |
+| pm, PRD, product discovery, PM 분석, 제품 기획, PM分析, PM-Analyse, analisi PM | rkit:pm-lead | PM Agent Team analysis |
 
 ### Skill Triggers (Auto-detection)
 | Keywords | Skill | Level |

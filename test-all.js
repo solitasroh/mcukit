@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * mcukit 전체 통합 테스트
+ * rkit 전체 통합 테스트
  */
 
 const fs = require('fs');

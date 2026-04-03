@@ -122,4 +122,4 @@ PDCA 없이 OP 도구를 직접 사용하는 것은 항상 허용.
 OpenProject MCP 서버에 연결되어 있지 않으면:
 - PDCA 단계별 OP 제안을 생략하고 PDCA만 진행
 - OP 명령(/op-status 등) 실행 시: "OpenProject MCP 서버에 연결되어 있지 않습니다. plugin 설정에서 OpenProject URL과 API Key를 확인하세요." 안내
-- mcukit 기본 기능에는 영향 없음
+- rkit 기본 기능에는 영향 없음

@@ -4,7 +4,7 @@ classification: workflow
 classification-reason: "Reports loaded skill inventory across core and project layers. Read-only status check workflow."
 deprecation-risk: none
 description: |
-  Shows loaded skill inventory: mcukit core skills vs project-local skills.
+  Shows loaded skill inventory: rkit core skills vs project-local skills.
   Detects conflicts, overrides, and coverage gaps.
   Triggers: /skill-status, skill status, 스킬 상태, 스킬 목록
   Keywords: skill-status, skill list, skills loaded, 스킬 상태, 스킬 목록
@@ -19,13 +19,13 @@ allowed-tools:
 
 # skill-status - Skill Inventory Report
 
-로드된 스킬 목록을 core(mcukit 기본)와 project-local로 구분하여 표시.
+로드된 스킬 목록을 core(rkit 기본)와 project-local로 구분하여 표시.
 
 ## Command: `/skill-status`
 
 ### Step 1: Scan Core Skills
 
-1. Read mcukit core skills directory:
+1. Read rkit core skills directory:
    `~/.claude/plugins/cache/bkit-marketplace/bkit/*/skills/`
 2. For each skill directory, read SKILL.md frontmatter:
    - name, classification, description (first line)
@@ -50,14 +50,14 @@ allowed-tools:
 Skill Status Report
 ====================
 
-Layer: mcukit Core (v1.6.2)
+Layer: rkit Core (v1.6.2)
   Skills: 28 loaded
   -----------------------------------------------
   Name                | Type       | Classification
   --------------------|------------|---------------
   pdca                | workflow   | PDCA lifecycle
   enterprise          | workflow   | Enterprise init
-  mcukit-rules          | capability | Auto-apply rules
+  rkit-rules          | capability | Auto-apply rules
   code-review         | workflow   | Code analysis
   ... (truncated)
 
@@ -91,7 +91,7 @@ Summary: 36 total skills (28 core + 8 project)
 ```
 Priority (high to low):
 1. .claude/skills/project/   (project-local, git-tracked)
-2. ~/.claude/plugins/.../skills/  (mcukit core, plugin-managed)
+2. ~/.claude/plugins/.../skills/  (rkit core, plugin-managed)
 3. ~/.claude/skills/          (user global, if any)
 ```
 

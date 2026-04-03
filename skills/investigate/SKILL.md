@@ -297,7 +297,7 @@ Domain: {mcu|mpu|wpf}
 
 Record significant investigation findings as Architecture Decision Records:
 
-Save to `.mcukit/decisions/ADR-{NNN}-{slug}.md`:
+Save to `.rkit/decisions/ADR-{NNN}-{slug}.md`:
 
 ```markdown
 # ADR-{NNN}: {Title}

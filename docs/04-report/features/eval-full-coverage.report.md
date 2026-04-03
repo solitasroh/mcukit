@@ -6,7 +6,7 @@
 
 | 관점 | 성과 |
 |------|------|
-| **Problem** | 벤치마크 31% 통과율(9/29), 12개 도메인 eval이 placeholder 수준, bkit 공통 웹 스킬이 mcukit과 무관하게 config에 포함 → **문제 완전 해결** |
+| **Problem** | 벤치마크 31% 통과율(9/29), 12개 도메인 eval이 placeholder 수준, bkit 공통 웹 스킬이 rkit과 무관하게 config에 포함 → **문제 완전 해결** |
 | **Solution** | config.json 재구성(bkit 10개 제거 + 도메인 12개 추가), runner.js criteria 5개 카테고리 확장, 기존 12개 eval 업그레이드 + 신규 10개 작성 → **Clean Architecture 완벽 구현** |
 | **Function/UX Effect** | 벤치마크 통과율 **31% → 100%**(31/31), Workflow 80% → 100%(11/11), Capability 0% → 100%(19/19), Hybrid 100% → 100%(1/1) → **도메인 특화 품질 기준선 확보** |
 | **Core Value** | MCU/MPU/Desktop 임베디드 개발 도메인에 집중된 자동화 품질 검증 체계 완성, Qt 도메인 확장 대비 확장성 구조 확보 → **생산성 고도화** |
@@ -15,11 +15,11 @@
 
 ### Plan
 - **Plan Document**: docs/01-plan/features/eval-full-coverage.plan.md
-- **Goal**: 벤치마크 통과율 31% → 100%, mcukit 도메인 전용 eval 시스템 구축
+- **Goal**: 벤치마크 통과율 31% → 100%, rkit 도메인 전용 eval 시스템 구축
 - **Estimated Duration**: 5 days
 - **Planning Approach**: 
   - 문제 분류 4가지 유형 정확히 파악
-  - mcukit 도메인 정의(MCU, MPU, Desktop, Cross, Safety)
+  - rkit 도메인 정의(MCU, MPU, Desktop, Cross, Safety)
   - 기존 12개 placeholder eval 업그레이드 계획
   - 신규 10개 eval 작성 계획(workflow 2 + capability 8)
 
@@ -28,7 +28,7 @@
 - **Architecture Selected**: Option B — Clean Architecture
 - **Key Design Decisions**:
   1. **runner.js criteria 확장**: trigger, process, output, pattern + 5개 신규(code, safety, architecture, api, config)
-  2. **config.json 재구성**: bkit 공통 웹 스킬 10개 제거(starter, dynamic, enterprise, mobile-app, claude-code-learning, bkend-*), mcukit 도메인 12개 추가
+  2. **config.json 재구성**: bkit 공통 웹 스킬 10개 제거(starter, dynamic, enterprise, mobile-app, claude-code-learning, bkend-*), rkit 도메인 12개 추가
   3. **Desktop 범위 재정의**: WPF/WinUI3 C# 기반(O), Electron/Tauri 제외(X)
   4. **도메인 커버리지**: MCU(4), MPU(3), Desktop(5), Cross(4), Safety(2)
   5. **확장성**: Qt 도메인 추가 시 config + eval 3파일만 추가
@@ -70,14 +70,14 @@
 
 **Configuration & Core**
 - ✅ runner.js: evaluateAgainstCriteria에 5개 신규 criteria 카테고리 추가 (code, safety, architecture, api, config)
-- ✅ config.json: bkit 공통 웹 스킬 10개 제거, mcukit 도메인 스킬 12개 추가 → 31개 스킬 등록
+- ✅ config.json: bkit 공통 웹 스킬 10개 제거, rkit 도메인 스킬 12개 추가 → 31개 스킬 등록
 - ✅ 도메인 커버리지: MCU(4), MPU(3), Desktop(5), Cross(4), Safety(2) = 18개 도메인 스킬
 
 **Workflow Eval (11개)**
 - ✅ zero-script-qa: MCU UART 통신 펌웨어 Docker 로그 기반 QA 테스트 (multi-eval 2개)
-- ✅ cc-version-analysis: CC 버전 업그레이드 시 mcukit 영향 분석
+- ✅ cc-version-analysis: CC 버전 업그레이드 시 rkit 영향 분석
 - ✅ misra-c: workflow로 이동 + criteria 확장 (기존 업그레이드)
-- ✅ mcukit-rules, mcukit-templates, pdca, development-pipeline, phase-2-convention, phase-8-review, code-review, pm-discovery (기존)
+- ✅ rkit-rules, rkit-templates, pdca, development-pipeline, phase-2-convention, phase-8-review, code-review, pm-discovery (기존)
 
 **Capability Eval (19개)**
 
@@ -130,7 +130,7 @@
 
 1. **명확한 문제 분석**: 4가지 유형 분류(workflow 누락, capability bkit, capability 누락, config 미등록)로 인해 구현 방향이 명확했음
 2. **Clean Architecture 선택 정당화**: Option B가 유연한 확장성(Qt 도메인 추가 시 config + 3파일)을 제공하여 장기 유지보수성 우수
-3. **도메인 재정의 정확성**: Desktop을 WPF/WinUI3(C#)으로 재정의하여 mcukit 도메인 일관성 유지
+3. **도메인 재정의 정확성**: Desktop을 WPF/WinUI3(C#)으로 재정의하여 rkit 도메인 일관성 유지
 4. **높은 초기 완성도**: 97% 매치율로 첫 번째 반복에서 벤치마크 100% 달성
 5. **파일 구조 표준화**: eval.yaml + prompt-N.md + expected-N.md 패턴으로 새로운 eval 추가가 용이
 
@@ -234,7 +234,7 @@
 **Option B (Clean Architecture) 선택 이유:**
 1. **확장성**: Qt 도메인 추가 시 config.json + eval 3파일만 추가, runner.js 변경 불필요
 2. **유지보수성**: 스킬별 고유 criteria로 정확한 품질 검증, 향후 수정 용이
-3. **일관성**: mcukit 도메인(MCU/MPU/Desktop/Cross/Safety)을 명확히 정의하여 범위 유지
+3. **일관성**: rkit 도메인(MCU/MPU/Desktop/Cross/Safety)을 명확히 정의하여 범위 유지
 4. **성능**: 초기 97% 매치율로 높은 설계 품질 입증
 
 ### E. Verification Checklist

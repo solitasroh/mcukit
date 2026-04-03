@@ -1,8 +1,8 @@
-# mcukit 사용 가이드
+# rkit 사용 가이드
 
-> **mcukit v0.7.0** — AI Native 임베디드 개발 키트
+> **rkit v0.7.0** — AI Native 임베디드 개발 키트
 >
-> MCU / MPU(Embedded Linux) / WPF 3개 도메인을 위한 PDCA 기반 AI 개발 워크플로
+> MCU / MPU(Embedded Linux, STM32MP) / WPF 3개 도메인을 위한 PDCA 기반 AI 개발 워크플로
 
 ---
 
@@ -30,21 +30,21 @@
 
 ```bash
 # 1. 마켓플레이스 등록
-/plugin marketplace add solitasroh/mcukit
+/plugin marketplace add solitasroh/rkit
 
 # 2. 플러그인 설치
-/plugin install mcukit@solitasroh-mcukit
+/plugin install rkit@solitasroh-rkit
 ```
 
 #### 방법 B: 수동 클론 + 심볼릭 링크
 
 ```bash
 # 1. 저장소 클론
-git clone https://github.com/solitasroh/mcukit.git ~/.claude/plugins/mcukit
+git clone https://github.com/solitasroh/rkit.git ~/.claude/plugins/rkit
 
 # 2. 심볼릭 링크 생성
-ln -s ~/.claude/plugins/mcukit/skills ~/.claude/skills
-ln -s ~/.claude/plugins/mcukit/agents ~/.claude/agents
+ln -s ~/.claude/plugins/rkit/skills ~/.claude/skills
+ln -s ~/.claude/plugins/rkit/agents ~/.claude/agents
 ```
 
 #### 방법 C: 프로젝트 로컬 (서브모듈)
@@ -52,13 +52,13 @@ ln -s ~/.claude/plugins/mcukit/agents ~/.claude/agents
 ```bash
 # 1. 서브모듈로 추가
 cd my-stm32-project
-git submodule add https://github.com/solitasroh/mcukit.git .mcukit
+git submodule add https://github.com/solitasroh/rkit.git .rkit
 
 # 2. .claude/ 디렉토리에 심볼릭 링크
 mkdir -p .claude
-ln -s ../.mcukit/skills .claude/skills
-ln -s ../.mcukit/agents .claude/agents
-cp .mcukit/CLAUDE.md ./CLAUDE.md
+ln -s ../.rkit/skills .claude/skills
+ln -s ../.rkit/agents .claude/agents
+cp .rkit/CLAUDE.md ./CLAUDE.md
 ```
 
 ### 1.2 기존 설치 업데이트
@@ -71,14 +71,14 @@ cp .mcukit/CLAUDE.md ./CLAUDE.md
 
 ```bash
 # 1. 기존 플러그인 제거
-/plugin uninstall mcukit@solitasroh-mcukit
+/plugin uninstall rkit@solitasroh-rkit
 
 # 2. 마켓플레이스 캐시 제거 후 재등록
-/plugin marketplace remove solitasroh-mcukit
-/plugin marketplace add solitasroh/mcukit
+/plugin marketplace remove solitasroh-rkit
+/plugin marketplace add solitasroh/rkit
 
 # 3. 최신 버전으로 재설치
-/plugin install mcukit@solitasroh-mcukit
+/plugin install rkit@solitasroh-rkit
 
 # 4. Claude Code 재시작
 ```
@@ -87,7 +87,7 @@ cp .mcukit/CLAUDE.md ./CLAUDE.md
 
 ```bash
 # 1. 플러그인 디렉토리로 이동 후 pull
-cd ~/.claude/plugins/mcukit
+cd ~/.claude/plugins/rkit
 git pull origin main
 
 # 2. Claude Code 세션 재시작 (새 터미널에서)
@@ -101,10 +101,10 @@ claude
 ```bash
 # 1. 프로젝트 루트에서 서브모듈 업데이트
 cd my-stm32-project
-git submodule update --remote .mcukit
+git submodule update --remote .rkit
 
 # 2. CLAUDE.md가 변경된 경우 재복사
-cp .mcukit/CLAUDE.md ./CLAUDE.md
+cp .rkit/CLAUDE.md ./CLAUDE.md
 
 # 3. Claude Code 세션 재시작
 claude
@@ -117,7 +117,7 @@ claude
 /skill-status
 ```
 
-v0.7.0에서 추가된 스킬 4개(`/benchmark`, `/deploy`, `/investigate`, `/retro`)와 self-healing 에이전트가 목록에 표시되면 업데이트가 완료된 것입니다.
+`/skill-status` 실행 시 69개 스킬과 40개 에이전트가 표시되면 업데이트가 완료된 것입니다.
 
 ---
 
@@ -125,17 +125,17 @@ v0.7.0에서 추가된 스킬 4개(`/benchmark`, `/deploy`, `/investigate`, `/re
 
 ### 2.1 지원 도메인
 
-mcukit은 프로젝트 파일을 분석하여 자동으로 도메인을 감지합니다.
+rkit은 프로젝트 파일을 분석하여 자동으로 도메인을 감지합니다.
 
 | 도메인 | 대상 플랫폼 | 자동 감지 파일 |
 |--------|------------|---------------|
 | **MCU** | STM32, NXP Kinetis K | `.ioc`, `.ld`, `startup_*.s`, `stm32*.h`, `fsl_*.h` |
-| **MPU** | i.MX6, i.MX6ULL, i.MX28 | `.dts`, `.dtsi`, `bblayers.conf`, `*.bb` |
+| **MPU** | i.MX6, i.MX6ULL, i.MX28, STM32MP | `.dts`, `.dtsi`, `bblayers.conf`, `*.bb` |
 | **WPF** | C#/XAML/.NET 8 | `.csproj` + `<UseWPF>true</UseWPF>` |
 
 ### 2.2 PDCA 방법론
 
-mcukit의 모든 개발 워크플로는 PDCA(Plan-Do-Check-Act) 사이클을 따릅니다.
+rkit의 모든 개발 워크플로는 PDCA(Plan-Do-Check-Act) 사이클을 따릅니다.
 
 ```
 [PM] → [Plan] → [Design] → [Do] → [Check] → [Act] → [Report]
@@ -174,7 +174,7 @@ mcukit의 모든 개발 워크플로는 PDCA(Plan-Do-Check-Act) 사이클을 따
 cd my-stm32-project
 claude
 
-# 2. mcukit이 자동 감지 → MCU 도메인 활성화
+# 2. rkit이 자동 감지 → MCU 도메인 활성화
 # 3. 새 기능 개발 시작
 /pdca plan uart-dma
 
@@ -644,7 +644,7 @@ Features Completed:
 
 ### 8.3 Living Context System (v0.7.0 신규)
 
-mcukit v0.7.0에서 추가된 Living Context System은 7개 모듈로 구성된 런타임 컨텍스트 분석 시스템입니다.
+rkit v0.7.0에서 추가된 Living Context System은 7개 모듈로 구성된 런타임 컨텍스트 분석 시스템입니다.
 
 | 모듈 | 역할 |
 |------|------|
@@ -658,19 +658,19 @@ mcukit v0.7.0에서 추가된 Living Context System은 7개 모듈로 구성된 
 
 Living Context System은 PDCA 사이클 전반에 걸쳐 자동으로 동작하며, 별도의 명령 없이 에이전트가 활용합니다.
 
-### 8.4 `.bkit/` → `.mcukit/` 자동 마이그레이션
+### 8.4 `.bkit/` → `.rkit/` 자동 마이그레이션
 
-기존 bkit 기반 상태 디렉토리(`.bkit/`)가 감지되면 세션 시작 시 자동으로 `.mcukit/`으로 마이그레이션합니다.
+기존 bkit 기반 상태 디렉토리(`.bkit/`)가 감지되면 세션 시작 시 자동으로 `.rkit/`으로 마이그레이션합니다.
 
 - **Newer-wins 전략**: 양쪽 모두 존재하는 파일은 최신 파일이 우선
-- **JSON 콘텐츠 변환**: JSON 파일 내 `.bkit/` 경로 참조를 `.mcukit/`으로 자동 변환
+- **JSON 콘텐츠 변환**: JSON 파일 내 `.bkit/` 경로 참조를 `.rkit/`으로 자동 변환
 - **원본 제거**: 마이그레이션 성공 후 `.bkit/` 디렉토리 삭제
 
 ---
 
 ## 9. 도메인별 전문 에이전트
 
-mcukit은 40개의 AI 에이전트와 54개의 스킬을 제공합니다. 키워드를 입력하면 자동으로 적합한 에이전트가 활성화됩니다.
+rkit은 40개의 AI 에이전트와 69개의 스킬을 제공합니다. 키워드를 입력하면 자동으로 적합한 에이전트가 활성화됩니다.
 
 ### 9.1 MCU 전문 에이전트
 
@@ -687,6 +687,32 @@ mcukit은 40개의 AI 에이전트와 54개의 스킬을 제공합니다. 키워
 | `linux-bsp-expert` | Device Tree, 커널 설정, 부팅 시퀀스 | BSP, Device Tree, DTS |
 | `kernel-module-dev` | platform_driver, sysfs/ioctl, DMA | kernel module, driver |
 | `yocto-expert` | 레시피 작성, 레이어 관리, 이미지 빌드 | Yocto, bitbake, recipe |
+
+#### STM32MP Yocto 워크플로 스킬 (9개)
+
+STM32MP 기반 Yocto 개발의 전체 워크플로를 자동화하는 전용 스킬 세트입니다. ST/NXP/TI 3개 벤더를 지원합니다.
+
+| 스킬 | 명령 | 설명 |
+|------|------|------|
+| `yocto-stm32-setup` | `/yocto-stm32-setup` | Yocto 빌드 환경 전체 구성 (12단계 풀 셋업, repo init/sync, GitLab 연동) |
+| `yocto-stm32-build` | `/yocto-stm32-build` | bitbake 빌드 실행, SDK 생성, SBOM/릴리즈노트 |
+| `yocto-stm32-bsp` | `/yocto-stm32-bsp` | Kernel/U-Boot/TF-A/OP-TEE BSP 커스터마이징 |
+| `yocto-stm32-recipe` | `/yocto-stm32-recipe` | bbappend/image/distro/recipe 자동 생성 |
+| `board-debug` | `/board-debug` | 타겟 보드 SSH 디버깅, 시리얼 로그 수집/분석, QC 리포트 |
+| `hw-analysis` | `/hw-analysis` | 회로도/데이터시트 분석 → DTS/defconfig/드라이버 매핑 |
+| `project-workspace` | `/project-workspace` | git submodule + Kconfig + Makefile 멀티 플랫폼 빌드 시스템 |
+| `yocto-build-reproducibility` | — | 빌드 재현성 가이드 (SRCREV 고정, SSTATE 캐시, DL_DIR 미러) |
+| `yocto-review` | — | Yocto 코드 리뷰 체크리스트 (Recipe, DTS, defconfig 검증) |
+
+```
+# STM32MP Yocto 전형적 워크플로
+/yocto-stm32-setup           # 1. 환경 구성
+/hw-analysis                  # 2. 회로도 분석 → DTS 매핑
+/yocto-stm32-bsp              # 3. BSP 커스터마이징
+/yocto-stm32-recipe           # 4. Recipe 작업
+/yocto-stm32-build            # 5. 빌드 실행
+/board-debug                  # 6. 타겟 보드 디버깅
+```
 
 ### 9.3 WPF 전문 에이전트
 
@@ -737,11 +763,27 @@ mcukit은 40개의 AI 에이전트와 54개의 스킬을 제공합니다. 키워
 | 스킬 | 도메인 | 설명 |
 |------|--------|------|
 | `stm32-hal` | MCU | STM32 HAL/LL API 가이드 |
+| `nxp-mcuxpresso` | MCU | NXP MCUXpresso SDK 드라이버 패턴 가이드 |
 | `freertos` | MCU | FreeRTOS 태스크/동기화 설계 |
 | `cmake-embedded` | MCU | 임베디드 CMake 빌드 시스템 |
 | `communication` | MCU | UART/SPI/I2C/CAN 통신 패턴 |
+| `misra-c` | MCU | MISRA C:2012 코딩 표준 가이드 |
+| `imx-bsp` | MPU | i.MX BSP/Device Tree 개발 가이드 |
+| `kernel-driver` | MPU | 리눅스 커널 모듈/드라이버 개발 가이드 |
+| `yocto-build` | MPU | Yocto 빌드 시스템 가이드 |
 | `rootfs-config` | MPU | 루트파일시스템 구성 |
+| `yocto-stm32-setup` | MPU | STM32MP Yocto 빌드 환경 구성 (12단계) |
+| `yocto-stm32-build` | MPU | STM32MP bitbake 빌드 실행 |
+| `yocto-stm32-bsp` | MPU | STM32MP BSP 커스터마이징 (Kernel/U-Boot/TF-A/OP-TEE) |
+| `yocto-stm32-recipe` | MPU | STM32MP bbappend/image/distro 자동 생성 |
+| `board-debug` | MPU | 타겟 보드 SSH 디버깅, 시리얼 로그 분석 |
+| `hw-analysis` | MPU | 회로도/데이터시트 → DTS/defconfig 매핑 |
+| `project-workspace` | MPU | git submodule + Kconfig + Makefile 빌드 시스템 |
+| `yocto-build-reproducibility` | MPU | 빌드 재현성 가이드 |
+| `yocto-review` | MPU | Yocto 코드 리뷰 체크리스트 |
+| `wpf-mvvm` | WPF | WPF MVVM 아키텍처 가이드 |
 | `xaml-design` | WPF | XAML UI 디자인/스타일 가이드 |
+| `dotnet-patterns` | WPF | .NET DI/패턴/테스트 가이드 |
 | `serial-bridge` | MCU+WPF | MCU↔WPF 시리얼 통신 브릿지 |
 
 ### 10.4 Ops/분석 스킬 (v0.7.0 신규)
@@ -753,27 +795,42 @@ mcukit은 40개의 AI 에이전트와 54개의 스킬을 제공합니다. 키워
 | `investigate` | `/investigate {issue}` | 버그/인시던트 근본 원인 분석 |
 | `retro` | `/retro {feature}` | PDCA 사이클 구조화 회고 |
 
-### 10.5 딜리버리/유틸리티 스킬
+### 10.5 프로젝트 관리 스킬
+
+| 스킬 | 명령 | 설명 |
+|------|------|------|
+| `mr` | `/mr {action}` | GitLab MR 전체 라이프사이클 관리 (생성/리뷰/피드백/머지) |
+| `mr-conventions` | — | GitLab MR 팀 규칙, 코드 리뷰 프로토콜 (자동 참조) |
+| `op-status` | `/op-status` | OpenProject 프로젝트 현황 요약 |
+| `op-task` | `/op-task` | OpenProject 태스크 조회/관리 |
+| `op-create-task` | `/op-create-task` | OpenProject 태스크 대화형 생성 |
+| `openproject-conventions` | — | OpenProject MCP 도구 사용 규칙 (자동 참조) |
+| `btw` | `/btw` | 작업 중 개선 제안 즉시 수집/관리 |
+
+### 10.6 딜리버리/유틸리티 스킬
 
 | 스킬 | 명령 | 설명 |
 |------|------|------|
 | `ship` | `/ship {mr/release/tag}` | GitLab MR 자동화 (glab) |
 | `code-review` | `/code-review [--auto-fix]` | 코드 리뷰 (자동 수정 지원) |
 | `audit` | `/audit {action}` | 감사 로그/회고 |
+| `rollback` | `/rollback` | PDCA 체크포인트 관리 및 롤백 |
+| `skill-create` | `/skill-create` | 프로젝트 로컬 스킬 생성 |
 | `skill-status` | `/skill-status` | 설치된 스킬 목록 |
+| `cc-version-analysis` | `/cc-version-analysis` | Claude Code 버전 업그레이드 영향 분석 |
 | `claude-code-learning` | `/claude-code-learning` | Claude Code 사용법 학습 |
 
 ---
 
 ## 11. 자주 묻는 질문
 
-### Q: mcukit은 어떤 Claude Code 버전이 필요한가요?
+### Q: rkit은 어떤 Claude Code 버전이 필요한가요?
 
 **A:** v2.1.78 이상이 필요합니다. `claude --version`으로 확인하세요.
 
 ### Q: 도메인을 수동으로 지정할 수 있나요?
 
-**A:** mcukit은 프로젝트 파일 기반으로 자동 감지합니다. `.ioc` 파일이 있으면 MCU, `.dts`가 있으면 MPU, `.csproj`에 `UseWPF`가 있으면 WPF로 인식합니다.
+**A:** rkit은 프로젝트 파일 기반으로 자동 감지합니다. `.ioc` 파일이 있으면 MCU, `.dts`가 있으면 MPU, `.csproj`에 `UseWPF`가 있으면 WPF로 인식합니다.
 
 ### Q: GitHub를 쓰는데 `/ship`을 사용할 수 있나요?
 
@@ -788,7 +845,7 @@ gh pr create --title "제목" --body "설명"
 
 ### Q: PDCA를 꼭 다 거쳐야 하나요?
 
-**A:** 아닙니다. 간단한 버그 수정이나 소규모 변경은 PDCA 없이 바로 진행해도 됩니다. mcukit은 변경 규모에 따라 자동으로 PDCA 필요성을 판단합니다:
+**A:** 아닙니다. 간단한 버그 수정이나 소규모 변경은 PDCA 없이 바로 진행해도 됩니다. rkit은 변경 규모에 따라 자동으로 PDCA 필요성을 판단합니다:
 - **Quick Fix** (10줄 미만): PDCA 불필요
 - **Minor Change** (10-50줄): PDCA 선택
 - **Feature** (50-200줄): PDCA 권장
@@ -807,10 +864,10 @@ export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 **A:**
 ```bash
 # Marketplace 설치의 경우
-/plugin uninstall mcukit
+/plugin uninstall rkit
 
 # 수동 설치의 경우
-rm -rf ~/.claude/plugins/mcukit
+rm -rf ~/.claude/plugins/rkit
 rm ~/.claude/skills    # 심볼릭 링크 제거
 rm ~/.claude/agents    # 심볼릭 링크 제거
 ```

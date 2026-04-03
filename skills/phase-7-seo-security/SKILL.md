@@ -19,8 +19,8 @@ description: |
 imports:
   - ${PLUGIN_ROOT}/templates/pipeline/phase-7-seo-security.template.md
 agents:
-  default: mcukit:code-analyzer
-  security: mcukit:security-architect
+  default: rkit:code-analyzer
+  security: rkit:security-architect
 allowed-tools:
   - Read
   - Edit

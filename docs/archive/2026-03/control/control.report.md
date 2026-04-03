@@ -1,6 +1,6 @@
 # PDCA Completion Report: control
 
-> gstack 분석 기반 mcukit 안전/품질/딜리버리 기능 강화
+> gstack 분석 기반 rkit 안전/품질/딜리버리 기능 강화
 
 | Key | Value |
 |-----|-------|
@@ -8,7 +8,7 @@
 | Start Date | 2026-03-24 |
 | End Date | 2026-03-25 |
 | Duration | 1 day |
-| Author | AI (Claude Code + mcukit PDCA) |
+| Author | AI (Claude Code + rkit PDCA) |
 
 ---
 
@@ -18,8 +18,8 @@
 
 | Item | Detail |
 |------|--------|
-| Feature Name | control — gstack 분석 기반 mcukit 기능 강화 |
-| Objective | Garry Tan의 gstack 28개 슬래시 커맨드에서 mcukit에 적용 가능한 패턴을 식별하여 안전/품질/보안/딜리버리 전 영역에 적용 |
+| Feature Name | control — gstack 분석 기반 rkit 기능 강화 |
+| Objective | Garry Tan의 gstack 28개 슬래시 커맨드에서 rkit에 적용 가능한 패턴을 식별하여 안전/품질/보안/딜리버리 전 영역에 적용 |
 | Domains Covered | MCU, MPU (Kernel/Driver/App), WPF — 3개 도메인 균등 |
 | Start Date | 2026-03-24 |
 | End Date | 2026-03-25 |

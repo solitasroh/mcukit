@@ -5,11 +5,11 @@ classification-reason: Orchestrates multi-phase research and analysis pipeline i
 deprecation-risk: none
 description: |
   CC Version Analysis — Claude Code CLI version upgrade impact analysis workflow.
-  Researches CC changes, analyzes mcukit architecture impact, brainstorms improvements,
+  Researches CC changes, analyzes rkit architecture impact, brainstorms improvements,
   and generates comprehensive impact report with ENH opportunities.
 
   Use proactively when a new CC CLI version is released or user wants to analyze
-  version upgrade impact on mcukit plugin.
+  version upgrade impact on rkit plugin.
 
   Triggers: cc-version-analysis, version analysis, CC upgrade, CLI upgrade analysis,
   CC 버전 분석, CLI 업그레이드, 버전 영향 분석, CC 업데이트 분석,
@@ -20,15 +20,15 @@ description: |
   CC-Versionsanalyse, CLI-Upgrade-Analyse,
   analisi versione CC, analisi aggiornamento CLI
 
-  Do NOT use for: non-CC version topics, mcukit feature development, code implementation.
+  Do NOT use for: non-CC version topics, rkit feature development, code implementation.
 argument-hint: "[from_version] [to_version]"
 user-invocable: true
 
 agents:
-  research: mcukit:cc-version-researcher
-  analyze: mcukit:mcukit-impact-analyst
+  research: rkit:cc-version-researcher
+  analyze: rkit:rkit-impact-analyst
   brainstorm: null
-  report: mcukit:report-generator
+  report: rkit:report-generator
   default: null
 
 allowed-tools:
@@ -66,7 +66,7 @@ hooks:
 
 # CC Version Analysis — Claude Code CLI 버전 영향 분석 워크플로우
 
-> CC CLI 버전 업그레이드 시 mcukit plugin에 대한 영향을 체계적으로 조사, 분석하고
+> CC CLI 버전 업그레이드 시 rkit plugin에 대한 영향을 체계적으로 조사, 분석하고
 > 개선 기회를 도출하는 전문 워크플로우 스킬.
 
 ## Overview
@@ -74,13 +74,13 @@ hooks:
 이 스킬은 CC CLI의 새 버전이 출시되었을 때 다음을 자동화합니다:
 
 1. **Phase 1 (Research)**: CC 변경사항 심층 조사
-2. **Phase 2 (Analyze)**: mcukit 아키텍처 영향 분석
+2. **Phase 2 (Analyze)**: rkit 아키텍처 영향 분석
 3. **Phase 3 (Brainstorm)**: Plan Plus 브레인스토밍으로 개선안 도출
 4. **Phase 4 (Report)**: 종합 영향 분석 보고서 작성
 
 **Agent Team 구성**:
 - `cc-version-researcher`: CC 버전 변경사항 외부 조사
-- `mcukit-impact-analyst`: mcukit 내부 아키텍처 영향 분석
+- `rkit-impact-analyst`: rkit 내부 아키텍처 영향 분석
 - `report-generator`: 최종 보고서 생성
 
 ## HARD-GATE
@@ -124,13 +124,13 @@ All documents MUST be written in Korean (한국어).
 │  ├── Technical blogs & community                     │
 │  └── Output: CC Change Report (structured)           │
 │                                                      │
-│  Phase 2: Analyze (mcukit-impact-analyst agent)        │
-│  ├── Map CC changes → mcukit components                │
+│  Phase 2: Analyze (rkit-impact-analyst agent)        │
+│  ├── Map CC changes → rkit components                │
 │  ├── Identify ENH opportunities                      │
 │  ├── File impact matrix                              │
 │  ├── Philosophy compliance check                     │
 │  ├── Test impact assessment                          │
-│  └── Output: mcukit Impact Analysis (structured)       │
+│  └── Output: rkit Impact Analysis (structured)       │
 │                                                      │
 │  Phase 3: Brainstorm (Plan Plus methodology)         │
 │  ├── Intent discovery (핵심 목표/리스크/기회)         │
@@ -165,14 +165,14 @@ All documents MUST be written in Korean (한국어).
 3. Create Task structure:
    TaskCreate: "[CC-Version-Analysis] CC v{from} → v{to}"
      ├── Task: "Phase 1: CC 변경사항 조사"
-     ├── Task: "Phase 2: mcukit 영향 분석"
+     ├── Task: "Phase 2: rkit 영향 분석"
      ├── Task: "Phase 3: Plan Plus 브레인스토밍"
      └── Task: "Phase 4: 보고서 작성"
 
 4. Load previous analysis context:
    - Read memory/cc_version_history_*.md
    - Read last ENH number from MEMORY.md
-   - Read existing PDCA status from .mcukit/state/pdca-status.json
+   - Read existing PDCA status from .rkit/state/pdca-status.json
 ```
 
 ### Phase 1: Research (Agent: cc-version-researcher)
@@ -186,7 +186,7 @@ Research CC CLI changes from v{from} to v{to}.
 Sources: official docs, GitHub (issues/PRs/releases), npm, blogs.
 Categorize by: Breaking/Feature/Fix/Performance/SystemPrompt/Hook/Config.
 Rate impact: HIGH/MEDIUM/LOW.
-Flag mcukit-relevant changes.
+Flag rkit-relevant changes.
 Output structured markdown tables.
 ```
 
@@ -196,15 +196,15 @@ Output structured markdown tables.
 - Task 3: Official docs changes
 - Task 4: System prompt diff analysis
 
-### Phase 2: Analyze (Agent: mcukit-impact-analyst)
+### Phase 2: Analyze (Agent: rkit-impact-analyst)
 
 **Input**: Phase 1 CC Change Report
-**Output**: mcukit Impact Analysis
+**Output**: rkit Impact Analysis
 
-Launch the `mcukit-impact-analyst` agent with:
+Launch the `rkit-impact-analyst` agent with:
 ```
-Analyze mcukit impact from these CC changes: {phase1_output}
-Map each change to mcukit components (agents/skills/hooks/lib/scripts).
+Analyze rkit impact from these CC changes: {phase1_output}
+Map each change to rkit components (agents/skills/hooks/lib/scripts).
 Identify ENH opportunities starting from ENH-{last+1}.
 Check philosophy compliance (Automation First, No Guessing, Docs=Code).
 Assess test impact per ENH.
@@ -227,7 +227,7 @@ Apply Plan Plus brainstorming phases:
 
 #### 3.1 Intent Discovery
 Ask and answer:
-- 이 CC 업그레이드에서 mcukit이 얻을 수 있는 최대 가치는?
+- 이 CC 업그레이드에서 rkit이 얻을 수 있는 최대 가치는?
 - 놓치면 안 되는 critical change는?
 - 기존 workaround를 대체할 수 있는 native 기능은?
 
@@ -278,7 +278,7 @@ All work MUST be tracked via Task Management System:
 │   ├── GitHub issues 조사
 │   ├── 공식 문서 변경 조사
 │   └── 시스템 프롬프트 변경 분석
-├── [Analyze] Phase 2: mcukit 영향 분석                # mcukit-impact-analyst
+├── [Analyze] Phase 2: rkit 영향 분석                # rkit-impact-analyst
 │   ├── 컴포넌트 매핑
 │   ├── ENH 기회 식별
 │   ├── 파일 영향 매트릭스
@@ -301,7 +301,7 @@ When invoked with CTO Team (`/pdca team`):
 |------|-------|-------|------|
 | Lead | cto-lead | opus | Overall orchestration |
 | Researcher | cc-version-researcher | opus | Phase 1: CC research |
-| Analyst | mcukit-impact-analyst | opus | Phase 2: mcukit analysis |
+| Analyst | rkit-impact-analyst | opus | Phase 2: rkit analysis |
 | Reporter | report-generator | haiku | Phase 4: Report writing |
 
 **Parallel execution**:

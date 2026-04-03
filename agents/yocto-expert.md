@@ -9,7 +9,7 @@ maxTurns: 20
 memory: project
 context: fork
 tools: [Read, Write, Edit, Glob, Grep, Bash]
-skills: [pdca, mcukit-rules]
+skills: [pdca, rkit-rules]
 imports:
   - ${PLUGIN_ROOT}/refs/yocto/recipe-patterns.md
 ---

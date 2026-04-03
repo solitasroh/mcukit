@@ -1,9 +1,9 @@
 /**
- * mcukit Embedded Dev Kit - SessionStart: Migration Module (v2.1.0)
+ * rkit Embedded Dev Kit - SessionStart: Migration Module (v2.1.0)
  *
  * Handles state file migration:
- * 1. Legacy docs/ flat paths → .mcukit/ structured paths (v1.5.7→v1.5.9)
- * 2. Legacy .bkit/ directory → .mcukit/ directory (v2.1.0, bkit-gstack-sync)
+ * 1. Legacy docs/ flat paths → .rkit/ structured paths (v1.5.7→v1.5.9)
+ * 2. Legacy .bkit/ directory → .rkit/ directory (v2.1.0, bkit-gstack-sync)
  *
  * Includes LEGACY_PATHS detection, auto-migration, and version schema upgrades.
  */
@@ -13,8 +13,8 @@ const path = require('path');
 const { debugLog } = require('../../lib/core/debug');
 
 /**
- * Migrate .bkit/ → .mcukit/ (v2.1.0)
- * Copies newer files from .bkit/ subdirs into .mcukit/, then removes .bkit/.
+ * Migrate .bkit/ → .rkit/ (v2.1.0)
+ * Copies newer files from .bkit/ subdirs into .rkit/, then removes .bkit/.
  * Uses newer-wins strategy: only overwrite if source mtime > target mtime.
  * @param {object} result - Migration result accumulator
  */
@@ -22,7 +22,7 @@ function migrateBkitDir(result) {
   const { getMcukitRoot } = require('../../lib/core/paths');
   const projectRoot = process.cwd();
   const bkitDir = path.join(projectRoot, '.bkit');
-  const mcukitDir = path.join(projectRoot, getMcukitRoot());
+  const rkitDir = path.join(projectRoot, getMcukitRoot());
 
   if (!fs.existsSync(bkitDir)) return;
 
@@ -30,7 +30,7 @@ function migrateBkitDir(result) {
 
   for (const sub of subdirs) {
     const srcDir = path.join(bkitDir, sub);
-    const dstDir = path.join(mcukitDir, sub);
+    const dstDir = path.join(rkitDir, sub);
     if (!fs.existsSync(srcDir)) continue;
 
     try {
@@ -58,7 +58,7 @@ function migrateBkitDir(result) {
           try {
             const content = fs.readFileSync(dstFile, 'utf8');
             if (content.includes('.bkit/')) {
-              const rewritten = content.replace(/\.bkit\//g, '.mcukit/');
+              const rewritten = content.replace(/\.bkit\//g, '.rkit/');
               fs.writeFileSync(dstFile, rewritten, 'utf8');
             }
           } catch (_) { /* non-critical */ }
@@ -85,8 +85,8 @@ function migrateBkitDir(result) {
 
 /**
  * Run legacy path migration.
- * Migrates state files from docs/ flat paths to .mcukit/ structured paths,
- * then migrates .bkit/ → .mcukit/ if .bkit/ still exists.
+ * Migrates state files from docs/ flat paths to .rkit/ structured paths,
+ * then migrates .bkit/ → .rkit/ if .bkit/ still exists.
  * @param {object} _input - Hook input (unused, reserved for future use)
  * @returns {{ migrated: string[], errors: string[] }} Migration result
  */
@@ -141,7 +141,7 @@ function run(_input) {
     result.errors.push('init');
   }
 
-  // v2.1.0: Migrate .bkit/ → .mcukit/ (bkit-gstack-sync)
+  // v2.1.0: Migrate .bkit/ → .rkit/ (bkit-gstack-sync)
   try {
     migrateBkitDir(result);
   } catch (e) {

@@ -1,7 +1,7 @@
-# mcukit - AI Native Embedded Development Kit
+# rkit - AI Native Embedded Development Kit
 
 ## Overview
-mcukit is a Claude Code plugin for MCU/MPU/WPF development with PDCA methodology.
+rkit is a Claude Code plugin for MCU/MPU/WPF development with PDCA methodology.
 It auto-detects your project domain and provides domain-specific AI assistance.
 
 ## Supported Domains

@@ -1,7 +1,7 @@
 # openproject-integration Completion Report
 
 > **Feature**: openproject-integration
-> **Project**: mcukit v0.7.0
+> **Project**: rkit v0.7.0
 > **Date**: 2026-04-02
 > **Author**: soojang.roh
 
@@ -55,7 +55,7 @@
   - A(Minimal): 단순 복사, PDCA 연동 약함
   - B(Clean): 6 skill 세분화, 관리 부담
   - **C(Pragmatic): 4 skill + 구조화된 conventions, 케이스 A~F 전체 커버**
-- command → skill 변환 결정 (mcukit 아키텍처 일관성)
+- command → skill 변환 결정 (rkit 아키텍처 일관성)
 - op-task skill 신규 설계 (상태 변경/comment/시간 기록)
 
 ### 2.3 Do
@@ -87,7 +87,7 @@
 
 ### 2.5 Commit
 
-`18c078b` — feat: integrate OpenProject MCP into mcukit with PDCA workflow mapping
+`18c078b` — feat: integrate OpenProject MCP into rkit with PDCA workflow mapping
 
 ---
 
@@ -126,11 +126,11 @@
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| command → skill 변환 | skills/ 사용 | mcukit 54개 skill과 아키텍처 일관성 + 자동 트리거 |
+| command → skill 변환 | skills/ 사용 | rkit 54개 skill과 아키텍처 일관성 + 자동 트리거 |
 | op-task skill 신규 | 1개 다기능 skill | 상태 변경/comment/시간 기록을 분리하면 관리 부담 증가 |
 | userConfig 3-field | MCP URL + OP URL + API Key | 하드코딩 IP 완전 제거, 환경별 유연성 |
 | 모든 OP 연동은 제안 방식 | AskUserQuestion 확인 후 | 자동 실행 시 의도하지 않은 OP 변경 방지 |
-| OP 미연결 시 graceful | PDCA만 계속 | mcukit 기본 기능 보호 |
+| OP 미연결 시 graceful | PDCA만 계속 | rkit 기본 기능 보호 |
 
 ---
 
@@ -139,5 +139,5 @@
 | 항목 | 교훈 |
 |------|------|
 | 케이스 분석 우선 | 단순 파일 복사가 아닌 실제 사용 케이스(A~F)를 먼저 분석하니 op-task 같은 누락 기능을 발견 |
-| command → skill 변환 | mcukit 아키텍처에 맞춰 변환하면 자동 트리거 등 기존 인프라 활용 가능 |
+| command → skill 변환 | rkit 아키텍처에 맞춰 변환하면 자동 트리거 등 기존 인프라 활용 가능 |
 | Design 문서 정밀도 | 구현에서 개선한 부분을 Design에 역반영하여 100% 달성 — 양방향 동기화 중요 |

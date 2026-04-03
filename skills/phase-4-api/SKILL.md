@@ -23,7 +23,7 @@ hooks:
     - type: command
       command: "node ${CLAUDE_PLUGIN_ROOT}/scripts/phase4-api-stop.js"
       timeout: 10000
-agent: mcukit:qa-monitor
+agent: rkit:qa-monitor
 allowed-tools:
   - Read
   - Write

@@ -47,7 +47,7 @@ task-template: "[Arch-Lock] {action}"
 
 1. Reads the Design document (`docs/02-design/features/{feature}.design.md`)
 2. Extracts architecture decisions (layers, interfaces, memory, patterns, dependencies)
-3. Locks decisions in `.mcukit/state/arch-lock.json`
+3. Locks decisions in `.rkit/state/arch-lock.json`
 4. Generates Mermaid diagrams based on domain
 5. Pre-write hook checks modifications against locked boundaries
 
@@ -159,7 +159,7 @@ Auto-suggested after Design document creation:
 
 | File | Purpose |
 |------|---------|
-| `.mcukit/state/arch-lock.json` | Locked decisions state |
+| `.rkit/state/arch-lock.json` | Locked decisions state |
 | `docs/02-design/features/{feature}.arch-lock.md` | Lock document with diagrams |
 
 ## Usage Examples

@@ -26,11 +26,11 @@ hooks:
       command: "node ${CLAUDE_PLUGIN_ROOT}/scripts/phase8-review-stop.js"
       timeout: 10000
 agents:
-  default: mcukit:code-analyzer
-  validate: mcukit:design-validator
-  gap: mcukit:gap-detector
-  qa: mcukit:qa-strategist
-  team: mcukit:cto-lead
+  default: rkit:code-analyzer
+  validate: rkit:design-validator
+  gap: rkit:gap-detector
+  qa: rkit:qa-strategist
+  team: rkit:cto-lead
 allowed-tools:
   - Read
   - Glob

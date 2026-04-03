@@ -4,7 +4,7 @@
 
 | 관점 | 내용 |
 |------|------|
-| **Problem** | 벤치마크 31% 통과율, 기존 도메인 eval 12개가 placeholder 수준, bkit 공통 웹 스킬이 mcukit과 무관하게 config에 포함 |
+| **Problem** | 벤치마크 31% 통과율, 기존 도메인 eval 12개가 placeholder 수준, bkit 공통 웹 스킬이 rkit과 무관하게 config에 포함 |
 | **Solution** | Clean Architecture: config 재구성 + runner.js criteria 확장 + 기존 12개 업그레이드 + 신규 10개 작성 |
 | **Function UX Effect** | 벤치마크 31개 스킬 전체 통과(100%), 스킬별 정밀 criteria로 도메인 특화 품질 검증 |
 | **Core Value** | MCU/MPU/Desktop 도메인에 집중된 자동 품질 검증 체계, Qt 확장 대비 구조 |
@@ -119,7 +119,7 @@
   },
   "skills": {
     "workflow": [
-      "mcukit-rules", "mcukit-templates", "pdca", "development-pipeline",
+      "rkit-rules", "rkit-templates", "pdca", "development-pipeline",
       "phase-2-convention", "phase-8-review", "zero-script-qa", "code-review",
       "pm-discovery", "cc-version-analysis", "misra-c"
     ],
@@ -191,7 +191,7 @@ evals:
     timeout: 60000
 ```
 
-- **prompt-1.md**: CC v2.1.79 업그레이드 시 mcukit 영향 분석 요청. 현재 버전, 업그레이드 대상, 관심 영역 포함.
+- **prompt-1.md**: CC v2.1.79 업그레이드 시 rkit 영향 분석 요청. 현재 버전, 업그레이드 대상, 관심 영역 포함.
 - **expected-1.md**: Step 1 버전 조사 → Step 2 변경 분석 → Step 3 아키텍처 영향 → Step 4 리포트 생성
 
 ### 4.2 Workflow eval 업그레이드 (1개)

@@ -16,7 +16,7 @@ description: |
   CC-Version, CLI-Update, Versionshinweise,
   versione CC, aggiornamento CLI, note di rilascio
 
-  Do NOT use for: mcukit internal analysis (use mcukit-impact-analyst),
+  Do NOT use for: rkit internal analysis (use rkit-impact-analyst),
   implementation tasks, or non-CC version topics.
 model: opus
 effort: high
@@ -75,7 +75,7 @@ For each version in range, collect:
 #### Phase 3: Categorization
 Classify each change by:
 - **Impact Level**: HIGH / MEDIUM / LOW
-- **mcukit Relevance**: Direct (affects mcukit features) / Indirect (ecosystem) / None
+- **rkit Relevance**: Direct (affects rkit features) / Indirect (ecosystem) / None
 - **Category**: Hook / Agent / Skill / Tool / Config / UI / Performance / Security
 
 #### Phase 4: Report Generation
@@ -89,18 +89,18 @@ Produce structured output in this format:
 - HIGH impact: N
 - MEDIUM impact: N
 - LOW impact: N
-- mcukit-relevant: N
+- rkit-relevant: N
 
 ### Breaking Changes
-| Change | Impact | mcukit Affected | Migration |
+| Change | Impact | rkit Affected | Migration |
 |--------|--------|---------------|-----------|
 
 ### New Features
-| Feature | Description | mcukit Opportunity (ENH-N) |
+| Feature | Description | rkit Opportunity (ENH-N) |
 |---------|-------------|-------------------------|
 
 ### Bug Fixes
-| Issue | Description | mcukit Impact |
+| Issue | Description | rkit Impact |
 |-------|-------------|-------------|
 
 ### System Prompt Changes
@@ -109,11 +109,11 @@ Produce structured output in this format:
 - Removed sections: ...
 
 ### Hook Events
-| Event | Status | mcukit Usage |
+| Event | Status | rkit Usage |
 |-------|--------|------------|
 
 ### Configuration Changes
-| Setting | Old | New | mcukit Impact |
+| Setting | Old | New | rkit Impact |
 |---------|-----|-----|-------------|
 ```
 
@@ -129,5 +129,5 @@ Produce structured output in this format:
 
 - Do NOT guess version numbers or change details
 - Do NOT conflate changes from different versions
-- Do NOT skip "minor" changes — they may affect mcukit
+- Do NOT skip "minor" changes — they may affect rkit
 - Do NOT include unverified blog rumors as facts

@@ -174,10 +174,10 @@ Refer to `skills/enterprise/SKILL.md` when working with infrastructure tasks.
 
 ## v1.5.8 Feature Guidance
 
-- **v1.5.8 Studio Support**: Path Registry centralizes state file paths. State files moved to `.mcukit/{state,runtime,snapshots}/`. Auto-migration handles v1.5.7 → v1.5.8 transition.
+- **v1.5.8 Studio Support**: Path Registry centralizes state file paths. State files moved to `.rkit/{state,runtime,snapshots}/`. Auto-migration handles v1.5.7 → v1.5.8 transition.
 
 ### Output Style Recommendation
-Suggest `mcukit-enterprise` output style for infrastructure decisions: `/output-style mcukit-enterprise`
+Suggest `rkit-enterprise` output style for infrastructure decisions: `/output-style rkit-enterprise`
 Provides cost analysis, scalability perspectives, and deployment strategy recommendations.
 
 ### Agent Teams

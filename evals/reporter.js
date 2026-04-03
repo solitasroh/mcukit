@@ -17,7 +17,7 @@ function formatMarkdownReport(benchmarkResult) {
   const { timestamp, version, model, summary, details } = benchmarkResult;
 
   const lines = [
-    `# mcukit Skill Evals Report`,
+    `# rkit Skill Evals Report`,
     ``,
     `> Generated: ${timestamp}`,
     `> Version: ${version}`,
@@ -74,7 +74,7 @@ function formatDetailedReport(benchmarkResult) {
   }
 
   const lines = [
-    `# mcukit Skill Evals Detailed Report`,
+    `# rkit Skill Evals Detailed Report`,
     ``,
     `> Generated: ${timestamp}`,
     `> Version: ${version}`,

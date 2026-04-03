@@ -22,9 +22,9 @@ description: |
 argument-hint: "[action] [feature]"
 user-invocable: true
 agents:
-  analyze: mcukit:gap-detector
-  iterate: mcukit:pdca-iterator
-  report: mcukit:report-generator
+  analyze: rkit:gap-detector
+  iterate: rkit:pdca-iterator
+  report: rkit:report-generator
   team: null
   pm: null
   default: null
@@ -97,7 +97,7 @@ Run PM Agent Team for product discovery and strategy analysis before Plan phase.
    - 8-section PRD generation
 5. Output PRD to `docs/00-pm/{feature}.prd.md`
 6. Create Task: `[PM] {feature}`
-7. Update .mcukit-memory.json: phase = "pm"
+7. Update .rkit-memory.json: phase = "pm"
 8. Guide user to next step: `/pdca plan {feature}`
 
 **Output Path**: `docs/00-pm/{feature}.prd.md`
@@ -115,7 +115,7 @@ Run PM Agent Team for product discovery and strategy analysis before Plan phase.
 2. If not, create based on `plan.template.md`
 3. If exists, display content and suggest modifications
 4. Create Task: `[Plan] {feature}`
-5. Update .mcukit-memory.json: phase = "plan"
+5. Update .rkit-memory.json: phase = "plan"
 6. Write `## Executive Summary` at document top with 4-perspective table (Problem/Solution/Function UX Effect/Core Value), each 1-2 sentences
 7. **MANDATORY**: After completing the document, also output the Executive Summary table in your response so the user sees it immediately without opening the file
 
@@ -131,7 +131,7 @@ Run PM Agent Team for product discovery and strategy analysis before Plan phase.
 2. Create `docs/02-design/features/{feature}.design.md`
 3. Use `design.template.md` structure + reference Plan content
 4. Create Task: `[Design] {feature}` (blockedBy: Plan task)
-5. Update .mcukit-memory.json: phase = "design"
+5. Update .rkit-memory.json: phase = "design"
 
 **Output Path**: `docs/02-design/features/{feature}.design.md`
 
@@ -141,7 +141,7 @@ Run PM Agent Team for product discovery and strategy analysis before Plan phase.
 2. Provide implementation guide based on `do.template.md`
 3. Reference implementation order from Design document
 4. Create Task: `[Do] {feature}` (blockedBy: Design task)
-5. Update .mcukit-memory.json: phase = "do"
+5. Update .rkit-memory.json: phase = "do"
 
 **Guide Provided**:
 - Implementation order checklist
@@ -155,7 +155,7 @@ Run PM Agent Team for product discovery and strategy analysis before Plan phase.
 3. Compare Design document vs implementation code
 4. Calculate Match Rate and generate Gap list
 5. Create Task: `[Check] {feature}` (blockedBy: Do task)
-6. Update .mcukit-memory.json: phase = "check", matchRate
+6. Update .rkit-memory.json: phase = "check", matchRate
 
 **Output Path**: `docs/03-analysis/{feature}.analysis.md`
 
@@ -169,7 +169,7 @@ Run PM Agent Team for product discovery and strategy analysis before Plan phase.
 6. Stop when >= 90% reached or max iterations (5) hit
 
 **Iteration Rules**:
-- Max iterations: 5 (adjustable via mcukit.config.json)
+- Max iterations: 5 (adjustable via rkit.config.json)
 - Stop conditions: matchRate >= 90% or maxIterations reached
 
 ### report (Completion Report)
@@ -180,7 +180,7 @@ Run PM Agent Team for product discovery and strategy analysis before Plan phase.
 4. Include `## Executive Summary` with `### 1.3 Value Delivered` reflecting actual results (4 perspectives with metrics)
 5. **MANDATORY**: After completing the report, also output the Executive Summary table in your response
 6. Create Task: `[Report] {feature}`
-6. Update .mcukit-memory.json: phase = "completed"
+6. Update .rkit-memory.json: phase = "completed"
 
 **Output Path**: `docs/04-report/{feature}.report.md`
 
@@ -341,7 +341,7 @@ Select features to cleanup:
 
 ### status (Status Check)
 
-1. Read `.mcukit-memory.json`
+1. Read `.rkit-memory.json`
 2. Display current feature, PDCA phase, Task status
 3. Visualize progress
 
@@ -469,10 +469,10 @@ Task Creation Pattern:
 
 ## Output Style Integration (v1.5.1)
 
-PDCA workflows benefit from the `mcukit-pdca-guide` output style:
+PDCA workflows benefit from the `rkit-pdca-guide` output style:
 
 ```
-/output-style mcukit-pdca-guide
+/output-style rkit-pdca-guide
 ```
 
 This provides PDCA-specific response formatting:

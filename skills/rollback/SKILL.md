@@ -55,7 +55,7 @@ task-template: "[Rollback] {action}"
 
 List all available checkpoints for the current or specified feature.
 
-1. Read checkpoint metadata from `.mcukit/checkpoints/`
+1. Read checkpoint metadata from `.rkit/checkpoints/`
 2. Filter by current active feature (or show all if no active feature)
 3. Sort by timestamp (newest first)
 4. Display formatted checkpoint list
@@ -91,7 +91,7 @@ Usage: /rollback to cp-1710842700000
 
 Restore state to a specific checkpoint.
 
-1. Validate the checkpoint ID exists in `.mcukit/checkpoints/`
+1. Validate the checkpoint ID exists in `.rkit/checkpoints/`
 2. Read the checkpoint metadata and saved state
 3. Display what will be restored (phase, files, status)
 4. **Require user confirmation** via AskUserQuestion (always, regardless of automation level)
@@ -110,7 +110,7 @@ even at L4 (Full-Auto). This is a destructive operation.
 
 Rollback to the previous PDCA phase.
 
-1. Read current feature state from `.mcukit/state/pdca-status.json`
+1. Read current feature state from `.rkit/state/pdca-status.json`
 2. Determine previous phase using the PDCA phase order:
    `idle <- pm <- plan <- design <- do <- check <- act <- report <- archived`
 3. If current phase is `idle`, display: "Already at initial state. Nothing to rollback."
@@ -167,8 +167,8 @@ PDCA status tracking. Use `/pdca cleanup` to remove archived status entries.
 
 | File | Purpose |
 |------|---------|
-| `.mcukit/checkpoints/cp-{timestamp}.json` | Checkpoint metadata and state snapshot |
-| `.mcukit/state/pdca-status.json` | Current PDCA status (modified on rollback) |
+| `.rkit/checkpoints/cp-{timestamp}.json` | Checkpoint metadata and state snapshot |
+| `.rkit/state/pdca-status.json` | Current PDCA status (modified on rollback) |
 
 ## Module Dependencies
 

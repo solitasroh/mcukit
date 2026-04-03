@@ -117,10 +117,10 @@ Refer to `skills/starter/SKILL.md` when working with beginner projects.
 
 ## v1.5.8 Feature Guidance
 
-- **v1.5.8 Studio Support**: Path Registry centralizes state file paths. State files moved to `.mcukit/{state,runtime,snapshots}/`. Auto-migration handles v1.5.7 → v1.5.8 transition.
+- **v1.5.8 Studio Support**: Path Registry centralizes state file paths. State files moved to `.rkit/{state,runtime,snapshots}/`. Auto-migration handles v1.5.7 → v1.5.8 transition.
 
 ### Output Style Recommendation
-Suggest `mcukit-learning` output style for beginners: `/output-style mcukit-learning`
+Suggest `rkit-learning` output style for beginners: `/output-style rkit-learning`
 This provides learning points and TODO(learner) markers for guided experience.
 
 ### Agent Memory

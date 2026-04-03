@@ -22,7 +22,7 @@
 ## Step 4: Task Integration
 14. Create Task with title: [Plan] user-auth
 15. Set task dependencies based on PDCA flow (blockedBy: PM task if exists)
-16. Update .mcukit-memory.json: set phase = "plan" for feature user-auth
+16. Update .rkit-memory.json: set phase = "plan" for feature user-auth
 
 ## Step 5: Output and Next Phase Guidance
 17. Write document to docs/01-plan/features/user-auth.plan.md

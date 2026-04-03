@@ -27,8 +27,8 @@
 | Step | Item | Status | Notes |
 |:----:|------|:------:|-------|
 | 1 | `hooks/startup/migration.js` — `migrateBkitDir()` exists | Matched | Function present at line 21, newer-wins strategy, .bkit/ removal logic all implemented |
-| 2 | MCP pdca-server — MCUKIT_ROOT/MCUKIT_DIR, serverInfo, no handleBkit* | Partial | Uses `MCUKIT_ROOT`/`MCUKIT_DIR` inline constants instead of `require('../../lib/core/paths')`. serverInfo = `mcukit-pdca-server`. Zero `handleBkit*` functions. See deviation D-01 below. |
-| 3 | MCP analysis-server — same checks | Partial | Same inline constant pattern. serverInfo = `mcukit-analysis-server`. Zero `handleBkit*`. Same deviation D-01. |
+| 2 | MCP pdca-server — MCUKIT_ROOT/MCUKIT_DIR, serverInfo, no handleBkit* | Partial | Uses `MCUKIT_ROOT`/`MCUKIT_DIR` inline constants instead of `require('../../lib/core/paths')`. serverInfo = `rkit-pdca-server`. Zero `handleBkit*` functions. See deviation D-01 below. |
+| 3 | MCP analysis-server — same checks | Partial | Same inline constant pattern. serverInfo = `rkit-analysis-server`. Zero `handleBkit*`. Same deviation D-01. |
 | 4 | `lib/pdca/status.js` — readMemory/writeMemory | Matched | `readMemory()` at line 786, `writeMemory()` at line 806. Legacy `readBkitMemory`/`writeBkitMemory` retained as compat aliases (lines 854-855). |
 | 5 | `NOTICE.md` — bkit + gstack attribution | Matched | Exists at project root with both bkit (Apache 2.0) and gstack (MIT) sections. |
 
@@ -65,11 +65,11 @@
 |-------|--------|:------:|
 | `.bkit/` refs in source = 0 (except migration.js, docs) | 0 in lib/scripts JS files | Pass |
 | `readBkit`/`writeBkit` in lib/ = 0 (except compat aliases) | 3 files with compat aliases only | Pass |
-| `node -c servers/mcukit-pdca-server/index.js` | OK, no syntax errors | Pass |
-| `node -c servers/mcukit-analysis-server/index.js` | OK, no syntax errors | Pass |
+| `node -c servers/rkit-pdca-server/index.js` | OK, no syntax errors | Pass |
+| `node -c servers/rkit-analysis-server/index.js` | OK, no syntax errors | Pass |
 | `node -e "require('./lib/common')"` | OK, loads successfully | Pass |
 | `node -e "require('./lib/context')"` | OK, loads successfully | Pass |
-| package.json names updated | `mcukit-pdca-server`, `mcukit-analysis-server` | Pass |
+| package.json names updated | `rkit-pdca-server`, `rkit-analysis-server` | Pass |
 | `.bkit/` directory should not exist post-migration | `.bkit/` directory still present with stale snapshot files | Fail |
 
 ---
@@ -81,7 +81,7 @@
 | ID | Item | Design Location | Description | Severity |
 |----|------|-----------------|-------------|----------|
 | M-01 | MCP paths.js import | design:3.1.1 (line 108) | MCP servers should `require('../../lib/core/paths')` for `STATE_PATHS`, but use inline `MCUKIT_DIR` constant instead | Low |
-| M-02 | pdca-status.json path rewrite | design:3.1.5 (line 189-194) | Migration should rewrite `.bkit/` to `.mcukit/` inside pdca-status.json content; not implemented in migration.js | Medium |
+| M-02 | pdca-status.json path rewrite | design:3.1.5 (line 189-194) | Migration should rewrite `.bkit/` to `.rkit/` inside pdca-status.json content; not implemented in migration.js | Medium |
 
 ### Added (Implementation present, Design absent)
 
@@ -93,7 +93,7 @@
 
 | ID | Item | Design | Implementation | Severity |
 |----|------|--------|----------------|----------|
-| D-01 | MCP server path resolution | `const { STATE_PATHS } = require('../../lib/core/paths')` | `const MCUKIT_DIR = path.join(ROOT, '.mcukit')` with local helper functions | Low |
+| D-01 | MCP server path resolution | `const { STATE_PATHS } = require('../../lib/core/paths')` | `const MCUKIT_DIR = path.join(ROOT, '.rkit')` with local helper functions | Low |
 | D-02 | Migration function name | `migrateBkitToMcukit(projectDir)` | `migrateBkitDir(result)` — different signature (uses result accumulator pattern) | Info |
 | D-03 | .bkit/ stale data | Design expects `.bkit/` removed after migration | `.bkit/` directory persists with 6 snapshot files containing legacy paths | Medium |
 
@@ -103,15 +103,15 @@
 
 ### D-01: MCP Server Path Resolution (Low Severity)
 
-The design specified that MCP servers should import `STATE_PATHS` from `lib/core/paths.js` to achieve Single Source of Truth for paths. The implementation instead uses inline constants (`const MCUKIT_DIR = path.join(ROOT, '.mcukit')`) with local helper functions (`statePath()`, `auditPath()`). This works correctly but creates a secondary path definition outside of `paths.js`.
+The design specified that MCP servers should import `STATE_PATHS` from `lib/core/paths.js` to achieve Single Source of Truth for paths. The implementation instead uses inline constants (`const MCUKIT_DIR = path.join(ROOT, '.rkit')`) with local helper functions (`statePath()`, `auditPath()`). This works correctly but creates a secondary path definition outside of `paths.js`.
 
-**Risk**: If `.mcukit/` directory structure changes, MCP servers must be updated separately from `paths.js`.
+**Risk**: If `.rkit/` directory structure changes, MCP servers must be updated separately from `paths.js`.
 
 **Recommendation**: Accept as-is. MCP servers intentionally avoid dependencies on lib/ to remain lightweight and standalone. Document this as an intentional design deviation.
 
 ### M-02: pdca-status.json Content Rewrite (Medium Severity)
 
-The design document (lines 189-194) specifies that after copying files from `.bkit/` to `.mcukit/`, the migration should rewrite `.bkit/` path references inside `pdca-status.json` content. The actual `migrateBkitDir()` function copies files but does not perform this content rewrite.
+The design document (lines 189-194) specifies that after copying files from `.bkit/` to `.rkit/`, the migration should rewrite `.bkit/` path references inside `pdca-status.json` content. The actual `migrateBkitDir()` function copies files but does not perform this content rewrite.
 
 **Risk**: Migrated `pdca-status.json` may contain stale `.bkit/` path references in its JSON values.
 
@@ -121,7 +121,7 @@ The design document (lines 189-194) specifies that after copying files from `.bk
 
 The `.bkit/` directory still exists with 6 snapshot JSON files containing `.bkit/runtime/` path references. The migration function should have cleaned this up, but the snapshots were not processed (they reference `agent-state.json` and `agent-events.jsonl` with `.bkit/` paths).
 
-**Risk**: Confusion between `.bkit/` and `.mcukit/` state directories. No functional impact since active code reads from `.mcukit/`.
+**Risk**: Confusion between `.bkit/` and `.rkit/` state directories. No functional impact since active code reads from `.rkit/`.
 
 **Recommendation**: Run migration or manually remove `.bkit/` directory. The migration function handles removal when no errors occur (migration.js line 63-71).
 

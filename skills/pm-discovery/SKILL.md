@@ -23,7 +23,7 @@ description: |
 argument-hint: "[feature]"
 user-invocable: true
 agents:
-  default: mcukit:pm-lead
+  default: rkit:pm-lead
 allowed-tools:
   - Read
   - Write
