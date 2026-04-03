@@ -7,3 +7,4 @@
 | mcukit-mcu-domain | — | — | 2026-03 | plan, design, analysis, report |
 | mcukit-mpu-domain | — | — | 2026-03 | plan, design, analysis, report |
 | mcukit-wpf-domain | — | — | 2026-03 | plan, report |
+| mcukit-full-parity | — (초과달성) | — | 2026-03 | plan, design, report |
