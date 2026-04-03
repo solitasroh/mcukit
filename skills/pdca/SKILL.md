@@ -47,6 +47,9 @@ imports:
   - ${PLUGIN_ROOT}/templates/analysis.template.md
   - ${PLUGIN_ROOT}/templates/report.template.md
   - ${PLUGIN_ROOT}/templates/iteration-report.template.md
+  - ${PLUGIN_ROOT}/skills/rkit-rules/SKILL.md
+  - ${PLUGIN_ROOT}/refs/code-quality/cpp.md
+  - ${PLUGIN_ROOT}/refs/code-quality/csharp.md
 next-skill: null
 pdca-phase: null
 task-template: "[PDCA] {feature}"

@@ -38,6 +38,9 @@ allowed-tools:
   - AskUserQuestion
 imports:
   - ${PLUGIN_ROOT}/templates/plan-plus.template.md
+  - ${PLUGIN_ROOT}/skills/rkit-rules/SKILL.md
+  - ${PLUGIN_ROOT}/refs/code-quality/cpp.md
+  - ${PLUGIN_ROOT}/refs/code-quality/csharp.md
 next-skill: pdca design
 pdca-phase: plan
 task-template: "[Plan Plus] {feature}"

@@ -11,6 +11,9 @@ description: |
   개발, 기능, 드라이버, 펌웨어, 커널, WPF, MVVM
 user-invocable: false
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
+imports:
+  - ${PLUGIN_ROOT}/refs/code-quality/cpp.md
+  - ${PLUGIN_ROOT}/refs/code-quality/csharp.md
 ---
 
 # rkit Core Rules
@@ -44,14 +47,49 @@ rkit automatically detects the project domain and applies domain-specific rules:
 - Check XAML binding paths against ViewModel properties
 - .NET 8: Use `Microsoft.NET.Sdk` with `<UseWPF>true</UseWPF>`
 
-## 3. Code Quality Standards
+## 3. Code Structure Quality (All Domains)
+
+AI-generated code introduces 1.7x more structural issues — these rules prevent that.
+Apply these rules whenever generating code, regardless of domain.
+
+### Core Principles
+1. **Single Responsibility**: Each function/class/module has one reason to change
+2. **Open/Closed**: 3+ branches on same axis → Strategy/polymorphism, not more elif
+3. **Depend on Abstractions**: Inject dependencies via constructor, never instantiate internally
+4. **Reuse Before Write**: Check existing codebase first, do not reimplement utilities
+5. **Refactor First, Then Add**: If existing code can't absorb addition cleanly — refactor first
+
+### Sizing Limits
+| Metric | Limit | Action |
+|--------|-------|--------|
+| Function body | 40 lines | Extract helpers |
+| Parameters | 3 | Parameter object |
+| Nesting depth | 3 levels | Early return / guard clauses |
+| Class public methods | 7 | Split responsibilities |
+| File length | 300 lines | Split by cohesion |
+
+### Self-Check (before completing any code task)
+1. Does each unit have a single, nameable responsibility?
+2. Could I add a new variant without editing existing code?
+3. Are dependencies injected, not instantiated internally?
+4. Did I reuse existing project code, or write from scratch?
+5. Is every function under 40 lines and under 3 params?
+
+### Language-Specific Rules
+When writing code, read the matching reference from refs/code-quality/:
+- **C/C++**: `refs/code-quality/cpp.md` — RAII, ownership, enum class, no raw new/delete
+- **C#**: `refs/code-quality/csharp.md` — MVVM boundaries, DI, async Task, ObservableCollection
+- **TypeScript**: `refs/code-quality/typescript.md` — No any, const default, named exports
+- **Python**: `refs/code-quality/python.md` — Type hints, @dataclass, Protocol, pytest
+
+## 4. Domain Code Quality Standards
 
 - MCU: Zero MISRA Required violations, advisory max 10
 - MPU: Device Tree must compile with dtc
 - WPF: Zero build warnings, zero binding errors
 - All: Convention compliance >= 90%
 
-## 4. Safety Rules
+## 5. Safety Rules
 
 - Never auto-execute flash erase commands
 - Never auto-execute dd to block devices
