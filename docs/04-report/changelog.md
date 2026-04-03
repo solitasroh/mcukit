@@ -1,5 +1,37 @@
 # Changelog
 
+## [2026-04-03] - mcu-domain-v2 Completion
+
+### Added
+- **mcu-critical-analyzer**: Opus agent implementing ConSynergy 4-Stage pipeline for concurrency/critical issue analysis
+- **Extraction Layer (Layer 1)**: 4 JS modules (13 functions) extracting ISR/DMA/concurrency/tool data
+  - `isr-extractor.js`: ISR handlers, NVIC config, call graphs, global access (4 functions)
+  - `dma-extractor.js`: DMA channels, buffers, peripheral mapping (3 functions)
+  - `concurrency-extractor.js`: Global vars, sync primitives, context switches, atomic ops (4 functions)
+  - `tool-bridge.js`: cppcheck threadsafety, GCC stack usage (2 functions)
+- **Reference Library**: 12 concurrency patterns (CP-01 to CP-12) with severity + detection rules + MISRA/CERT references
+- **Custom Scheduler Guide**: Configurable patterns for team's non-FreeRTOS scheduler (16 sync + 9 switch patterns)
+- **Skill**: `/mcu-critical-analysis [srcDir]` user-facing interface (workflow classification)
+- **Report Template**: Structured critical issue report with severity × confidence matrix
+
+### Changed
+- **lib/mcu/index.js**: Added re-exports for 4 new modules (isr-extractor, dma-extractor, concurrency-extractor, tool-bridge)
+- **MCU domain scope**: 6 → 10 modules, 24 → 37 functions total
+
+### Metrics
+- Design-implementation match rate: 98% (no iteration needed)
+- Modules implemented: 4 extraction + 1 agent + 1 skill + 2 references + 1 template
+- Functions: 13 new (4+3+4+2)
+- Pattern coverage: 12 concurrency patterns with academic backing (ConSynergy, SDRacer, IntRace, SADA)
+- Execution time: 1 day (Plan Plus + Design + Do + Check → no Act phase)
+- Files created: 10 new files, 1 updated
+
+### Notes
+- Custom scheduler specialization: First AI tool for non-FreeRTOS concurrency analysis
+- Architecture: Hybrid 2-Layer (deterministic JS extraction + semantic LLM reasoning)
+- Integration: Zero breaking changes, backward compatible with existing MCU domain
+- Next: Live validation on team codebase, confidence calibration, scheduler pattern customization
+
 ## [2026-04-03] - eval-full-coverage Completion
 
 ### Added

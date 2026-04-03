@@ -156,6 +156,14 @@ if (activeAgent === 'qa-monitor') {
   handleQaMonitorPost(input, filePath);
 }
 
+// Code quality check on every code file write
+try {
+  const { handleCodeQuality } = require('./code-quality-hook');
+  handleCodeQuality(input);
+} catch (e) {
+  debugLog('UnifiedWritePost', 'code-quality-hook failed', { error: e.message });
+}
+
 // v1.6.0 ENH-103: PDCA template validation
 if (filePath) {
   try {
