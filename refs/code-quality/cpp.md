@@ -246,12 +246,241 @@ auto w = std::make_shared<Widget>(); auto w = std::make_unique<Widget>();
 
 ---
 
-## Reference Repos
+## Reference Repo Patterns (Pre-extracted)
 
-| Repository | Stars | Learn from |
-|------------|-------|------------|
-| [fmtlib/fmt](https://github.com/fmtlib/fmt) | 23k | API design, constexpr, RAII |
-| [abseil/abseil-cpp](https://github.com/abseil/abseil-cpp) | 17k | Modular structure, StatusOr\<T\> |
-| [TheLartians/ModernCppStarter](https://github.com/TheLartians/ModernCppStarter) | 5k | CMake project template |
-| [nlohmann/json](https://github.com/nlohmann/json) | 49k | ADL pattern, structured bindings |
-| [cpp-best-practices/gui_starter_template](https://github.com/cpp-best-practices/gui_starter_template) | 2.5k | Full tooling setup |
+> When designing C++ classes/modules, apply these patterns from real-world production repos.
+> Do NOT just list rules — structure your code like these repos do.
+
+### fmtlib/fmt (23k stars) — API Extension Patterns
+
+**Pattern 1: formatter<T> specialization for custom type formatting**
+
+When you need to make a user type formattable, specialize `formatter<T>` with `parse()` + `format()`:
+
+```cpp
+// User extends the library by specializing formatter in their namespace
+template <>
+struct fmt::formatter<Point> {
+    // Parse format spec (e.g., "{:}" or "{:.2f}")
+    constexpr auto parse(format_parse_context& ctx) -> format_parse_context::iterator {
+        return ctx.begin();  // no custom spec
+    }
+    // Format the value
+    auto format(const Point& p, format_context& ctx) const -> format_context::iterator {
+        return fmt::format_to(ctx.out(), "({}, {})", p.x, p.y);
+    }
+};
+// Usage: fmt::format("pos={}", point);
+```
+
+**Design intent**: Two-method interface (parse + format) separates spec parsing from rendering.
+Inherit from existing formatters to reuse standard specifiers.
+
+**Pattern 2: format_as() ADL for simple type aliases**
+
+```cpp
+// Simpler alternative: just define format_as() in the type's namespace
+enum class Color { Red, Green, Blue };
+auto format_as(Color c) -> std::string_view {
+    switch (c) {
+        case Color::Red:   return "red";
+        case Color::Green: return "green";
+        case Color::Blue:  return "blue";
+    }
+}
+// Usage: fmt::format("color={}", Color::Red);  // "color=red"
+```
+
+**Design intent**: ADL finds `format_as()` automatically — zero coupling to fmt library.
+Use for enums and thin wrappers. Use `formatter<T>` for complex types.
+
+**Pattern 3: Compile-time format string validation**
+
+```cpp
+// fmt validates format strings at compile time via constexpr parsing
+auto msg = fmt::format("{} has {} items", name, count);  // checked at compile time
+// Mismatch between args and placeholders → compile error, not runtime crash
+```
+
+**Apply this**: Use `std::format` (C++20) or fmtlib for ALL string formatting.
+Never use `sprintf`/`snprintf`/`stringstream`.
+
+---
+
+### abseil/abseil-cpp (17k stars) — Module & Error Patterns
+
+**Pattern 1: StatusOr<T> — Result type for error handling without exceptions**
+
+```cpp
+// Function returns value OR error — caller MUST check
+absl::StatusOr<Config> LoadConfig(std::string_view path) {
+    auto content = ReadFile(path);
+    if (!content.ok()) return content.status();  // propagate error
+
+    auto parsed = ParseYaml(*content);
+    if (!parsed.ok()) return absl::InvalidArgumentError("bad yaml");
+
+    return Config{*parsed};
+}
+
+// Caller
+auto config = LoadConfig("app.yaml");
+if (!config.ok()) {
+    LOG(ERROR) << config.status();
+    return;
+}
+UseConfig(*config);  // operator* accesses the value
+```
+
+**Design intent**: Errors are values, not exceptions. Caller can't ignore errors
+(`ABSL_MUST_USE_RESULT`). Use `std::expected<T,E>` (C++23) as standard equivalent.
+
+**Pattern 2: LogSink — Abstract interface for extensible logging**
+
+```cpp
+// Abstract sink with Send(LogEntry) + Flush()
+class LogSink {
+public:
+    virtual ~LogSink() = default;
+    virtual void Send(const LogEntry& entry) = 0;  // pure virtual, thread-safe
+    virtual void Flush() {}                          // optional, for buffered sinks
+};
+
+// LogEntry carries structured metadata — not just a string
+struct LogEntry {
+    LogSeverity severity;
+    absl::Time timestamp;
+    std::string_view message;
+    std::string_view source_filename;
+    int source_line;
+};
+```
+
+**Apply this**: When designing any interface that accepts pluggable backends (sinks, handlers,
+strategies), pass a **structured data object** (not a formatted string). This lets backends
+filter, route, or transform based on metadata.
+
+**Pattern 3: Module directory structure — self-contained per feature**
+
+```
+absl/
+  status/         # StatusOr, Status — own BUILD + CMakeLists
+  log/            # Log, LogSink, LogEntry — own BUILD + CMakeLists
+  strings/        # StrCat, StrFormat — own BUILD + CMakeLists
+  container/      # flat_hash_map, btree — own BUILD + CMakeLists
+```
+
+**Apply this**: Each module has its own headers + sources + build config.
+Public API in top-level headers, implementation in `internal/` subdirectory.
+
+---
+
+### TheLartians/ModernCppStarter (5k stars) — Project Template
+
+**Pattern: CMake with generator expressions for build/install separation**
+
+```cmake
+cmake_minimum_required(VERSION 3.14...3.22)
+project(MyLib VERSION 1.0 LANGUAGES CXX)
+
+# Dependencies via CPM (declarative, version-pinned)
+include(cmake/CPM.cmake)
+CPMAddPackage("gh:fmtlib/fmt#10.2.1")
+
+# Library target — scoped includes, not global
+add_library(mylib src/core.cpp src/parser.cpp)
+target_include_directories(mylib
+    PUBLIC  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
+    PRIVATE src)
+target_link_libraries(mylib PRIVATE fmt::fmt)
+target_compile_features(mylib PUBLIC cxx_std_20)
+
+# Tests in separate directory
+if(PROJECT_IS_TOP_LEVEL)
+    add_subdirectory(test)
+endif()
+```
+
+**Apply this**: Always use `target_*` commands (never `include_directories()`/`link_libraries()`).
+`$<BUILD_INTERFACE>` / `$<INSTALL_INTERFACE>` for proper header relocation.
+
+**Directory layout**:
+```
+project/
+  CMakeLists.txt
+  cmake/CPM.cmake         # dependency manager
+  include/mylib/           # public headers (users include these)
+    core.hpp
+    parser.hpp
+  src/                     # private implementation
+    core.cpp
+    parser.cpp
+    internal/              # internal headers not exposed
+  test/
+    CMakeLists.txt
+    test_core.cpp
+  standalone/              # executable entry point (if app, not lib)
+    main.cpp
+```
+
+---
+
+### nlohmann/json (49k stars) — Type Extension via ADL
+
+**Pattern 1: to_json / from_json free functions**
+
+```cpp
+// Define in YOUR namespace — ADL finds them automatically
+struct Person {
+    std::string name;
+    int age;
+};
+
+// Serialization: your type → json
+void to_json(nlohmann::json& j, const Person& p) {
+    j = nlohmann::json{{"name", p.name}, {"age", p.age}};
+}
+
+// Deserialization: json → your type
+void from_json(const nlohmann::json& j, Person& p) {
+    j.at("name").get_to(p.name);
+    j.at("age").get_to(p.age);
+}
+
+// Usage — library calls your functions via ADL
+nlohmann::json j = Person{"Alice", 30};     // implicit to_json
+auto p = j.get<Person>();                    // implicit from_json
+```
+
+**Design intent**: Zero coupling — your type never includes json.hpp.
+The library finds your functions through ADL (same namespace as your type).
+
+**Pattern 2: Macro for boilerplate elimination**
+
+```cpp
+// For simple struct-to-json mapping, use the intrusive macro
+struct Config {
+    std::string host;
+    int port;
+    bool verbose;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Config, host, port, verbose)
+};
+// Automatically generates to_json/from_json for listed members
+```
+
+**Pattern 3: Modular internal structure**
+
+```
+include/nlohmann/
+  json.hpp                  # public API (single include)
+  detail/
+    conversions/            # to_json, from_json dispatchers
+    iterators/              # iterator implementation
+    input/                  # parser, lexer
+    output/                 # serializer
+    meta/                   # type traits, void_t, is_detected
+```
+
+**Apply this**: Public API = one header. Complex implementation = `detail/` or `internal/`
+subdirectory. Never expose implementation headers to users.

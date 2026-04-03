@@ -92,7 +92,11 @@ This is not optional — skipping this produces structurally poor code.
 Each reference contains:
 - Bad/Good code pairs (follow the Good patterns)
 - Modern language idioms (use these, not legacy patterns)
-- Reference repositories (study these for code style)
+- **Pre-extracted reference repo patterns** (apply these design structures directly)
+  - When designing a class → apply the matching repo's architecture pattern
+  - Example: C++ Logger → abseil LogSink pattern (Send + Flush + LogEntry struct)
+  - Example: C++ API → fmtlib formatter<T> pattern (parse + format two-method interface)
+- Anti-patterns (avoid these explicitly)
 - Anti-patterns (avoid these explicitly)
 
 ## 4. Domain Code Quality Standards
