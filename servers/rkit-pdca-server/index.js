@@ -186,7 +186,7 @@ const TOOLS = [
           type: 'string',
           enum: ['matchRate', 'codeQualityScore', 'criticalIssueCount', 'apiComplianceRate',
                  'runtimeErrorRate', 'p95ResponseTime', 'conventionCompliance',
-                 'designCompleteness', 'iterationEfficiency', 'pdcaCycleTimeHours'],
+                 'designCompleteness', 'iterationEfficiency', 'pdcaCycleTimeHours', 'architectureCompliance'],
           description: 'Filter to a single metric. Omit for all.',
         },
         limit: { type: 'integer', minimum: 1, maximum: 100, default: 30 },
@@ -350,7 +350,7 @@ function handleMetricsGet(args) {
       thresholds: {
         matchRate: 90, codeQualityScore: 70, criticalIssueCount: 0,
         apiComplianceRate: 95, runtimeErrorRate: 1, p95ResponseTime: 1000,
-        conventionCompliance: 90, designCompleteness: 85,
+        conventionCompliance: 90, designCompleteness: 85, architectureCompliance: 90,
       },
     });
   }
