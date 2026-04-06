@@ -145,7 +145,7 @@ if (domainResult.domain !== 'unknown') {
 
 // --- Output ---
 const response = {
-  systemMessage: `rkit Embedded Dev Kit v0.1.0 activated (Claude Code)`,
+  systemMessage: `rkit Embedded Dev Kit v${require('../package.json').version} activated (Claude Code)`,
   hookSpecificOutput: {
     hookEventName: 'SessionStart',
     onboardingType: onboardingContext.onboardingData.type,

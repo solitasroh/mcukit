@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "AI Native Development Kit for MCU/MPU/WPF",
-    "version": "1.0.0"
+    "version": "0.9.2"
   },
   "plugins": [
     {
