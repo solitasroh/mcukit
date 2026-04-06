@@ -100,61 +100,20 @@
 
 ---
 
-## Phase 4: Bridge — common.js 점진적 해소
+## Phase 4: Bridge — common.js 점진적 해소 ✅ (2026-04-06 완료)
 
-> 목표: common.js 의존성을 직접 모듈 import로 전환
->
-> 예상 작업량: 2~3일 (점진적 — 배포 주기에 맞춰 분할 가능)
->
-> ⚠️ 이 단계는 Phase 3 완료 후 진행
+> 목표: `common.js` 의존성을 완전히 제거하고 직접 모듈 import로 전환.
 
-### 4.1 현황
+### 4.1 현황 및 파악 결과
 
-- `lib/common.js`: 5개 모듈에서 ~200개 함수 재-export
-- 현재 `scripts/` 61개 파일이 의존 (직접 또는 간접)
-- `common.js` 자체는 "Migration Bridge"로 명시되어 있음
+- `docs/improvement-plan.md`의 최초 작성 시점엔 `scripts/`에 약 61개 파일이 의존한다고 분석되었으나, 확인 결과 **`scripts/` 하위 파일들은 이미 이전 리팩토링 단계에서 모두 직접 import(`require('../lib/core/...')` 등)로 전환을 완료**한 상태였습니다.
+- 단, `lib/` 디렉토리 내의 6개 파일(`context-fork.js`, `context-hierarchy.js`, `import-resolver.js`, `memory-store.js`, `permission-manager.js`, `skill-orchestrator.js`)만이 여전히 `require('./common.js')` 패턴에 의존하고 있었습니다.
 
-### 4.2 전환 전략
+### 4.2 완료 사항
 
-```
-단계 A: scripts/ 파일에서 direct import 전환 (common.js 제거 없이)
-단계 B: common.js에 deprecation 경고 추가
-단계 C: common.js 제거
-```
-
-**단계 A 예시** (`scripts/unified-stop.js`):
-
-```diff
-- const common = require('../lib/common');
-- const { getPdcaStatusFull, debugLog, getConfig } = common;
-+ const { debugLog, getConfig } = require('../lib/core');
-+ const { getPdcaStatusFull } = require('../lib/pdca/status');
-```
-
-**작업 우선순위** (사용 빈도 높은 순):
-
-1. `scripts/unified-stop.js` (17KB — 가장 큰 스크립트)
-2. `scripts/pdca-skill-stop.js` (14KB)
-3. `scripts/iterator-stop.js` (13KB)
-4. `scripts/gap-detector-stop.js` (18KB)
-5. 나머지 57개 점진적 전환
-
-**단계 B**: common.js에 로드 시 deprecation 로그 추가
-
-```js
-// lib/common.js 상단에 추가
-const { debugLog } = require('./core/debug');
-debugLog('DEPRECATION', 'lib/common.js is deprecated. Import from specific modules instead.', {
-  caller: new Error().stack?.split('\n')[2]?.trim()
-});
-```
-
-**단계 C**: 모든 `require('../lib/common')` 제거 확인 후 `common.js` 삭제
-
-**검증**:
-- 각 파일 전환 후 `node test-all.js` 통과 확인
-- `grep -rn "require.*common" scripts/ lib/` 으로 잔여 참조 추적
-- 최종적으로 0건일 때 common.js 제거
+- 위 6개의 잔여 참조 파일 안에서 사용되는 `common.` 패턴을 추적하여 `core.` 및 `pdcaStatus.` 등의 명시적 객체 호출로 스크립트를 통해 일괄 변환 완료.
+- 거대 브릿지 파일이었던 **`lib/common.js` 최종 완전 삭제**.
+- **검증**: `node test-all.js` (122/122개 모듈 로드, 76 PASS, 0 FAIL) 를 바탕으로 레거시 브릿지가 제거된 후에도 전체 애플리케이션의 모듈 시스템이 완벽하게 동작함을 확인.
 
 ---
 
