@@ -5,19 +5,8 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 function getConfig() {
-  let url = process.env.OPENPROJECT_URL || process.env.openproject_url;
+  let url = process.env.OPENPROJECT_URL || process.env.openproject_url || process.env.openproject_mcp_url;
   let apiKey = process.env.OPENPROJECT_API_KEY || process.env.openproject_api_key;
-  
-  // Attempt to parse local .env file
-  const envPath = path.join(__dirname, '..', '.env');
-  if (fs.existsSync(envPath)) {
-    const lines = fs.readFileSync(envPath, 'utf8').split('\n');
-    for (const line of lines) {
-      if (line.trim().startsWith('#')) continue;
-      if (line.includes('OPENPROJECT_URL=')) url = line.split('=')[1].trim();
-      if (line.includes('OPENPROJECT_API_KEY=')) apiKey = line.split('=')[1].trim();
-    }
-  }
   
   if (url && url.endsWith('/')) {
     url = url.slice(0, -1);
