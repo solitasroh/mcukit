@@ -357,6 +357,91 @@ function createOrder(price: Money, email: Email) {
 
 ---
 
+## 6.5. Refactoring Recipes (Before/After)
+
+### Recipe 1: Nested Loops → Pipeline
+
+```javascript
+// BEFORE — O(n²), hard to read
+for (const order of orders) {
+  for (const item of order.items) {
+    if (item.price > 100) result.push(item.name);
+  }
+}
+
+// AFTER — pipeline (flatMap/filter/map)
+const result = orders
+  .flatMap(o => o.items)
+  .filter(i => i.price > 100)
+  .map(i => i.name);
+```
+
+### Recipe 2: Branch Chain → Lookup Table
+
+```typescript
+// BEFORE — 5+ if/else-if on same axis
+if (type === 'A') return handleA();
+else if (type === 'B') return handleB();
+else if (type === 'C') return handleC();
+else if (type === 'D') return handleD();
+else return handleDefault();
+
+// AFTER — lookup table
+const handlers: Record<string, () => Result> = {
+  A: handleA, B: handleB, C: handleC, D: handleD,
+};
+return (handlers[type] ?? handleDefault)();
+```
+
+### Recipe 3: State Branching → State Pattern
+
+```typescript
+// BEFORE — status checks scattered everywhere
+if (status === 'draft') { /* draft logic */ }
+else if (status === 'confirmed') { /* confirmed logic */ }
+else if (status === 'shipped') { /* shipped logic */ }
+
+// AFTER — State pattern
+interface OrderState { handle(ctx: OrderContext): void; }
+class DraftState implements OrderState { handle(ctx) { /* draft logic */ } }
+class ConfirmedState implements OrderState { handle(ctx) { /* confirmed logic */ } }
+// Each state handles its own transitions
+```
+
+### Recipe 4: Constructor Bloat → Builder
+
+```typescript
+// BEFORE — 5+ constructor params
+const config = new ServerConfig('localhost', 8080, true, 30000, '/api', true, 'production');
+
+// AFTER — Builder pattern
+const config = new ServerConfigBuilder()
+  .host('localhost').port(8080)
+  .ssl(true).timeout(30000)
+  .basePath('/api').env('production')
+  .build();
+```
+
+### Recipe 5: Switch Cases → Registry
+
+```typescript
+// BEFORE — 8+ switch cases
+switch (command) {
+  case 'start': return startHandler();
+  case 'stop': return stopHandler();
+  // ... 6 more cases
+}
+
+// AFTER — registry pattern
+const registry = new Map<string, CommandHandler>();
+registry.set('start', startHandler);
+registry.set('stop', stopHandler);
+// Register at startup, lookup at runtime
+return registry.get(command)?.execute() ?? unknownCommand();
+```
+
+---
+
 ## 7. Self-Check (Run Before Completing Any Code Task)
 
 1. Does each function/class have a single, nameable responsibility?

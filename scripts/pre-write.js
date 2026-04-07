@@ -209,22 +209,20 @@ if (isCodeFile(filePath)) {
 }
 
 // ============================================================
-// 4.5. Code Structure Quality (v0.9.1 - Always inject for code files)
+// 4.5. Code Structure Quality (v2.1.0 - Context-aware Pre Guide)
 // ============================================================
 if (isCodeFile(filePath)) {
-  const ext = require('path').extname(filePath).toLowerCase();
-  const langRef = {
-    '.c': 'cpp', '.cpp': 'cpp', '.h': 'cpp', '.hpp': 'cpp', '.cc': 'cpp',
-    '.cs': 'csharp', '.ts': 'typescript', '.tsx': 'typescript',
-    '.js': 'typescript', '.jsx': 'typescript', '.py': 'python',
-  }[ext];
-  const refPath = langRef ? `refs/code-quality/${langRef}.md` : null;
-  contextParts.push(
-    'CODE QUALITY: Functions<=40 lines, params<=3, nesting<=3. ' +
-    'Single responsibility. Inject dependencies. Reuse existing code. ' +
-    'Apply design patterns from reference repos.' +
-    (refPath ? ` MUST Read ${refPath} before writing.` : '')
-  );
+  try {
+    const { generateStructuralGuide } = require('../lib/code-quality/pre-guide');
+    const guide = generateStructuralGuide(filePath, content);
+    if (guide) contextParts.push(guide);
+  } catch (e) {
+    // Fallback to basic rules if pre-guide module fails
+    contextParts.push(
+      'CODE QUALITY: Functions<=40 lines, params<=3, nesting<=3. Single responsibility.'
+    );
+    debugLog('PreToolUse', 'Pre-guide fallback', { error: e.message });
+  }
 }
 
 // ============================================================

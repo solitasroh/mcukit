@@ -63,10 +63,30 @@ Analyzes quality, security, performance, and architecture compliance of implemen
     - Classes: PascalCase
     - Constants: UPPER_SNAKE_CASE
 
-[ ] Code structure
-    - Function length (50 lines or less recommended)
-    - File length (300 lines or less recommended)
-    - Nesting depth (3 levels or less recommended)
+[ ] Code structure (SQ-001~004)
+    - SQ-001: Function length (40 lines warning, 80 error)
+    - SQ-002: Parameter count (3 warning, 5 error)
+    - SQ-003: Nesting depth (3 warning, 5 error)
+    - SQ-004: File length (300 warning, 500 error)
+
+[ ] Structural complexity (SQ-005~008)
+    - SQ-005: Nested loops (depth 2 warning, 3 error) → Extract to helper or pipeline
+    - SQ-006: Branch chain — if/else-if (5 warning, 8 error) → Strategy/lookup table
+    - SQ-006b: Switch cases (8 warning, 12 error) → Lookup table/registry
+    - SQ-007: God Class signal (7+ public methods AND 300+ lines) → Split by SRP
+    - SQ-008: Architecture violation (cross-layer import) → Dependencies point inward
+
+[ ] Anti-patterns
+    - Feature Envy: accessing 4+ fields of another object
+    - Primitive Obsession: 3+ primitive params → Value Object
+    - Magic Numbers: unnamed numeric literals → named constants
+
+[ ] Design pattern fitness
+    - 4+ branches on same axis → Strategy pattern
+    - 3+ state checks (status/phase/mode) → State pattern
+    - Type-based object creation → Factory pattern
+    - 4+ constructor params → Builder pattern
+    - Do NOT over-engineer: <4 branches = keep simple if/else
 
 [ ] Comments and documentation
     - Public API documentation
