@@ -51,6 +51,7 @@ imports:
   - ${PLUGIN_ROOT}/refs/code-quality/cpp.md
   - ${PLUGIN_ROOT}/refs/code-quality/csharp.md
   - ${PLUGIN_ROOT}/refs/code-quality/architecture-patterns.md
+  - ${PLUGIN_ROOT}/skills/openproject-conventions/SKILL.md
 next-skill: null
 pdca-phase: null
 task-template: "[PDCA] {feature}"
