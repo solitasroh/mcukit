@@ -7,6 +7,7 @@ description: |
   Unified skill for managing the entire PDCA cycle.
   Auto-triggered by keywords: "plan", "design", "analyze", "report", "status".
   Replaces legacy /pdca-* commands.
+  Mermaid 다이어그램을 적극 활용하여 설계와 구조를 시각화한다.
 
   Use proactively when user mentions PDCA cycle, planning, design documents,
   gap analysis, iteration, or completion reports.
@@ -51,6 +52,7 @@ imports:
   - ${PLUGIN_ROOT}/refs/code-quality/cpp.md
   - ${PLUGIN_ROOT}/refs/code-quality/csharp.md
   - ${PLUGIN_ROOT}/refs/code-quality/architecture-patterns.md
+  - ${PLUGIN_ROOT}/skills/mermaid/SKILL.md
   - ${PLUGIN_ROOT}/skills/openproject-conventions/SKILL.md
 next-skill: null
 pdca-phase: null
