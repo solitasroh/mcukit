@@ -6,3 +6,4 @@
 | openproject-integration | 100% | 1 | 2026-04-02 |
 | mr-lifecycle | 100% | 1 | 2026-04-03 |
 | ui-enhancement | 100% | 1 | 2026-04-03 |
+| ecc-insights-integration | 97.1% | 0 | 2026-04-10 |
