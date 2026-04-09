@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-hooks.json",
-  "description": "rkit Embedded Dev Kit v0.9.2 - Claude Code (7 essential hooks)",
+  "description": "rkit v0.9.13 — AI Native Development Kit: PDCA lifecycle, code quality gates, pattern learning",
   "hooks": {
     "SessionStart": [
       {
