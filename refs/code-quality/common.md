@@ -481,3 +481,117 @@ Study these repos for excellent code structure in each language:
 ### Multi-Language Patterns
 - [RefactoringGuru](https://github.com/RefactoringGuru) — 23 GoF patterns in 8 languages
 - [ryanmcdermott/clean-code-javascript](https://github.com/ryanmcdermott/clean-code-javascript) (94k) — Bad/Good pairs
+
+---
+
+## 9. Security Checklist (ECC-Insight)
+
+> Inspired by Everything Claude Code security patterns. Apply across all languages.
+
+### 9.1 Hardcoded Secrets — CRITICAL
+
+Secrets in source = immediate BLOCK.
+
+| Pattern | Severity | Fix |
+|---------|:--------:|-----|
+| `password = "..."` / `apiKey = "..."` / `secret = "..."` | CRITICAL | Environment variable or secret manager |
+| `Bearer <token>` hardcoded | CRITICAL | Fetch from env / vault |
+| Private keys (RSA, SSH) committed | CRITICAL | `.gitignore` + rotate compromised keys |
+| `.env` files tracked in git | HIGH | `.gitignore` + `.env.example` |
+
+### 9.2 Injection Prevention — CRITICAL
+
+| Type | Bad | Good |
+|------|-----|------|
+| **SQL** | `"SELECT * FROM t WHERE id=" + id` | Parameterized query / ORM |
+| **Shell** | `subprocess.run(cmd, shell=True)` | `subprocess.run([cmd, arg], shell=False)` |
+| **Path Traversal** | `open(base + user_input)` | `realpath()` + prefix check |
+| **Command** | `system("rm " + filename)` | Validate + whitelist + proper escaping |
+
+### 9.3 Deserialization Safety — CRITICAL
+
+Never deserialize untrusted data with unsafe formats.
+
+- **Python**: `pickle.load()` on untrusted data → use JSON/MessagePack
+- **C#**: `BinaryFormatter` → use `System.Text.Json`
+- **Java**: `ObjectInputStream` → use Jackson with type validation
+- **YAML**: `yaml.load()` → `yaml.safe_load()`
+
+### 9.4 Input Validation Boundaries — HIGH
+
+Validate at system boundaries, trust internal code.
+
+- User input (web forms, CLI args, API requests)
+- External API responses
+- File uploads (size, type, content)
+- Environment variables (type coercion)
+
+Do NOT re-validate inside trusted internal calls — this is defensive programming anti-pattern.
+
+---
+
+## 10. Severity Classification (ECC-Insight)
+
+Unified severity taxonomy for all review layers (L1 design, L2 language idioms, L3 domain safety).
+
+| Severity | Criteria | Review Action | Examples |
+|----------|----------|---------------|----------|
+| **CRITICAL** | Security vulnerability, data loss risk, crash-inducing | **BLOCK** — Must fix, deployment halted | Hardcoded secrets, SQL injection, use-after-free, MISRA Required violation |
+| **HIGH** | SOLID violation, cyclomatic > 20, unhandled errors | **WARNING** — Fix recommended, review cannot pass | God class, deeply nested logic, missing error handling, data race |
+| **MEDIUM** | Naming inconsistency, DRY violation, magic numbers | **WARNING** — Improvement suggested, review can pass | Duplicate code, unclear names, missing constants |
+| **LOW** | Missing docs, formatting inconsistency | **APPROVE** — Informational only | Missing JSDoc, import order, trailing whitespace |
+
+### Review Report Format
+
+```markdown
+## Quality Score: {0-100}/100
+
+### BLOCK (CRITICAL) — Fix required
+- [SQ-XXX] Description at file:line
+- ...
+
+### WARNING (HIGH / MEDIUM) — Recommended
+- [SQ-XXX] Description at file:line
+- ...
+
+### APPROVE (LOW) — Informational
+- [SQ-XXX] Description at file:line
+- ...
+
+### Summary
+- Files reviewed: N
+- Critical: X | High: Y | Medium: Z | Low: W
+- Decision: BLOCK / WARNING / APPROVE
+```
+
+---
+
+## 11. AI-Generated Code Audit Rules (ECC-Insight)
+
+> AI-generated code has distinct failure modes. These rules augment standard review.
+
+### 11.1 Mandatory Verification
+
+| Check | Why | How to verify |
+|-------|-----|---------------|
+| **Error handling sincerity** | AI often adds empty `catch {}` blocks to silence errors | Every catch must log OR re-throw OR handle meaningfully |
+| **Resource cleanup paths** | File handles, DB connections, sockets may leak | Trace every resource through all exit paths (happy + error) |
+| **Boundary conditions** | Empty input, null, max values often missed | Add explicit tests for empty/null/max |
+| **API existence** | AI hallucinates library functions | Verify every import and method call against real docs |
+| **Version accuracy** | AI suggests deprecated APIs | Check against current language/framework version |
+
+### 11.2 AI-Specific Anti-Patterns
+
+- **Overbroad try-catch**: Wrapping large blocks with `catch (Exception)` — split into specific exceptions
+- **Premature abstraction**: Creating interface/factory for single implementation — YAGNI
+- **Unnecessary null checks**: Defensive null checks after framework guarantees non-null
+- **Duplicated boilerplate**: AI re-generates same utility rather than extracting
+- **Comment rot**: Comments describing pre-AI code that no longer matches
+
+### 11.3 Red Flags in Diffs
+
+- Mass changes across unrelated files in one "fix"
+- New dependencies without justification
+- Config/lint rule relaxation to "fix" errors
+- `// TODO`, `// FIXME`, `// temporary` comments introduced by AI
+- Test assertions weakened (`expect(x).toBeDefined()` vs `expect(x).toBe(42)`)

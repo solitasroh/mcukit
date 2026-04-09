@@ -198,3 +198,202 @@ def validate(order: Order, rules: list[Validator[Order]]) -> list[str]:
 | [Textualize/textual](https://github.com/Textualize/textual) | 35k | Python 3.11+ idioms, async, `Self` |
 | [litestar-org/litestar](https://github.com/litestar-org/litestar) | 8k | Protocol + DI + async patterns |
 | [polarsource/polar](https://github.com/polarsource/polar) | 9.6k | Production Clean Architecture, FastAPI |
+
+---
+
+## Security (ECC-Insight)
+
+Security-critical Python rules. Every violation is CRITICAL severity.
+
+### SQL Injection — No f-strings in Queries
+
+```python
+# Bad — SQL injection
+cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
+cursor.execute("SELECT * FROM users WHERE name = '" + name + "'")
+
+# Good — parameterized (DB-API 2.0 style)
+cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+
+# Good — SQLAlchemy Core
+stmt = select(User).where(User.id == user_id)
+result = session.execute(stmt)
+
+# Good — SQLAlchemy ORM
+user = session.get(User, user_id)
+```
+
+### Shell Injection — No `shell=True` with User Input
+
+```python
+# Bad — shell interprets everything
+import subprocess
+subprocess.run(f"ls {user_input}", shell=True)
+subprocess.run("ls " + user_input, shell=True)
+
+# Good — list of arguments, no shell
+subprocess.run(["ls", user_input], check=True)
+
+# Good — when shell pipes are truly needed, validate first
+import shlex
+if not user_input.isalnum():
+    raise ValueError("invalid input")
+subprocess.run(["sh", "-c", f"ls {shlex.quote(user_input)} | wc -l"], check=True)
+```
+
+### Deserialization — pickle is Unsafe
+
+```python
+# Bad — arbitrary code execution on untrusted data
+import pickle
+with open("data.pkl", "rb") as f:
+    obj = pickle.load(f)  # RCE if file is attacker-controlled
+
+# Good — JSON for untrusted data
+import json
+with open("data.json") as f:
+    obj = json.load(f)
+
+# Good — MessagePack for binary
+import msgpack
+obj = msgpack.unpackb(data, raw=False)
+```
+
+pickle is only acceptable for data your own code wrote and never left a trusted boundary.
+
+### Path Traversal
+
+```python
+# Bad — user controls path
+from pathlib import Path
+file = Path(base_dir) / user_input
+content = file.read_text()
+
+# Good — resolve and verify prefix
+from pathlib import Path
+
+def safe_path(base: Path, user_input: str) -> Path:
+    base_real = base.resolve()
+    requested = (base / user_input).resolve()
+    try:
+        requested.relative_to(base_real)
+    except ValueError:
+        raise PermissionError("path traversal detected")
+    return requested
+
+file = safe_path(Path(base_dir), user_input)
+content = file.read_text()
+```
+
+### Secrets in Environment
+
+```python
+# Bad — hardcoded
+API_KEY = "sk-abc123..."
+
+# Good — environment variables with validation
+import os
+API_KEY = os.environ.get("API_KEY")
+if not API_KEY:
+    raise RuntimeError("API_KEY environment variable required")
+
+# Good — pydantic-settings for typed config
+from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    api_key: str
+    debug: bool = False
+
+    class Config:
+        env_file = ".env"
+```
+
+---
+
+## Anti-patterns (ECC-Insight)
+
+### Mutable Default Arguments — HIGH
+
+```python
+# Bad — list is shared across all calls
+def append_item(item, items=[]):
+    items.append(item)
+    return items
+
+# Good — None sentinel + create new list
+def append_item(item, items=None):
+    items = items if items is not None else []
+    items.append(item)
+    return items
+```
+
+Same applies to `{}`, `set()`, dataclass `field(default=[])`. Use `field(default_factory=list)` for dataclasses.
+
+### `print` vs `logging`
+
+```python
+# Bad — production code
+print(f"Processing user {user_id}")
+print(f"Error: {e}")
+
+# Good — structured logging
+import logging
+logger = logging.getLogger(__name__)
+
+logger.info("Processing user", extra={"user_id": user_id})
+logger.error("Processing failed", exc_info=True, extra={"user_id": user_id})
+```
+
+`print` is for CLI output. Everything else uses `logging`. Configure log levels per environment.
+
+### Builtin Shadowing
+
+```python
+# Bad — shadows builtins
+list = [1, 2, 3]       # breaks list() later
+dict = {"a": 1}        # breaks dict() later
+id = user.id           # breaks id() later
+type = "admin"         # breaks type() later
+input = request.body   # breaks input() later
+```
+
+Builtin names to avoid: `list`, `dict`, `set`, `tuple`, `str`, `int`, `float`, `bool`, `id`, `type`, `input`, `filter`, `map`, `open`, `file`, `hash`, `sum`, `max`, `min`, `len`.
+
+Use descriptive alternatives: `items`, `mapping`, `user_id`, `user_type`, `request_body`.
+
+### bare `except:` — Hides Everything
+
+```python
+# Bad — catches KeyboardInterrupt, SystemExit, everything
+try:
+    risky()
+except:
+    pass
+
+# Bad — still too broad, swallows MemoryError etc.
+try:
+    risky()
+except BaseException:
+    pass
+
+# Good — catch Exception or specific
+try:
+    risky()
+except (ValueError, KeyError) as e:
+    logger.warning("Expected failure", exc_info=True)
+    raise DomainError("operation failed") from e
+```
+
+### Identity vs Equality
+
+```python
+# Bad — equality check for None/True/False
+if x == None: ...
+if flag == True: ...
+
+# Good — identity check
+if x is None: ...
+if flag is True: ...
+```
+
+`None`, `True`, `False`, `NotImplemented`, `Ellipsis` are singletons — always use `is`.

@@ -574,3 +574,192 @@ public partial class MainViewModel : ObservableObject
 ```
 
 **Apply this**: Always use `[ObservableProperty]` over manual properties. Always use `[RelayCommand(CanExecute)]` — commands without CanExecute are incomplete.
+
+---
+
+## Nullable Reference Types (ECC-Insight)
+
+C# 8+ mandatory. Every project must enable nullable checking.
+
+### Project-level Enable
+
+```xml
+<!-- .csproj -->
+<PropertyGroup>
+  <Nullable>enable</Nullable>
+  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  <WarningsAsErrors>nullable</WarningsAsErrors>
+</PropertyGroup>
+```
+
+### Declaration Rules
+
+```csharp
+// Good — explicit nullability
+public class User
+{
+    public required string Name { get; init; }         // non-null, must be set
+    public string? MiddleName { get; init; }           // explicitly nullable
+    public List<string> Roles { get; init; } = [];     // non-null, default empty
+}
+
+// Bad — hides null semantics
+public class User
+{
+    public string Name { get; set; }       // warning if not initialized
+    public string MiddleName { get; set; } // implicitly non-null, lies about data
+}
+```
+
+### null-forgiving Operator (`!`)
+
+```csharp
+// Bad — silencing compiler without reason
+var value = dict[key]!;
+
+// Good — null-forgiving with documented rationale
+// Safe: key existence verified by ContainsKey check above
+var value = dict[key]!;
+```
+
+Every `!` usage requires a comment explaining why null is impossible.
+
+### Defensive Chaining
+
+```csharp
+// Bad — NullReferenceException waiting to happen
+string city = user.Address.City.ToUpper();
+
+// Good — null-conditional + null-coalescing
+string city = user?.Address?.City?.ToUpper() ?? "UNKNOWN";
+```
+
+### required Keyword (C# 11+)
+
+Use `required` on DTO/model properties that must be set at construction:
+
+```csharp
+public record CreateUserRequest
+{
+    public required string Email { get; init; }
+    public required string Password { get; init; }
+    public string? DisplayName { get; init; }
+}
+```
+
+---
+
+## Security (ECC-Insight)
+
+### BinaryFormatter — FORBIDDEN
+
+`System.Runtime.Serialization.Formatters.Binary` has multiple RCE CVEs. Never use.
+
+```csharp
+// Bad — RCE risk
+var formatter = new BinaryFormatter();
+var obj = formatter.Deserialize(stream);
+
+// Good — System.Text.Json with type validation
+var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+var obj = JsonSerializer.Deserialize<MyType>(json, options);
+```
+
+### Path Traversal
+
+```csharp
+// Bad — user controls path
+var file = Path.Combine(baseDir, userInput);
+var content = File.ReadAllText(file);
+
+// Good — canonicalize and verify prefix
+var baseFull = Path.GetFullPath(baseDir);
+var requested = Path.GetFullPath(Path.Combine(baseDir, userInput));
+if (!requested.StartsWith(baseFull + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+{
+    throw new UnauthorizedAccessException("Path traversal detected");
+}
+var content = File.ReadAllText(requested);
+```
+
+### SQL Injection — Parameterized Queries Only
+
+```csharp
+// Bad — string concatenation
+var sql = $"SELECT * FROM Users WHERE Id = {userId}";
+
+// Good — Dapper parameterized
+var user = conn.QueryFirstOrDefault<User>(
+    "SELECT * FROM Users WHERE Id = @Id",
+    new { Id = userId });
+
+// Good — EF Core LINQ
+var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+```
+
+### Secrets Management
+
+```csharp
+// Bad — hardcoded
+private const string ApiKey = "sk-abc123...";
+
+// Good — configuration + user secrets (dev) / key vault (prod)
+public class ApiClient(IOptions<ApiSettings> options)
+{
+    private readonly string _apiKey = options.Value.ApiKey
+        ?? throw new InvalidOperationException("ApiKey not configured");
+}
+```
+
+---
+
+## sealed Class + IOptions Pattern (ECC-Insight)
+
+### sealed by Default
+
+If inheritance is not explicitly designed for, mark the class `sealed`.
+
+```csharp
+// Good — intent clear, JIT can devirtualize
+public sealed class EmailValidator
+{
+    public bool IsValid(string email) => ...;
+}
+
+// Good — polymorphism is the purpose
+public abstract class PaymentProcessor
+{
+    public abstract Task<Result> Process(Payment p);
+}
+```
+
+Benefits: 5-10% JIT optimization, prevents accidental inheritance, documents intent.
+
+### IOptions&lt;T&gt; for Configuration
+
+```csharp
+// 1. Define strongly-typed settings
+public sealed class EmailSettings
+{
+    public required string SmtpHost { get; init; }
+    public int SmtpPort { get; init; } = 587;
+    public required string FromAddress { get; init; }
+}
+
+// 2. Register in DI
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("Email"));
+
+// 3. Inject into services
+public sealed class EmailService(IOptions<EmailSettings> options)
+{
+    private readonly EmailSettings _settings = options.Value;
+
+    public Task SendAsync(string to, string body) { /* ... */ }
+}
+```
+
+**Variants**:
+- `IOptions<T>`: Singleton, never reloads
+- `IOptionsSnapshot<T>`: Scoped, reloads per request
+- `IOptionsMonitor<T>`: Singleton with change notifications

@@ -678,3 +678,152 @@ include/nlohmann/
 
 **Apply this**: Public API = one header. Complex implementation = `detail/` or `internal/`
 subdirectory. Never expose implementation headers to users.
+
+---
+
+## Security (ECC-Insight)
+
+Security-critical C++ rules. Every violation is CRITICAL severity.
+
+### Integer Overflow
+
+```cpp
+// Bad — silent overflow on large inputs
+size_t total = count * item_size;
+
+// Good — checked arithmetic
+#include <climits>
+if (count > SIZE_MAX / item_size) {
+  throw std::overflow_error("size computation overflow");
+}
+size_t total = count * item_size;
+```
+
+Use `<cstdint>` fixed-width types at boundaries. Check before multiply/add when operands are external inputs.
+
+### Buffer Overflow — No C-Style String Functions
+
+| Forbidden | Use instead |
+|-----------|-------------|
+| `strcpy`, `strcat`, `sprintf`, `gets` | `std::string`, `std::string_view`, `std::format` |
+| `char buf[N]; strncpy(buf, src, N);` (may not null-terminate) | `std::string` or `std::array<char,N>` with explicit null-termination |
+| `memcpy(dst, src, size)` without bounds check | `std::copy_n` with iterator range |
+
+### Uninitialized Variables
+
+```cpp
+// Bad — undefined behavior
+int x;
+if (condition) x = 1;
+use(x);  // UB if condition false
+
+// Good — always initialize
+int x = 0;  // or std::optional<int> x;
+```
+
+Enable `-Wuninitialized -Werror=uninitialized`. Zero tolerance.
+
+### Command Injection
+
+```cpp
+// Bad — shell interprets user_input
+std::system(("ls " + user_input).c_str());
+
+// Good — avoid shell entirely
+std::vector<std::string> args{"ls", user_input};
+// Use posix_spawn or platform-specific safe exec
+```
+
+Never pass concatenated user input to `system()`, `popen()`, or `exec` family.
+
+---
+
+## Concurrency Safety (ECC-Insight)
+
+### Data Races — HIGH severity
+
+Every shared variable accessed from multiple threads MUST be protected.
+
+```cpp
+// Bad — data race
+class Counter {
+  int count_ = 0;
+public:
+  void increment() { ++count_; }  // unsynchronized
+  int get() const { return count_; }
+};
+
+// Good — std::atomic for simple types
+class Counter {
+  std::atomic<int> count_{0};
+public:
+  void increment() { count_.fetch_add(1, std::memory_order_relaxed); }
+  int get() const { return count_.load(std::memory_order_relaxed); }
+};
+
+// Good — std::mutex + scoped_lock for complex state
+class Cache {
+  mutable std::mutex mu_;
+  std::unordered_map<std::string, Value> data_;
+public:
+  void put(const std::string& k, Value v) {
+    std::scoped_lock lk(mu_);
+    data_[k] = std::move(v);
+  }
+};
+```
+
+### Deadlock Prevention
+
+Use `std::scoped_lock` (not `std::lock_guard`) for multiple locks — it acquires atomically.
+
+```cpp
+// Bad — potential deadlock with swapped lock order
+void transfer(Account& a, Account& b, int amt) {
+  std::lock_guard la(a.mu);
+  std::lock_guard lb(b.mu);  // deadlock if another thread locks b then a
+  a.balance -= amt; b.balance += amt;
+}
+
+// Good — atomic multi-lock
+void transfer(Account& a, Account& b, int amt) {
+  std::scoped_lock lk(a.mu, b.mu);  // deadlock-free
+  a.balance -= amt; b.balance += amt;
+}
+```
+
+### Condition Variables — Spurious Wakeup
+
+Always use `while` loop (not `if`) with `cv.wait()`:
+
+```cpp
+std::unique_lock lk(mu);
+cv.wait(lk, [&]{ return ready; });  // lambda form handles spurious wakeup
+```
+
+### Memory Order
+
+Default to `std::memory_order_seq_cst` unless profiling proves a weaker order is needed. `memory_order_relaxed` only for counters without ordering dependencies.
+
+---
+
+## Sanitizer Guide (ECC-Insight)
+
+| Sanitizer | Flag | Detects | CI |
+|-----------|------|---------|:--:|
+| **ASan** | `-fsanitize=address` | Buffer overflow, use-after-free, double-free, memory leaks | Required |
+| **UBSan** | `-fsanitize=undefined` | Integer overflow, signed overflow, null deref, alignment | Required |
+| **TSan** | `-fsanitize=thread` | Data races, deadlocks | Recommended |
+| **MSan** | `-fsanitize=memory` | Use of uninitialized memory (Clang only) | Optional |
+
+**CMake setup**:
+
+```cmake
+option(ENABLE_SANITIZERS "Enable ASan+UBSan" OFF)
+if(ENABLE_SANITIZERS)
+  add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address,undefined)
+endif()
+```
+
+Run CI with `-DENABLE_SANITIZERS=ON` builds in addition to release builds. ASan+UBSan combined catches ~80% of memory/UB bugs.
