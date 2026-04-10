@@ -140,20 +140,123 @@ AI 분석 결과를 리뷰어에게 요약 테이블로 제시한다:
 
 "AI가 N건의 comment를 생성했습니다. 검토 후 수정/삭제/추가하세요."
 
-#### Step 4: Discussion 생성 (사용자 확인 후)
+#### Step 4: Line Comment Discussion 생성 (사용자 확인 후)
 
-리뷰어가 확인/수정한 comment를 GitLab discussion으로 생성한다:
+리뷰어가 확인/수정한 comment를 GitLab discussion으로 생성한다.
+**파일:라인 정보가 있는 comment는 line comment로 생성**하여 Changes 탭에 표시한다.
+
+> **배경**: `glab api -f`는 nested JSON field를 지원하지 않아 `position` object가 무시된다.
+> line comment 생성에는 `curl` + JSON body를 사용한다. (solitasroh/rkit#3)
+
+##### Step 4-a: GitLab 인증 정보 추출
+
+glab config에서 host, token, project ID를 추출한다:
+
+```bash
+# glab config 파일 경로 (OS별)
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+  GLAB_CONFIG="$APPDATA/glab-cli/config.yml"
+else
+  GLAB_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/glab-cli/config.yml"
+fi
+
+# host, token, protocol 추출
+GITLAB_HOST=$(grep -A1 'hosts:' "$GLAB_CONFIG" | tail -1 | sed 's/[: ]//g')
+GITLAB_TOKEN=$(grep -A5 "$GITLAB_HOST:" "$GLAB_CONFIG" | grep 'token:' | awk '{print $2}')
+API_PROTOCOL=$(grep -A5 "$GITLAB_HOST:" "$GLAB_CONFIG" | grep 'api_protocol:' | awk '{print $2}')
+GITLAB_URL="${API_PROTOCOL:-https}://${GITLAB_HOST}"
+
+# project ID 추출
+PROJECT_PATH=$(git remote get-url origin | sed -E 's|.*[:/]([^/]+/[^/]+)(\.git)?$|\1|')
+PROJECT_ID=$(curl -s -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+  "${GITLAB_URL}/api/v4/projects/$(echo $PROJECT_PATH | sed 's|/|%2F|g')" | jq -r '.id')
+```
+
+인증 추출 실패 시: "`glab auth login`으로 인증하세요" 안내.
+
+##### Step 4-b: Diff SHA 추출
+
+MR versions API에서 position에 필요한 3개 SHA를 추출한다:
+
+```bash
+VERSIONS=$(curl -s -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+  "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/merge_requests/${MR_IID}/versions")
+BASE_SHA=$(echo "$VERSIONS" | jq -r '.[0].base_commit_sha')
+HEAD_SHA=$(echo "$VERSIONS" | jq -r '.[0].head_commit_sha')
+START_SHA=$(echo "$VERSIONS" | jq -r '.[0].start_commit_sha')
+```
+
+versions API 빈 배열 시: "diff version이 없습니다" 안내, fallback으로 일반 discussion 생성.
+
+##### Step 4-c: Diff Hunk 범위 검증
+
+`glab mr diff ${MR_IID}`의 diff hunk header(`@@ -a,b +c,d @@`)를 파싱하여
+각 comment의 `new_line`이 유효 범위 내에 있는지 검증한다:
+
+```
+is_valid_line(file, new_line):
+  hunks = parse_diff_hunks(file)   # @@ -a,b +c,d @@ 에서 c~c+d-1 범위 추출
+  for each hunk in hunks:
+    if hunk.new_start <= new_line <= hunk.new_end:
+      return true
+  return false
+```
+
+범위 밖이면: body에 `[file:line]` prefix를 추가하여 일반 discussion으로 fallback.
+
+##### Step 4-d: Comment 생성
+
+**파일:라인 정보가 있는 comment → curl + JSON body (line comment)**:
+
+```bash
+curl -s -w "\n%{http_code}" -X POST \
+  "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/merge_requests/${MR_IID}/discussions" \
+  -H "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "body": "issue (blocking, safety): ISR 내 HAL_Delay() 사용 금지...",
+    "position": {
+      "base_sha": "'$BASE_SHA'",
+      "start_sha": "'$START_SHA'",
+      "head_sha": "'$HEAD_SHA'",
+      "position_type": "text",
+      "old_path": "src/uart.c",
+      "new_path": "src/uart.c",
+      "new_line": 42
+    }
+  }'
+```
+
+**파일:라인 정보가 없는 comment → 기존 glab api (일반 discussion)**:
 
 ```bash
 glab api --method POST \
   "projects/:id/merge_requests/:iid/discussions" \
-  --field body="issue (blocking, safety): ISR 내 HAL_Delay() 사용 금지..."
+  --field body="praise: DMA 더블 버퍼링 구현이 교과서적입니다."
+```
+
+##### Fallback 전략 (3단계)
+
+```
+1차: curl + JSON body (line comment)
+  │ 실패 (HTTP != 201)
+  ▼
+2차: glab api --field body="[file:line] comment..." (일반 discussion, 위치 명시)
+  │ 실패
+  ▼
+3차: 에러 메시지 출력 + 수동 생성 안내
 ```
 
 ### 오류 처리
 
 - MR 미발견: "MR !{iid}를 찾을 수 없습니다."
 - diff 없음: "이 MR에 변경사항이 없습니다."
+- glab config 파싱 실패: "`glab auth login`으로 인증하세요."
+- curl 미설치: "curl이 필요합니다." + glab api fallback 시도.
+- jq 미설치: grep/sed 기반 JSON 파싱 fallback 또는 "jq 설치를 권장합니다" 안내.
+- line comment 400 에러: "라인 범위가 diff에 포함되지 않습니다." + 일반 discussion fallback.
+- GitLab API 5xx 에러: 1회 재시도 후 실패 시 일반 discussion fallback.
+- project ID 조회 404: "프로젝트를 찾을 수 없습니다. git remote URL을 확인하세요."
 
 ---
 
