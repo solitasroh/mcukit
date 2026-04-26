@@ -22,3 +22,6 @@ cmake-build-*/
 # OS
 .DS_Store
 Thumbs.db
+
+# External reference clones (upstream bkit / gstack, analysis-only)
+references/
