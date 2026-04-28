@@ -1,0 +1,30 @@
+name: security-review-cycle15
+classification: capability
+domain: all
+judge: regex_only
+description: |
+  Cycle 1.5 — verify BLOCK/WARN/LOG_ONLY threshold + combineVerdict ensemble + severity=critical
+  no-downgrade rule. Tests boundary cases (0.85,0.60), (0.90,0.50), critical-pattern preservation.
+tests:
+  - id: cycle15-before
+    prompt: cycle15-before.prompt.md
+    expected: cycle15-before.expected.md
+    assertions:
+      - type: regex_negative
+        patterns:
+          - "BLOCK"
+          - "WARN"
+          - "LOG_ONLY"
+          - "combineVerdict"
+  - id: cycle15-after
+    prompt: cycle15-after.prompt.md
+    expected: cycle15-after.expected.md
+    assertions:
+      - type: regex_positive
+        patterns:
+          - "BLOCK"
+          - "WARN"
+          - "LOG_ONLY"
+          - "severity=critical"
+          - "강등 금지"
+          - "S-MCU-001"

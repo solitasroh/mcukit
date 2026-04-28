@@ -1,7 +1,8 @@
 name: code-review
 classification: workflow
-version: 1.6.1
-description: "code-review process compliance evaluation"
+version: 1.6.2
+judge: regex_only
+description: "code-review process compliance + Cycle 1.5 adaptive gating + cross-review dedup"
 
 evals:
   - name: trigger-accuracy
@@ -11,6 +12,24 @@ evals:
       - "Must trigger correctly on relevant keywords"
       - "Must follow defined process steps"
     timeout: 60000
+  - name: cycle15-before
+    prompt: cycle15-before.prompt.md
+    expected: cycle15-before.expected.md
+    assertions:
+      - type: regex_negative
+        patterns:
+          - "자동 생략됨"
+          - "fingerprint"
+          - "100 entries 윈도우"
+  - name: cycle15-after
+    prompt: cycle15-after.prompt.md
+    expected: cycle15-after.expected.md
+    assertions:
+      - type: regex_positive
+        patterns:
+          - "자동 생략됨"
+          - "이전 리뷰에서 사용자가 무시한"
+          - "NEVER_GATE"
 
 parity_test:
   enabled: false

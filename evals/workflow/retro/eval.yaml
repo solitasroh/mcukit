@@ -1,0 +1,26 @@
+name: retro-cycle15
+classification: workflow
+version: 1.0.0
+judge: regex_only
+description: "Cycle 1.5 — verify trend delta auto-attach (≥3 learnings) + AI slop reduction (8 banned terms + reserved-vocab exemption)"
+tests:
+  - id: cycle15-before
+    prompt: cycle15-before.prompt.md
+    expected: cycle15-before.expected.md
+    assertions:
+      - type: regex_negative
+        patterns:
+          - "직전 회고"
+          - "Δ"
+  - id: cycle15-after
+    prompt: cycle15-after.prompt.md
+    expected: cycle15-after.expected.md
+    assertions:
+      - type: regex_positive
+        patterns:
+          - "직전 회고"
+          - "Δ"
+      - type: regex_negative
+        description: "AI slop banned vocab MUST NOT appear"
+        patterns:
+          - "delve|robust|comprehensive|nuanced|fundamental|leverage|seamless|holistic"
