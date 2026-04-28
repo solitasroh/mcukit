@@ -19,3 +19,4 @@
 | code-quality-preguide | 99.7% (orphan analysis) | — | 2026-04-27 |
 | everything-claude-code-comparison | research analysis (no PDCA cycle) | — | 2026-04-27 |
 | bkit-gstack-sync-v2 | 100% | 0 | 2026-04-27 |
+| bkit-gstack-sync-v2-cycle15 | 100% | 0 | 2026-04-28 |
