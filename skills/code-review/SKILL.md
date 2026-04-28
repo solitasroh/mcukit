@@ -42,7 +42,15 @@ hooks:
 
 # Code Review Skill
 
-> Skill for code quality analysis and review
+> Skill for code quality analysis and review.
+>
+> **잠금 어휘 SoT**: [policies/locked-vocab.json](../../policies/locked-vocab.json) — 부록 §A는 `node scripts/gen-locked-vocab.mjs`로 자동 생성됩니다.
+
+## 0. 문서 구조 (본 SKILL의 세 층)
+
+1. **도메인 본문 (기존 §Arguments ~ §PDCA Integration)**: 기존 쓰임. 잠금 어휘 사용 허용 (grandfathered).
+2. **방법론 본문 — 도메인 중립 (§자동 생략, §리뷰 중복 제거, §사용자 질문 양식)**: Cycle 1.5 추가. 잠금 어휘 0건 자동 검증.
+3. **도메인 예시 부록 (§A)**: SoT 자동 생성.
 
 ## Arguments
 
@@ -157,3 +165,225 @@ When `--auto-fix` flag is provided:
 - **Phase**: Check (Quality verification)
 - **Trigger**: Auto-suggested after implementation
 - **Output**: docs/03-analysis/code-review-{date}.md
+
+<!-- BEGIN: cycle15-body-neutral -->
+
+## 자주 안 잡히는 검사 자동 생략 (Adaptive Gating)
+
+### 동작 원리
+
+1. `/code-review` 시작 시 `.rkit/state/code-review-stats.json`을 읽습니다 (parse 실패 시 빈 객체로 폴백 + 감사 로그 기록).
+2. 각 검사(specialist)에 대해 `gateStatus`로 분기:
+   - `gateStatus == "never_gate"`: 무조건 dispatch (5개 고정).
+   - `gateStatus == "active"`: 정상 dispatch.
+   - `gateStatus == "gate_candidate"`: **자동 생략** + 출력 "[검사명] 자동 생략됨 — 최근 N회 0 findings".
+3. `gate_candidate` 상태에서도 N=20 커밋마다 강제 1회 dispatch (probe). `lastProbe` 필드로 추적.
+4. 파일 패턴 변화 감지 시 카운터 리셋 (예: 신규 SKILL.md 등장).
+5. `--force-{이름}` 옵션 시 강제 dispatch.
+
+### 통계 파일 스키마
+
+위치: `.rkit/state/code-review-stats.json`. 갱신은 **임시파일 + rename 패턴** (POSIX atomic write).
+
+```json
+{
+  "version": "1.0",
+  "lastUpdated": "ISO8601",
+  "specialists": {
+    "<name>": {
+      "dispatchCount": 0,
+      "totalFindings": 0,
+      "lastDispatch": "ISO8601",
+      "gateStatus": "active|gate_candidate|never_gate",
+      "lastProbe": "ISO8601 또는 null"
+    }
+  }
+}
+```
+
+### `gateStatus` 결정 규칙
+
+- `dispatchCount` < 10 → `active` (안전 기본값, 통계 부족).
+- `dispatchCount` ≥ 10 AND `totalFindings` == 0 AND name ∉ NEVER_GATE → `gate_candidate`.
+- name ∈ NEVER_GATE → `never_gate`.
+
+### NEVER_GATE 고정 5개
+
+| 이름 | 이유 |
+|------|------|
+| `security` | 안전망 (보안 위협은 단발이라도 차단) |
+| `data_migration` | 안전망 (데이터 손실 방지) |
+| `skill_md_consistency` | 본 sync 핵심 자산 (잠금 어휘 보존 검증) |
+| `vocab_sync` | SoT-부록 일관성 검증 |
+| `eval_syntax` | eval.yaml 구문 유효성 (CI 진입 전) |
+
+### 자동 생략 사유 기록
+
+자동 생략이 발생할 때마다 `.rkit/state/skip-log.json`에 append:
+
+```json
+{
+  "timestamp": "ISO8601",
+  "specialist": "performance",
+  "reason": "gate_candidate (10회 0건)",
+  "reviewId": "rv-005",
+  "diffSize": 142
+}
+```
+
+### 통계 갱신 (원자적 쓰기)
+
+```javascript
+const tmpPath = path + '.tmp.' + Date.now();
+fs.writeFileSync(tmpPath, JSON.stringify(stats, null, 2));
+fs.renameSync(tmpPath, path);  // POSIX atomic
+```
+
+## 리뷰 간 중복 제거 (Cross-Review Dedup)
+
+### 동작 원리
+
+1. `.rkit/state/review-history.jsonl`에서 **최근 100 entries 윈도우**만 읽습니다 (O(N) 디스크 I/O 방지).
+2. 각 현재 리뷰 항목에 대해 다음 알고리즘:
+
+```
+function shouldSuppress(currentFinding, currentCommit):
+  recentHistory = readJsonlTail("review-history.jsonl", 100)
+  for each prevReview in recentHistory reversed:
+    for each prevFinding in prevReview.findings:
+      if prevFinding.fingerprint == currentFinding.fingerprint:
+        if prevFinding.action != "skipped":
+          return false   // "fixed" / "auto_fixed"는 항상 재검사
+        try:
+          changedFiles = git_diff_name_only(prevReview.commit, currentCommit)
+        catch GitNotAvailable:
+          return false   // 폴백: 보수적으로 재출력
+        if currentFinding.file in changedFiles:
+          return false   // 파일 변경 → 재출력
+        return true   // 모든 조건 통과 → 숨김
+  return false
+```
+
+3. 출력 끝에 "이전 리뷰에서 사용자가 무시한 N건 숨김 처리됨" 요약.
+
+### 식별값 (fingerprint)
+
+5개 입력의 sha256:
+
+```
+fingerprint = sha256(
+  file_path                          + ":" +    // POSIX 정규화 (slash 통일, lower)
+  line_number                        + ":" +    // 정수
+  rule_id                            + ":" +    // 검사 규칙 ID
+  severity                           + ":" +    // critical|major|minor|info (lower_snake)
+  message_first_80_codepoints                   // 메시지 첫 80개 유니코드 코드포인트
+)
+```
+
+### 이력 파일 스키마
+
+위치: `.rkit/state/review-history.jsonl` (한 줄 한 리뷰, append-only, 줄당 ≤ 4096 byte).
+
+```jsonl
+{"timestamp":"ISO8601","reviewId":"rv-NNN","commit":"<sha>","schemaVersion":"1.0","findings":[{"fingerprint":"<sha256>","file":"...","line":N,"ruleId":"...","severity":"...","message":"...","action":"skipped|fixed|auto_fixed"}]}
+```
+
+큰 리뷰는 findings를 분할해 여러 줄로 작성 (각 줄 < 4096 byte).
+
+### 원자적 append
+
+```javascript
+const line = JSON.stringify(reviewEntry) + '\n';
+if (Buffer.byteLength(line, 'utf8') > 4096) {
+  splitAndAppend(line);   // findings 분할
+} else {
+  fs.appendFileSync('.rkit/state/review-history.jsonl', line);  // POSIX atomic < 4096
+}
+```
+
+### 회전 정책
+
+본 sync 사이클 미적용. 100 entries 윈도우 한정으로 검색 비용 한정. 이력 파일이 무한 누적되어도 검색 비용은 일정합니다. 회전 도입은 별 사이클로 이월합니다.
+
+## 사용자 질문 양식
+
+`AskUserQuestion` 호출 시 5요소 강제: 질문(≤90자) / ELI10(30~120자, 도메인 전문가 면제 가능) / 추천안+이유(중립 자세 허용) / 선택지마다 ✅ ≥ 2개·❌ ≥ 1개 (각 40자 이상) / 한 번뿐인 결정에는 "⚠️ 이 결정은 되돌릴 수 없습니다 — 신중히 선택하십시오" 표시.
+
+ELI10은 전체 결정에 1회만 작성합니다.
+
+도메인별 코드 리뷰 사례는 부록 §A를 참조하세요.
+
+<!-- END: cycle15-body-neutral -->
+
+---
+
+<!-- BEGIN: locked-vocab-appendix (auto-generated by scripts/gen-locked-vocab.mjs) -->
+
+## 부록 A: 도메인 예시
+
+> 이 부록은 `scripts/gen-locked-vocab.mjs`가 `policies/locked-vocab.json` SoT에서 자동 생성합니다.
+> 직접 편집하지 마세요 — `bun run gen:vocab` 또는 `node scripts/gen-locked-vocab.mjs`로 재생성됩니다.
+
+### A.1 MCU 예시
+
+#### 잠금 어휘 (mcu)
+
+| 어휘 | 의미 |
+|------|------|
+| `HardFault` | Cortex-M 코어 예외 |
+| `CFSR` | 0xE000ED28, Configurable Fault Status Register |
+| `HFSR` | 0xE000ED2C, HardFault Status Register |
+| `MMFAR` | 0xE000ED34, MemManage Fault Address Register |
+| `BFAR` | 0xE000ED38, BusFault Address Register |
+| `FreeRTOS` | 임베디드 RTOS — xTaskCreate/Queue/Mutex/Semaphore |
+| `MISRA C` | 안전 임베디드 코딩 표준 (MISRA C:2012) |
+
+#### 시나리오
+
+**MCU 코드 리뷰 — FreeRTOS 태스크 스택 추정**
+
+**발견**: xTaskCreate에 STACK_SIZE 1024 byte 지정인데 uxTaskGetStackHighWaterMark 측정 시 942 byte 사용 — 여유 8% 미만. MISRA C 17.5 (Stack 사용 한도) 권고 위반 가능.
+
+
+### A.2 MPU 예시
+
+#### 잠금 어휘 (mpu)
+
+| 어휘 | 의미 |
+|------|------|
+| `Device Tree` | 리눅스 하드웨어 기술 트리 |
+| `dtsi` | Device Tree Source Include 파일 |
+| `dtoverlay` | Device Tree Overlay (런타임 수정) |
+| `bblayers.conf` | Yocto 레이어 설정 파일 |
+| `Yocto` | 임베디드 리눅스 빌드 시스템 |
+| `bitbake` | Yocto 빌드 도구 |
+| `U-Boot` | Bootloader |
+
+#### 시나리오
+
+**MPU 코드 리뷰 — Device Tree 파편화**
+
+**발견**: 동일 노드가 base dtsi와 dtoverlay에 중복 정의. bitbake 빌드 시 후자가 이김. 의도된 동작인지 dtsi 주석 추가 필요.
+
+
+### A.3 WPF 예시
+
+#### 잠금 어휘 (wpf)
+
+| 어휘 | 의미 |
+|------|------|
+| `XAML` | WPF/UWP UI 마크업 언어 |
+| `MVVM` | Model-View-ViewModel 패턴 |
+| `ObservableObject` | CommunityToolkit.Mvvm 베이스 클래스 |
+| `RelayCommand` | CommunityToolkit.Mvvm Command 속성 |
+| `.csproj` | C# 프로젝트 파일 |
+| `app.config` | .NET 응용 프로그램 설정 파일 |
+
+#### 시나리오
+
+**WPF 코드 리뷰 — ViewModel이 System.Windows.Controls 참조**
+
+**발견**: MainViewModel.cs가 System.Windows.Controls.TextBox 직접 참조. MVVM 위반 — View 계층으로 분리 필요. ObservableObject 속성으로 변환 권고.
+
+
+<!-- END: locked-vocab-appendix -->
