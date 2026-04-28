@@ -75,6 +75,11 @@
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-stop.js",
             "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/verify-policy.js --quiet",
+            "timeout": 5000
           }
         ]
       }
