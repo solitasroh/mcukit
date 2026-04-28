@@ -1,0 +1,105 @@
+{
+  "version": "1.0",
+  "description": "Embedded reserved vocabulary — single source of truth (SoT) for rkit MCU/MPU/WPF domains.",
+  "policy": "이 어휘는 일반화·번역·삭제 금지. 4 SKILL 본문에 사용 0건. 4 SKILL 부록에 1건 이상 보존. gstack→rkit 동기화 시에도 보존.",
+  "generated_via": "scripts/gen-locked-vocab.mjs (수동 편집 금지)",
+  "vocabs": [
+    { "term": "HardFault", "domain": "mcu", "meaning": "Cortex-M 코어 예외" },
+    { "term": "CFSR", "domain": "mcu", "meaning": "0xE000ED28, Configurable Fault Status Register" },
+    { "term": "HFSR", "domain": "mcu", "meaning": "0xE000ED2C, HardFault Status Register" },
+    { "term": "MMFAR", "domain": "mcu", "meaning": "0xE000ED34, MemManage Fault Address Register" },
+    { "term": "BFAR", "domain": "mcu", "meaning": "0xE000ED38, BusFault Address Register" },
+    { "term": "FreeRTOS", "domain": "mcu", "meaning": "임베디드 RTOS — xTaskCreate/Queue/Mutex/Semaphore" },
+    { "term": "MISRA C", "domain": "mcu", "meaning": "안전 임베디드 코딩 표준 (MISRA C:2012)" },
+    { "term": "Device Tree", "domain": "mpu", "meaning": "리눅스 하드웨어 기술 트리" },
+    { "term": "dtsi", "domain": "mpu", "meaning": "Device Tree Source Include 파일" },
+    { "term": "dtoverlay", "domain": "mpu", "meaning": "Device Tree Overlay (런타임 수정)" },
+    { "term": "bblayers.conf", "domain": "mpu", "meaning": "Yocto 레이어 설정 파일" },
+    { "term": "Yocto", "domain": "mpu", "meaning": "임베디드 리눅스 빌드 시스템" },
+    { "term": "bitbake", "domain": "mpu", "meaning": "Yocto 빌드 도구" },
+    { "term": "U-Boot", "domain": "mpu", "meaning": "Bootloader" },
+    { "term": "XAML", "domain": "wpf", "meaning": "WPF/UWP UI 마크업 언어" },
+    { "term": "MVVM", "domain": "wpf", "meaning": "Model-View-ViewModel 패턴" },
+    { "term": "ObservableObject", "domain": "wpf", "meaning": "CommunityToolkit.Mvvm 베이스 클래스" },
+    { "term": "RelayCommand", "domain": "wpf", "meaning": "CommunityToolkit.Mvvm Command 속성" },
+    { "term": ".csproj", "domain": "wpf", "meaning": "C# 프로젝트 파일" },
+    { "term": "app.config", "domain": "wpf", "meaning": ".NET 응용 프로그램 설정 파일" }
+  ],
+  "schema": {
+    "verdictEnum": ["BLOCK", "WARN", "LOG_ONLY", "IGNORE"],
+    "gateStatusEnum": ["active", "gate_candidate", "never_gate"],
+    "severityEnum": ["critical", "major", "minor", "info"],
+    "actionEnum": ["skipped", "fixed", "auto_fixed"]
+  },
+  "domain_examples": {
+    "mcu": {
+      "investigate": {
+        "title": "MCU 예시 — UNALIGNED HardFault 조사",
+        "scenario": "🛑 멈춤: \"CFSR=0x40000400 (UNALIGNED) 발생. 정렬 위반이 (A) packed 구조체 접근인지 (B) DMA 버퍼 정렬 문제인지 결정해야 합니다.\"",
+        "options": [
+          { "label": "A) packed 구조체 분석", "pros": ["코드 검색만으로 검증 가능, 빌드 영향 없음.", "FreeRTOS 태스크 단위로 격리 검증 용이."], "cons": ["실제 원인이 DMA면 시간 낭비."] },
+          { "label": "B) DMA 버퍼 4-byte 정렬 검증", "pros": ["linker script + DMA channel 설정 동시 점검 가능.", "근본 해결로 재발 방지."], "cons": ["하드웨어 매뉴얼 참조 필요, 30분 소요."] }
+        ],
+        "recommendation": "B — UNALIGNED + 직전 DMA 트랜잭션 로그 있으면 DMA 가능성 높음. MISRA C 권고에도 정렬 가정 명시화 필요."
+      },
+      "retro": {
+        "title": "MCU 회고 — HardFault 0건 사이클",
+        "summary": "Flash 사용량 78% 유지, HardFault 0건, MISRA C Required 위반 0건."
+      },
+      "security_review": {
+        "title": "MCU 보안 검사 — JTAG/SWD production 노출 (강등 금지)",
+        "verdict": "BLOCK (단일 검사기 ≥0.85, severity=critical, I-MCU-001) — production 펌웨어에 JTAG 핀 활성화 발견."
+      },
+      "code_review": {
+        "title": "MCU 코드 리뷰 — FreeRTOS 태스크 스택 추정",
+        "finding": "xTaskCreate에 STACK_SIZE 1024 byte 지정인데 uxTaskGetStackHighWaterMark 측정 시 942 byte 사용 — 여유 8% 미만. MISRA C 17.5 (Stack 사용 한도) 권고 위반 가능."
+      }
+    },
+    "mpu": {
+      "investigate": {
+        "title": "MPU 예시 — Device Tree 클럭 변경 결정",
+        "scenario": "🛑 멈춤: \"Device Tree 노드 &i2c1의 clock-frequency 변경이 (A) bblayers.conf 신규 레이어 추가인지 (B) 기존 dtsi 오버라이드인지 결정해야 합니다.\"",
+        "options": [
+          { "label": "A) bblayers.conf 신규 레이어", "pros": ["Yocto 빌드 격리, U-Boot 영향 없음.", "팀 간 변경 추적 용이 (별 레이어).", "bitbake 캐시 분리 가능."], "cons": ["레이어 추가로 빌드 시간 +5분."] },
+          { "label": "B) 기존 dtsi 오버라이드 (dtoverlay 없이)", "pros": ["변경 한 파일에 집중, diff 명확.", "기존 dtsi 의도 유지."], "cons": ["다른 보드 변형(BSP fork)에 영향 가능.", "dtoverlay 없이 정적 변경이라 런타임 변경 불가."] }
+        ],
+        "recommendation": "B — 단일 보드 대상이고 런타임 변경 요구가 없다. bitbake 캐시 무효화는 1회만 발생."
+      },
+      "retro": {
+        "title": "MPU 회고 — Yocto 빌드 시간 단축",
+        "summary": "U-Boot + 커널 빌드 시간 22분 → 14분 (-36%), bblayers.conf 캐시 분리 효과."
+      },
+      "security_review": {
+        "title": "MPU 보안 검사 — 커널 모듈 위변조 (강등 금지)",
+        "verdict": "BLOCK (S-MPU-001, severity=critical) — insmod 호출 경로에 무결성 검증 부재 발견."
+      },
+      "code_review": {
+        "title": "MPU 코드 리뷰 — Device Tree 파편화",
+        "finding": "동일 노드가 base dtsi와 dtoverlay에 중복 정의. bitbake 빌드 시 후자가 이김. 의도된 동작인지 dtsi 주석 추가 필요."
+      }
+    },
+    "wpf": {
+      "investigate": {
+        "title": "WPF 예시 — MVVM 마이그레이션 결정",
+        "scenario": "🛑 멈춤: \"MainViewModel의 ObservableObject 상속을 (A) 기존 MVVM 구조 유지인지 (B) 새 RelayCommand 패턴으로 마이그레이션인지 결정해야 합니다.\"",
+        "options": [
+          { "label": "A) 기존 MVVM 구조 유지", "pros": ["회귀 위험 0, .csproj 변경 없음.", "팀 학습 부담 0."], "cons": ["RelayCommand 보일러플레이트 누적, XAML 바인딩 코드 중복."] },
+          { "label": "B) RelayCommand 패턴 마이그레이션", "pros": ["코드 30% 감소 (boilerplate 제거).", "ObservableObject + [RelayCommand] 자동 생성기로 일관성 향상.", "app.config 변경 없이 .csproj NuGet만 추가."], "cons": ["8개 ViewModel 동시 변경, XAML 바인딩 검증 필요."] }
+        ],
+        "recommendation": "B — 보일러플레이트 누적이 심각하고 CommunityToolkit.Mvvm은 안정 버전. 8 ViewModel은 단계적 마이그레이션 가능."
+      },
+      "retro": {
+        "title": "WPF 회고 — XAML 바인딩 오류 0건",
+        "summary": "MVVM 구조 정합성 검증 도구 도입 후 XAML 바인딩 오류 12건 → 0건. .csproj 빌드 시간 회귀 0건."
+      },
+      "security_review": {
+        "title": "WPF 보안 검사 — DLL 인젝션 (강등 금지)",
+        "verdict": "BLOCK (S-WPF-001, severity=critical) — LoadLibrary 호출 경로에 코드 서명 검증 부재."
+      },
+      "code_review": {
+        "title": "WPF 코드 리뷰 — ViewModel이 System.Windows.Controls 참조",
+        "finding": "MainViewModel.cs가 System.Windows.Controls.TextBox 직접 참조. MVVM 위반 — View 계층으로 분리 필요. ObservableObject 속성으로 변환 권고."
+      }
+    }
+  }
+}
