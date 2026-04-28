@@ -42,6 +42,10 @@ It auto-detects your project domain and provides domain-specific AI assistance.
 | `/pdca report {feature}` | Completion report |
 | `/pdca status` | Show current status |
 
+## Sync Policy (gstack → rkit)
+
+See [`docs/policy/gstack-sync-policy.md`](docs/policy/gstack-sync-policy.md) for the lock policy on the embedded reserved vocabulary (20 terms, SoT at `policies/locked-vocab.json`), the 7 excluded items, and the 5 automated checks (`node scripts/verify-policy.js`). Body/appendix two-layer separation applies to the 4 SKILLs touched by Cycle 1.5 (`/investigate`, `/retro`, `/security-review`, `/code-review`). Run `node scripts/gen-locked-vocab.mjs` to regenerate appendices after editing the SoT.
+
 ## Coding Conventions
 
 ### MCU (C/Embedded)
