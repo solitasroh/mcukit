@@ -157,18 +157,190 @@ function checkEvalSyntax() {
 
 function checkSotSchema() {
   const errors = [];
-  if (SOT.version !== '1.0') errors.push(`SoT version: expected "1.0", got "${SOT.version}"`);
+  if (!['1.0', '1.1'].includes(SOT.version)) errors.push(`SoT version: expected "1.0" or "1.1", got "${SOT.version}"`);
   if (!Array.isArray(SOT.vocabs) || SOT.vocabs.length !== 20) {
     errors.push(`SoT vocabs: expected 20 entries, got ${SOT.vocabs?.length}`);
   }
   const validDomains = new Set(['mcu', 'mpu', 'wpf']);
+  const validScopes = new Set(['neutral', 'domain']);
   for (const v of SOT.vocabs || []) {
     if (typeof v.term !== 'string' || !v.term) errors.push(`SoT vocab: invalid term "${v.term}"`);
     if (!validDomains.has(v.domain)) errors.push(`SoT vocab "${v.term}": invalid domain "${v.domain}"`);
     if (typeof v.meaning !== 'string' || !v.meaning) errors.push(`SoT vocab "${v.term}": missing meaning`);
+    if (SOT.version === '1.1' && !validScopes.has(v.scope)) {
+      errors.push(`SoT vocab "${v.term}": missing or invalid scope (expected neutral|domain)`);
+    }
   }
   if (!SOT.schema || !Array.isArray(SOT.schema.verdictEnum) || !Array.isArray(SOT.schema.gateStatusEnum)) {
     errors.push('SoT schema enum lists missing or malformed');
+  }
+  return errors;
+}
+
+// Cycle 2 new check: manifest-sync — every policies/*.json must register in manifest
+function checkManifestSync() {
+  const errors = [];
+  const manifestPath = path.join(ROOT, 'policies/manifest.json');
+  if (!fs.existsSync(manifestPath)) {
+    errors.push('policies/manifest.json missing — SoT registry required from Cycle 2');
+    return errors;
+  }
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const registered = new Set((manifest.sots || []).map((s) => s.path));
+
+  function walk(dir, prefix) {
+    const out = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) {
+        out.push(...walk(path.join(dir, entry.name), rel));
+      } else if (entry.name.endsWith('.json')) {
+        out.push(rel);
+      }
+    }
+    return out;
+  }
+  const actual = walk(path.join(ROOT, 'policies'), '');
+  for (const f of actual) {
+    if (!registered.has(f)) {
+      errors.push(`policies/${f} not registered in manifest.json sots[]`);
+    }
+  }
+  for (const r of registered) {
+    if (!actual.includes(r)) {
+      errors.push(`manifest.sots references missing file: policies/${r}`);
+    }
+  }
+  return errors;
+}
+
+// Cycle 2 new check: decisions-matrix — 11 candidates, pending count, required fields
+function checkDecisionsMatrix() {
+  const errors = [];
+  const matrixPath = path.join(ROOT, 'policies/decisions/cycle2-matrix.json');
+  if (!fs.existsSync(matrixPath)) {
+    errors.push('policies/decisions/cycle2-matrix.json missing');
+    return errors;
+  }
+  const m = JSON.parse(fs.readFileSync(matrixPath, 'utf8'));
+  if (!Array.isArray(m.candidates) || m.candidates.length !== 11) {
+    errors.push(`decisions matrix: expected 11 candidates, got ${m.candidates?.length}`);
+  }
+  const decisionEnum = new Set(['pending', 'adopt', 'partial_adopt', 'defer', 'reject']);
+  for (const c of m.candidates || []) {
+    if (!decisionEnum.has(c.decision)) {
+      errors.push(`candidate ${c.id}: invalid decision "${c.decision}"`);
+      continue;
+    }
+    if (c.decision === 'pending') continue;
+    // non-pending requires decided_by, evidence, reasoning
+    if (!c.decided_by || !c.decided_by.role) {
+      errors.push(`candidate ${c.id} (${c.decision}): decided_by.role required`);
+    }
+    if (!Array.isArray(c.evidence) || c.evidence.length === 0) {
+      errors.push(`candidate ${c.id} (${c.decision}): evidence array must have >= 1 entry`);
+    }
+    if (c.decision === 'adopt' || c.decision === 'partial_adopt') {
+      if (!c.reasoning || c.reasoning.length < 20) {
+        errors.push(`candidate ${c.id} (${c.decision}): reasoning >= 20 chars required (got ${c.reasoning?.length || 0})`);
+      }
+    }
+    if (c.decision === 'defer') {
+      if (!c.revisit_by && !c.unblock_condition) {
+        errors.push(`candidate ${c.id} (defer): revisit_by or unblock_condition required`);
+      }
+    }
+  }
+  return errors;
+}
+
+// Cycle 2 new check: network-egress — blocked patterns must not appear outside exempt paths
+function checkNetworkEgress() {
+  const errors = [];
+  const allowlistPath = path.join(ROOT, 'policies/network-allowlist.json');
+  if (!fs.existsSync(allowlistPath)) {
+    errors.push('policies/network-allowlist.json missing');
+    return errors;
+  }
+  const a = JSON.parse(fs.readFileSync(allowlistPath, 'utf8'));
+  const blocked = a.blocked_patterns || [];
+  const exempt = new Set(a.exempt_paths || []);
+
+  function shouldCheck(filePath) {
+    if (filePath.includes('node_modules/')) return false;
+    if (filePath.includes('.git/')) return false;
+    for (const ex of exempt) if (filePath.startsWith(ex)) return false;
+    return filePath.endsWith('.js') || filePath.endsWith('.mjs') || filePath.endsWith('.cjs');
+  }
+
+  function walk(dir) {
+    const out = [];
+    let entries;
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); }
+    catch { return []; }
+    for (const e of entries) {
+      const full = path.join(dir, e.name);
+      const rel = path.relative(ROOT, full).replace(/\\/g, '/');
+      if (e.isDirectory()) {
+        if (e.name === 'node_modules' || e.name === '.git') continue;
+        out.push(...walk(full));
+      } else if (shouldCheck(rel)) {
+        out.push(rel);
+      }
+    }
+    return out;
+  }
+
+  const files = ['lib', 'scripts', 'hooks'].flatMap((d) => walk(path.join(ROOT, d)));
+  for (const f of files) {
+    const txt = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    for (const pattern of blocked) {
+      try {
+        const re = new RegExp(pattern);
+        if (re.test(txt)) {
+          errors.push(`${f}: blocked egress pattern matched "${pattern}"`);
+        }
+      } catch {}
+    }
+  }
+  return errors;
+}
+
+// Cycle 2 new check: pii-in-logs — forbidden PII tokens in .rkit/state/
+function checkPiiInLogs() {
+  const errors = [];
+  const stateDir = path.join(ROOT, '.rkit/state');
+  if (!fs.existsSync(stateDir)) return errors;
+  // forbidden tokens that should never be raw in logs
+  const forbidden = [
+    process.env.USERNAME,
+    process.env.USER,
+    process.env.HOSTNAME,
+    process.env.HOME?.replace(/\\/g, '/'),
+    process.env.USERPROFILE?.replace(/\\/g, '/'),
+  ].filter(Boolean);
+
+  function walk(dir) {
+    const out = [];
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, e.name);
+      if (e.isDirectory()) out.push(...walk(full));
+      else if (e.name.endsWith('.json') || e.name.endsWith('.jsonl')) out.push(full);
+    }
+    return out;
+  }
+
+  for (const f of walk(stateDir)) {
+    const txt = fs.readFileSync(f, 'utf8');
+    for (const tok of forbidden) {
+      if (tok && tok.length > 2 && txt.includes(tok)) {
+        errors.push(`${path.relative(ROOT, f)}: PII leak — raw token "${tok}" found`);
+      }
+    }
+    // git remote URL pattern
+    if (/https:\/\/github\.com\/[^/]+\//.test(txt) || /git@github\.com:/.test(txt)) {
+      errors.push(`${path.relative(ROOT, f)}: PII leak — raw git remote URL found`);
+    }
   }
   return errors;
 }
@@ -179,6 +351,10 @@ const checks = {
   'forbidden-tokens': checkForbiddenTokens,
   'eval-syntax': checkEvalSyntax,
   'sot-schema': checkSotSchema,
+  'manifest-sync': checkManifestSync,
+  'decisions-matrix': checkDecisionsMatrix,
+  'network-egress': checkNetworkEgress,
+  'pii-in-logs': checkPiiInLogs,
 };
 
 const argv = process.argv.slice(2);
