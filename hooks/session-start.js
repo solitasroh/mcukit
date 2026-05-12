@@ -201,10 +201,24 @@ if (domainResult.domain !== 'unknown') {
 
 // --- Context Budget Guard (Cycle 2 A partial_adopt) ---
 // CC hooks cap additionalContext at 10,000 chars per spec. Apply pre-emptive
-// 8,000-char budget with priority section preservation (MANDATORY,
-// Previous Work, AskUserQuestion).
+// 8,000-char budget with priority section preservation.
+//
+// rkit-specific priorities (extend bkit defaults): preserve Instinct,
+// PDCA progress, stale warnings, domain info — these contain learned
+// patterns and live state the LLM must see every session.
 try {
-  additionalContext = applyBudget(additionalContext);
+  additionalContext = applyBudget(additionalContext, {
+    priorityPreserve: [
+      'MANDATORY',
+      'Previous Work Detected',
+      'Previous Work',
+      'AskUserQuestion',
+      'Project Instinct',          // ## Project Instinct (auto-learned patterns)
+      'PDCA Progress',              // ## PDCA Progress: ...
+      'Stale Feature Warning',      // ## Stale Feature Warning
+      'Detected Domain',            // ## Detected Domain: ...
+    ],
+  });
 } catch (e) {
   debugLog('SessionStart', 'Context budget failed (passthrough)', { error: e.message });
 }
