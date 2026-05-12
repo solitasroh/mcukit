@@ -1,18 +1,28 @@
 {
   "version": "1.0",
   "cycle": "2",
-  "lastUpdated": "2026-04-28T00:00:00Z",
+  "lastUpdated": "2026-05-12T23:40:13.473Z",
   "description": "Cycle 2 candidate × decision tracking matrix. 11 candidates (7 bkit module groups + 4 carry-over) × 5 decision enum.",
   "candidates": [
     {
       "id": "A",
       "title": "lib/core/{version,context-budget,worktree-detector,session-ctx-fp,session-title-cache}",
       "priority": "P0",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
+      "decision": "partial_adopt",
+      "reasoning": "5 모듈 중 2개만 도입. context-budget.js(CC 10K cap 대응, rkit 미구현)와 worktree-detector.js(git worktree #46808 회피)는 즉시 가치. worktree-detector는 FR-09 anonymizeFingerprint 패치 + .rkit/runtime/ 경로 재배치 동반. version.js는 lib/core/constants.js의 RKIT_VERSION과 중복, session-ctx-fp.js는 bkit 원본 16자 sha256 + salt 없음으로 FR-09 14자 + salt와 불일치하여 알고리즘 재설계 필요로 defer. session-title-cache.js는 lib/team/state-writer.js와 책임 중복 가능성으로 defer.",
+      "evidence": [
+        "lib/core/context-budget.js (rkit 도입, bkit 원본 변형)",
+        "lib/core/worktree-detector.js (rkit 도입 + FR-09 PII 패치)",
+        "lib/core/anonymize-fingerprint.js (FR-09 헬퍼 신규)",
+        "tests/cycle2/lib-core-adopt.smoke.test.js (12 TC PASS)",
+        "references/bkit-claude-code/lib/core/session-ctx-fp.js:24-30 (FR-09 알고리즘 불일치 evidence)",
+        "lib/core/constants.js:15 (RKIT_VERSION 기존 구현 evidence)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:enterprise-expert + rkit:security-architect council"
+      },
+      "decided_at": "2026-05-12T23:40:13.473Z",
       "depends_on": [],
       "unblock_condition": null,
       "revisit_by": null,
@@ -22,12 +32,24 @@
       "id": "B",
       "title": "lib/domain/{ports,guards,rules}",
       "priority": "P0",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
-      "depends_on": ["A"],
+      "decision": "partial_adopt",
+      "reasoning": "bkit ports 6개 중 rkit 도메인 매핑 가능 2개(state-store, audit-sink)만 도입. 나머지 4 ports(cc-payload/docs-code-index/regression-registry/token-meter)는 bkit 고유 도메인으로 rkit 매핑률 33% (<80%) defer. guards/rules는 bkit ENH-25x 식별자와 EXPECTED_COUNTS(skills:39 등) bkit 인벤토리 하드코딩으로 rkit 비호환 — defer (revisit cycle 3+에서 rkit 카운트 재초기화 후 검토). A의 partial_adopt 결정 후 진행.",
+      "evidence": [
+        "lib/domain/ports/state-store.port.js (rkit 도입, type-only)",
+        "lib/domain/ports/audit-sink.port.js (rkit 도입, type-only)",
+        "tests/cycle2/lib-domain-ports.smoke.test.js (3 TC PASS)",
+        "references/bkit-claude-code/lib/domain/ports/ (6 ports 원본)",
+        "references/bkit-claude-code/lib/domain/guards/enh-25*.js (bkit ENH 하드코딩 evidence)",
+        "references/bkit-claude-code/lib/domain/rules/docs-code-invariants.js (skills:39 카운트 bkit 전용 evidence)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:code-analyzer council"
+      },
+      "decided_at": "2026-05-12T23:40:13.473Z",
+      "depends_on": [
+        "A"
+      ],
       "unblock_condition": null,
       "revisit_by": null
     },
@@ -107,7 +129,10 @@
       "evidence": [],
       "decided_by": null,
       "decided_at": null,
-      "depends_on": ["D", "E"],
+      "depends_on": [
+        "D",
+        "E"
+      ],
       "unblock_condition": "D or E adopts (rotation policy integration target)",
       "revisit_by": null,
       "linked_to": "D or E"
@@ -134,7 +159,9 @@
       "evidence": [],
       "decided_by": null,
       "decided_at": null,
-      "depends_on": ["B"],
+      "depends_on": [
+        "B"
+      ],
       "unblock_condition": "D-7 scope meta-policy resolved AND B decision != pending",
       "revisit_by": null
     },
@@ -142,20 +169,38 @@
       "id": "CO-4",
       "title": "BKIT_VERSION SoT (policies/version.json)",
       "priority": "P0",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
-      "depends_on": ["A"],
+      "decision": "defer",
+      "reasoning": "A.version 모듈이 defer되었으므로 unblock_condition 미충족. policies/version.json SoT 스키마는 Design §3.3에 정의됐으나 자동화는 cycle-3 이월. rkit 0.9.13과 bkit 2.1.10 sync 추적은 현 단계에서 docs/policy/gstack-sync-policy.md로 수동 추적 가능.",
+      "evidence": [
+        "cycle2-matrix.json A.decision === partial_adopt without version.js (unblock_condition unmet)",
+        "docs/02-design/features/bkit-gstack-sync-v2-cycle2.design.md §3.3 (version.json schema spec)",
+        "references/bkit-claude-code/lib/core/version.js (bkit runtime detection, not SoT file)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:infra-architect council"
+      },
+      "decided_at": "2026-05-12T23:40:13.473Z",
+      "depends_on": [
+        "A"
+      ],
       "unblock_condition": "A.version adopted",
-      "revisit_by": null,
+      "revisit_by": "cycle-3",
       "linked_to": "A"
     }
   ],
-  "decision_enum": ["pending", "adopt", "partial_adopt", "defer", "reject"],
+  "decision_enum": [
+    "pending",
+    "adopt",
+    "partial_adopt",
+    "defer",
+    "reject"
+  ],
   "decided_by_schema": {
-    "role_enum": ["human", "agent"],
+    "role_enum": [
+      "human",
+      "agent"
+    ],
     "id_format": "human: git email | agent: rkit:<agent-name>"
   },
   "depends_on_semantics": "candidate IDs (each must have decision != pending before this candidate can adopt)",
