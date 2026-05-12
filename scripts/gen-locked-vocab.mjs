@@ -30,8 +30,8 @@ const APPENDIX_END = '<!-- END: locked-vocab-appendix -->';
 function loadSoT() {
   const raw = fs.readFileSync(SOT_PATH, 'utf8');
   const sot = JSON.parse(raw);
-  if (sot.version !== '1.0') {
-    throw new Error(`SoT version mismatch: expected "1.0", got "${sot.version}"`);
+  if (!['1.0', '1.1'].includes(sot.version)) {
+    throw new Error(`SoT version mismatch: expected "1.0" or "1.1", got "${sot.version}"`);
   }
   if (!Array.isArray(sot.vocabs) || sot.vocabs.length !== 20) {
     throw new Error(`SoT vocabs must be exactly 20 entries, got ${sot.vocabs?.length}`);
