@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "description": "SoT registry — every policies/ JSON file must register here. New SoT additions require manifest entry (enforced by verify-policy --check manifest-sync).",
+  "policy": "Single source of truth manifest. Adding a new policies/*.json without registering here will fail manifest-sync check.",
+  "sots": [
+    {
+      "path": "locked-vocab.json",
+      "since": "cycle-1.5",
+      "version": "1.1",
+      "validator": "scripts/verify-policy.js --check vocab-preservation",
+      "description": "Embedded reserved vocabulary SoT (20 terms, scope: neutral|domain)"
+    },
+    {
+      "path": "manifest.json",
+      "since": "cycle-2",
+      "version": "1.0",
+      "validator": "scripts/verify-policy.js --check manifest-sync",
+      "description": "This file. SoT registry."
+    },
+    {
+      "path": "never-gate.json",
+      "since": "cycle-2",
+      "version": "1.0",
+      "validator": "scripts/verify-policy.js --check decisions-matrix",
+      "description": "NEVER_GATE list (8 items) with sunset metadata"
+    },
+    {
+      "path": "network-allowlist.json",
+      "since": "cycle-2",
+      "version": "1.0",
+      "validator": "scripts/verify-policy.js --check network-egress",
+      "description": "External egress allowlist (deny by default, 14 blocked patterns)"
+    },
+    {
+      "path": "decisions/cycle2-matrix.json",
+      "since": "cycle-2",
+      "version": "1.0",
+      "validator": "scripts/verify-policy.js --check decisions-matrix",
+      "description": "Cycle 2 candidate × decision tracking matrix (11 candidates × 5-enum)"
+    }
+  ]
+}
