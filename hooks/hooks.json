@@ -80,6 +80,11 @@
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/verify-policy.js --quiet",
             "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/check-sunset.js",
+            "timeout": 3000
           }
         ]
       }
