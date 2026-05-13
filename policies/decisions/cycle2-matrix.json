@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "cycle": "2",
-  "lastUpdated": "2026-05-12T23:40:13.473Z",
+  "lastUpdated": "2026-05-13T00:00:00.000Z",
   "description": "Cycle 2 candidate × decision tracking matrix. 11 candidates (7 bkit module groups + 4 carry-over) × 5 decision enum.",
   "candidates": [
     {
@@ -57,25 +57,43 @@
       "id": "C",
       "title": "lib/orchestrator/",
       "priority": "P1",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
+      "decision": "defer",
+      "reasoning": "Council 결정. 책임 중복 4건 식별 — bkit orchestrator vs rkit (1) lib/intent/ (의도 분류), (2) lib/pdca/lifecycle.js (PDCA 전이), (3) lib/team/coordinator.js (Agent Team 분배), (4) lib/control/trust-engine.js (자동화 레벨 조정). Design §6.2 auto_defer_trigger 충족 (overlap >= 3). 책임 중복 해소 표 작성 후 cycle-3 재검토. 자동화 레벨 통합 시너지 가능성은 있으나 rkit의 4 모듈 통합 비용이 본 사이클 범위 초과.",
+      "evidence": [
+        "lib/intent/router.js (rkit 의도 분류 존재)",
+        "lib/pdca/lifecycle.js (rkit PDCA 전이 존재)",
+        "lib/team/coordinator.js (rkit Agent Team 분배 존재)",
+        "lib/control/trust-engine.js (rkit 자동화 레벨 조정 존재)",
+        "references/bkit-claude-code/lib/orchestrator/ (bkit 4 책임 통합 evidence)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:enterprise-expert council"
+      },
+      "decided_at": "2026-05-13T00:00:00.000Z",
       "depends_on": [],
       "unblock_condition": "responsibility overlap table written AND overlap count <= 2",
-      "revisit_by": null,
+      "revisit_by": "cycle-3",
       "auto_defer_trigger": "responsibility overlap >= 3"
     },
     {
       "id": "D",
       "title": "lib/qa/ + QA agents + qa-phase skill",
       "priority": "P1",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
+      "decision": "reject",
+      "reasoning": "Council 결정. (1) qa-phase SKILL이 chrome-bridge.js (web/headless chrome) 의존 → body-neutrality 위배 (D-1 SKILL은 도메인 중립이어야 함). (2) vocab-preservation 잠금 어휘와 충돌 (qa-phase 신어휘 도입). (3) lib/quality/ 4 모듈 (review-engine, simplifier, gap-detector, code-analyzer)과 책임 중복. (4) test-all.js scripts 중복. cycle-3 이후에도 도입 권장 안 함 — rkit는 qa를 lib/quality + agents (gap-detector, qa-monitor)로 이미 분담.",
+      "evidence": [
+        "references/bkit-claude-code/skills/qa-phase/SKILL.md (chrome-bridge 의존 evidence)",
+        "references/bkit-claude-code/lib/qa/chrome-bridge.js (web 의존 evidence)",
+        "lib/quality/ (rkit 4 모듈 책임 중복 evidence)",
+        "agents/gap-detector.md + qa-monitor.md (rkit qa agents 존재)",
+        "scripts/test-all.js (rkit test runner 존재)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:code-analyzer council"
+      },
+      "decided_at": "2026-05-13T00:00:00.000Z",
       "depends_on": [],
       "unblock_condition": "independent opt-in stage AND qa-phase SKILL body-neutrality passes",
       "revisit_by": null,
@@ -85,37 +103,62 @@
       "id": "E",
       "title": "lib/cc-regression/",
       "priority": "P1",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
+      "decision": "defer",
+      "reasoning": "Council 결정. bkit event-recorder.js가 promptHash/outputHash 해시 생성 로직 없음 (200자 truncate만 수행) → D-8 GDPR hash-only 정책과 구조 불일치. 재작성 수준 비용 (해시 함수 + opt-in prompt + retention 정책 + purge 명령 전체 신규). cycle-3에 CO-2 canary와 묶음 처리 권장. D-8 정책 자체는 본 사이클에서 docs/policy/gdpr-cc-regression.md로 문서화 완료.",
+      "evidence": [
+        "references/bkit-claude-code/lib/cc-regression/event-recorder.js (해시 없음, 200자 truncate evidence)",
+        "docs/policy/gdpr-cc-regression.md (rkit GDPR 정책 문서화 완료 evidence)",
+        "scripts/pdca-regression-purge.mjs (rkit purge 도구 신규 — 어댑터 준비)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:security-architect council"
+      },
+      "decided_at": "2026-05-13T00:00:00.000Z",
       "depends_on": [],
-      "unblock_condition": "D-8 GDPR resolved AND opt-in prompt implemented AND retention check PASS",
-      "revisit_by": null
+      "unblock_condition": "D-8 GDPR resolved AND opt-in prompt implemented AND retention check PASS AND hash-only refactor complete",
+      "revisit_by": "cycle-3"
     },
     {
       "id": "F",
       "title": "lib/infra/{telemetry,cc-bridge,docs-code-scanner}",
       "priority": "P2",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
+      "decision": "partial_adopt",
+      "reasoning": "Council 결정. 3 모듈 중 2개 도입. docs-code-scanner.js는 외부 송신 0건 (offline fs 스캔) → adopt, bkit_ 프리픽스 → rkit_ 치환 + bkit.config.json → rkit.config.json 경로 치환. cc-bridge.js는 stdin 파싱 + claude CLI 자식 프로세스만 사용 (HTTP 없음) → adopt. telemetry.js는 http/https import 2건 (14 blocked patterns 위배) → defer. crossCheck()는 lib/domain/rules/docs-code-invariants.js (B에서 defer)에 의존하므로 measure() + scanVersions()만 우선 도입.",
+      "evidence": [
+        "lib/infra/docs-code-scanner.js (rkit 도입, bkit→rkit 치환)",
+        "lib/infra/cc-bridge.js (rkit 도입, 외부 송신 0)",
+        "references/bkit-claude-code/lib/infra/telemetry.js (http/https import evidence — defer)",
+        "policies/network-allowlist.json (14 blocked patterns evidence)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:infra-architect council"
+      },
+      "decided_at": "2026-05-13T00:00:00.000Z",
       "depends_on": [],
       "unblock_condition": "egress=deny allowlist SoT exists AND consent prompt implemented",
-      "revisit_by": null
+      "revisit_by": "cycle-3"
     },
     {
       "id": "G",
       "title": "lib/pdca/status.js split",
       "priority": "P2",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
+      "decision": "adopt",
+      "reasoning": "Council 결정. status.js 863 lines + 33 exports → SQ-004 위배 (warn>300, error>500). 5 책임 영역 식별: (1) schema (createInitialStatusV2, migrateStatusToV2, migrateStatusV2toV3), (2) store (path/cache/init/load/save), (3) feature-lifecycle (CRUD + cleanup + limit), (4) context (extractFeatureFromContext), (5) memory-io (readMemory/writeMemory). Facade 패턴 적용 — status.js는 5 서브모듈 re-export만 수행, 외부 33 호출자 호환 100% 보존 (FR-12 compat matrix 13/13 PASS 보장).",
+      "evidence": [
+        "lib/pdca/status.js (863 lines 분할 대상)",
+        "lib/pdca/status/schema.js (신규 — 스키마 + 마이그레이션)",
+        "lib/pdca/status/store.js (신규 — 파일/캐시 IO)",
+        "lib/pdca/status/feature-lifecycle.js (신규 — feature CRUD)",
+        "lib/pdca/status/context.js (신규 — context 추출)",
+        "lib/pdca/status/memory-io.js (신규 — memory.json IO)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:code-analyzer council"
+      },
+      "decided_at": "2026-05-13T00:00:00.000Z",
       "depends_on": [],
       "unblock_condition": "FR-12 compat matrix 13/13 PASS",
       "revisit_by": null
@@ -124,28 +167,40 @@
       "id": "CO-1",
       "title": "JSONL rotation policy (review-history.jsonl, code-review-stats.json, cc-regression.jsonl)",
       "priority": "P1",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
+      "decision": "defer",
+      "reasoning": "Council 자동 defer 적용. depends_on [D, E] 두 후보 모두 reject/defer → 회전 정책 통합 대상 자체가 없음. 정책 권고만 문서화: 5MB cap / 5000 entries / 1 backup file. D 또는 E가 adopt 결정 시 동반 도입. cycle-3+ 검토.",
+      "evidence": [
+        "cycle2-matrix.json D.decision === reject AND E.decision === defer (unblock 미충족)",
+        "docs/policy/network-egress.md (rotation policy 권고 문서)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:infra-architect council"
+      },
+      "decided_at": "2026-05-13T00:00:00.000Z",
       "depends_on": [
         "D",
         "E"
       ],
       "unblock_condition": "D or E adopts (rotation policy integration target)",
-      "revisit_by": null,
+      "revisit_by": "cycle-3",
       "linked_to": "D or E"
     },
     {
       "id": "CO-2",
       "title": "Canary token policy",
       "priority": "P2",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
+      "decision": "defer",
+      "reasoning": "Council 결정. canary token 인프라 0건 — cycle 1.5 D-7에서 결정된 인프라 미구축 상태 유지. E (cc-regression)와 묶음 처리 권고 — 두 후보 모두 해시화/탐지 메커니즘 필요로 cycle-3+에서 함께 검토.",
+      "evidence": [
+        "docs/policy/ (canary-tokens.md 부재 evidence)",
+        "cycle2-matrix.json E.decision === defer (묶음 처리 대상)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:security-architect council"
+      },
+      "decided_at": "2026-05-13T00:00:00.000Z",
       "depends_on": [],
       "unblock_condition": "canary token infrastructure exists (docs/policy/canary-tokens.md + regex >= 3)",
       "revisit_by": "cycle-3 or later"
@@ -154,16 +209,23 @@
       "id": "CO-3",
       "title": "28 SKILL classification table + domain-scoped marker",
       "priority": "P1",
-      "decision": "pending",
-      "reasoning": null,
-      "evidence": [],
-      "decided_by": null,
-      "decided_at": null,
+      "decision": "partial_adopt",
+      "reasoning": "Council 결정. unblock 조건 충족 — B.decision != pending (partial_adopt) AND D-7 scope meta-policy resolved (locked-vocab.json v1.1 scope enum 도입 완료). 분류표 작성은 B의 ports 매핑률 완료와 독립 가능. 본 사이클 범위: design §4.12 분류표 (28 SKILL × workflow/capability/hybrid × domain/neutral marker) 작성만. SKILL 본문 적용은 cycle-3+ — 28 SKILL 일괄 수정 비용이 본 사이클 초과.",
+      "evidence": [
+        "policies/locked-vocab.json v1.1 (scope enum 도입 evidence)",
+        "cycle2-matrix.json B.decision === partial_adopt (unblock 충족)",
+        "docs/02-design/features/bkit-gstack-sync-v2-cycle2.design.md §4.12 (분류표 스키마 정의)"
+      ],
+      "decided_by": {
+        "role": "agent",
+        "id": "rkit:frontend-architect council"
+      },
+      "decided_at": "2026-05-13T00:00:00.000Z",
       "depends_on": [
         "B"
       ],
       "unblock_condition": "D-7 scope meta-policy resolved AND B decision != pending",
-      "revisit_by": null
+      "revisit_by": "cycle-3"
     },
     {
       "id": "CO-4",

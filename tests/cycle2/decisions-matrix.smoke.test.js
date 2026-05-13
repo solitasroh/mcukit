@@ -22,9 +22,27 @@ test('completion_gate references verify-policy decisions-matrix', () => {
   assert.match(matrix.completion_gate.check, /decisions-matrix/);
 });
 
-test('initial state: all candidates pending', () => {
+test('completion gate: no candidates remain pending', () => {
+  const stillPending = matrix.candidates.filter((c) => c.decision === 'pending');
+  assert.deepEqual(stillPending.map((c) => c.id), [], 'all 11 candidates must have decision != pending');
+});
+
+test('completion gate: adopt/partial_adopt require reasoning >= 20 chars', () => {
   for (const c of matrix.candidates) {
-    assert.equal(c.decision, 'pending', `${c.id} should be pending initially`);
+    if (c.decision === 'adopt' || c.decision === 'partial_adopt') {
+      assert.ok(c.reasoning && c.reasoning.length >= 20, `${c.id} reasoning too short`);
+    }
+  }
+});
+
+test('completion gate: defer requires revisit_by or unblock_condition', () => {
+  for (const c of matrix.candidates) {
+    if (c.decision === 'defer') {
+      assert.ok(
+        c.revisit_by || c.unblock_condition,
+        `${c.id} defer must have revisit_by or unblock_condition`
+      );
+    }
   }
 });
 
