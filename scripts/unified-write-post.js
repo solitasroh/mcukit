@@ -161,7 +161,27 @@ try {
   const { handleCodeQuality } = require('./code-quality-hook');
   handleCodeQuality(input);
 } catch (e) {
+  // Module load failures (SyntaxError, missing file) bypass user awareness
+  // entirely if only debug-logged. Surface to stderr once per session.
+  // (PR #5 review C6)
+  if (!global.__rkit_cqh_load_warned) {
+    process.stderr.write(`unified-write-post: code-quality-hook load failed: ${e.message}\n`);
+    global.__rkit_cqh_load_warned = true;
+  }
   debugLog('UnifiedWritePost', 'code-quality-hook failed', { error: e.message });
+}
+
+// C++ static analysis (cpp-static-analysis) — only fires for C/C++ extensions.
+// Non-blocking: Python hook stderr is relayed, never outputs decision:block.
+try {
+  const { handleCppStaticAnalysis } = require('./cpp-static-analysis-hook');
+  handleCppStaticAnalysis(input);
+} catch (e) {
+  if (!global.__rkit_cppsa_load_warned) {
+    process.stderr.write(`unified-write-post: cpp-static-analysis-hook load failed: ${e.message}\n`);
+    global.__rkit_cppsa_load_warned = true;
+  }
+  debugLog('UnifiedWritePost', 'cpp-static-analysis-hook failed', { error: e.message });
 }
 
 // v1.6.0 ENH-103: PDCA template validation
