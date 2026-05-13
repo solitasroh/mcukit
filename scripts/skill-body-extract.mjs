@@ -96,7 +96,8 @@ function scan() {
     const s = readSkill(name);
     const has15 = s.text.includes(CYCLE15_BEGIN);
     const has3 = s.text.includes(BEGIN);
-    const grandfathered = /^grandfathered:\s*true/m.test(s.text.split('---\n')[1] || '');
+    const { fm: skillFm } = splitFrontmatter(s.text);
+    const grandfathered = skillFm ? /^grandfathered:\s*true/m.test(skillFm) : false;
     const hasSection0 = /^## 0\. 문서 구조/m.test(s.text);
     if (has15) summary.cycle15_converted++;
     if (has3) summary.cycle3_converted++;
@@ -155,7 +156,8 @@ function applyGrandfathered(name) {
   }
   let newFm = fm;
   if (!/^grandfathered:/m.test(fm)) {
-    newFm = fm.replace(/\n---\n$/, '\ngrandfathered: true\n---\n');
+    // Insert grandfathered line before closing --- (CRLF or LF tolerant).
+    newFm = fm.replace(/(\r?\n)(---\r?\n)$/, '$1grandfathered: true$1$2');
   } else {
     console.log(`  ${name}: grandfathered already set`);
   }
