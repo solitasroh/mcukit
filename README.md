@@ -1,5 +1,7 @@
 # rkit — AI Native Embedded Development Kit
 
+![Version-0.9.14](https://img.shields.io/badge/Version-0.9.14-blue) ![License-MIT](https://img.shields.io/badge/License-MIT-green) ![claude--code->=2.1.78](https://img.shields.io/badge/claude--code-%3E%3D2.1.78-purple)
+
 > **PDCA methodology + Domain-specific AI agents for MCU/MPU/WPF development**
 
 rkit is a Claude Code plugin that provides structured development workflows for embedded and desktop projects. It auto-detects your project domain and activates domain-specific Skills, Agents, and Quality Gates.
