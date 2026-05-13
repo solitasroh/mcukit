@@ -35,22 +35,17 @@
     {
       "id": "network_egress",
       "since": "cycle-2",
-      "scope": "transitional",
-      "sunset": "cycle-4",
-      "reason": "Module group F (telemetry/cc-bridge/docs-code-scanner) egress=deny enforcement. Sunset when F decided permanently."
+      "scope": "permanent",
+      "promoted_at": "cycle-4",
+      "promoted_from": "transitional",
+      "previous_sunset": "cycle-4",
+      "reason": "Module group F (telemetry/cc-bridge/docs-code-scanner) egress=deny enforcement. Promoted to permanent in cycle-4 (CR4-4) after cycle-3 verify-policy 9/9 PASS regression. Re-introduction of group F requires new candidate in cycle-5+."
     },
     {
       "id": "pii_in_logs",
       "since": "cycle-2",
       "scope": "permanent",
       "reason": "Username/HOME/hostname/git remote URL must not appear in .rkit/state/ logs (FR-09)"
-    },
-    {
-      "id": "regression_retention",
-      "since": "cycle-2",
-      "scope": "transitional",
-      "sunset": "cycle-4",
-      "reason": "cc-regression 90-day retention enforcement (FR-08 + D-8). Sunset when module group E decided permanently."
     }
   ]
 }

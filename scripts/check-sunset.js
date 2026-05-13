@@ -66,6 +66,8 @@ function main() {
   const failures = [];
 
   for (const item of ng.items || []) {
+    // permanent items (including those promoted from transitional) are skipped
+    if (item.scope === 'permanent') continue;
     if (item.scope !== 'transitional' || !item.sunset) continue;
     const sunsetCycle = parseCycleString(item.sunset);
     if (sunsetCycle == null) {

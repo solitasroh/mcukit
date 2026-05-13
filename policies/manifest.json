@@ -51,6 +51,13 @@
       "version": "1.0",
       "validator": "scripts/verify-policy.js --check decisions-matrix",
       "description": "Defer escalation thresholds (warn@1, fail@2, prohibit@3). Prevents indefinite carry-over chains."
+    },
+    {
+      "path": "decisions/cycle4-matrix.json",
+      "since": "cycle-4",
+      "version": "1.0",
+      "validator": "scripts/verify-policy.js --check decisions-matrix",
+      "description": "Cycle 4 candidate × decision tracking matrix (7 candidates × 5-enum). STRICT + escalation prohibit_at terminal cycle for CR4-1/CR4-2. CO-2 split from CR4-1 as CR4-7 adopt."
     }
   ]
 }

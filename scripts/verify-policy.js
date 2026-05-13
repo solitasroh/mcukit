@@ -242,7 +242,7 @@ function checkDecisionsMatrix() {
   const VAGUE_UNBLOCK = /^cycle-?\d+\s*(이월|carry.?over|defer|연기)\s*$/i;
   const VERB_RE = /(implemented|completed|resolved|passes|adopted|written|exists|integrated|merged|verified)/i;
   const REVISIT_FMT = /^cycle-\d+(\.\d+)?$/;
-  const expectedCounts = { '2': 11, '3': 8 };
+  const expectedCounts = { '2': 11, '3': 8, '4': 7 };
 
   for (const entry of matrixEntries) {
     const matrixPath = path.join(ROOT, 'policies', entry.path);
@@ -272,6 +272,22 @@ function checkDecisionsMatrix() {
       }
       if (!Array.isArray(c.evidence) || c.evidence.length < minEvidenceCount) {
         errors.push(`${id} (${c.decision}): evidence >= ${minEvidenceCount} entries required (got ${c.evidence?.length || 0})`);
+      }
+
+      // Cycle 4+ cascade_origin: escalation_count=0 강제, cycle 4 이상 STRICT만 적용
+      const isCascade = c.cascade_origin === true && typeof c.cascade_parent === 'string';
+      if (cycleNum >= 4 && isCascade && c.escalation_count !== 0) {
+        errors.push(`${id}: cascade_origin=true requires escalation_count=0 (got ${c.escalation_count})`);
+      }
+
+      // Cycle 4+ escalation_history: each entry tracks one cycle's decision.
+      // history.length == escalation_count (count = number of cycles tracked).
+      if (cycleNum >= 4 && typeof c.escalation_count === 'number' && c.escalation_count > 0 && !isCascade) {
+        if (Array.isArray(c.escalation_history)) {
+          if (c.escalation_history.length !== c.escalation_count) {
+            errors.push(`${id}: escalation_history.length (${c.escalation_history.length}) must equal escalation_count (${c.escalation_count})`);
+          }
+        }
       }
 
       // R1: reasoning length (STRICT: all non-pending; legacy: adopt/partial only)

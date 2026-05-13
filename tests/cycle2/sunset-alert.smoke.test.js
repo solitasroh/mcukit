@@ -32,15 +32,18 @@ test('TC-40: current cycle 2, sunset cycle-4 → silent', () => {
   assert.equal(r.failures.length, 0);
 });
 
-test('current cycle 3, sunset cycle-4 → WARN', () => {
+test('current cycle 3, sunset cycle-4 → WARN (only items still transitional)', () => {
+  // After cycle 4 processing: network_egress promoted to permanent, regression_retention removed.
+  // No transitional items remain — warnings should be empty.
   const r = evaluate(ng.items, 3);
-  assert.deepEqual(r.warnings.sort(), ['network_egress', 'regression_retention'].sort());
+  assert.equal(r.warnings.length, 0, `expected 0 transitional WARN after cycle 4 processing, got: ${r.warnings.join(',')}`);
   assert.equal(r.failures.length, 0);
 });
 
-test('current cycle 4, sunset cycle-4 → FAIL', () => {
+test('current cycle 4, sunset cycle-4 → no FAIL (transitional resolved)', () => {
+  // Cycle 4 (CR4-4 promote + CR4-5 remove) cleared all transitional sunsets.
   const r = evaluate(ng.items, 4);
-  assert.deepEqual(r.failures.sort(), ['network_egress', 'regression_retention'].sort());
+  assert.equal(r.failures.length, 0, `expected 0 FAIL after cycle 4 processing, got: ${r.failures.join(',')}`);
 });
 
 test('permanent items not affected', () => {
