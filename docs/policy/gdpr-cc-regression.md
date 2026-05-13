@@ -1,5 +1,15 @@
 # cc-regression GDPR 보존 정책 (D-8, FR-08)
 
+> **Status**: **OBSOLETE** (CR4-1 permanent_reject, cycle 4, 2026-05-13)
+>
+> **Obsoleted by**: `policies/decisions/cycle4-matrix.json#CR4-1`
+>
+> **Reason**: cc-regression 모듈 그룹 E는 cycle 4 council (security + enterprise + code-analyzer) 합의로 영구 reject 결정. 본 정책은 결정 이력 보존 목적으로 유지되며, 신규 코드/모듈 도입 기준으로 사용 금지. 향후 hooks regression 탐지가 필요하면 cycle 5+ 신규 candidate로 재평가.
+>
+> 보안 가치 대체: `policies/canary-tokens.md` + `scripts/security/scan-canary.mjs` (CR4-7 canary regex 분리 채택).
+
+---
+
 > 적용 대상: `lib/cc-regression/` (묶음 E 도입 시), `.rkit/state/cc-regression.jsonl`
 
 ## 핵심 원칙

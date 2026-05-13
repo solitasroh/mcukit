@@ -2,6 +2,11 @@
 /**
  * pdca-regression-purge.mjs
  *
+ * @deprecated cycle-4 CR4-1 permanent_reject (2026-05-13). lib/cc-regression/
+ * never adopted in rkit. This tool is preserved as a standalone jsonl purge
+ * utility — reusable for other .rkit/state/*.jsonl domains if introduced later.
+ * No manifest registration, no active call sites (verified via Grep).
+ *
  * Cycle 2 FR-08 (D-8 GDPR) — Purge cc-regression entries.
  *
  * Council code-analyzer MEDIUM-3 + infra HIGH-2 reflected:
