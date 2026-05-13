@@ -72,12 +72,16 @@ function scan() {
   const patterns = cfg.patterns.map((p) => ({ ...p, _re: new RegExp(p.regex) }));
   const files = walk(ROOT);
   const findings = [];
+  const unreadable = []; // PR #6 H2: track silently-skipped files for transparency
   let scanned = 0;
   for (const rel of files) {
     if (shouldExclude(rel, cfg.exclusion_globs || [])) continue;
     let content;
     try { content = fs.readFileSync(path.join(ROOT, rel), 'utf8'); }
-    catch { continue; }
+    catch (e) {
+      unreadable.push({ file: rel, error: e.code || e.message });
+      continue;
+    }
     scanned++;
     const lines = content.split(/\r?\n/);
     for (let i = 0; i < lines.length; i++) {
@@ -96,10 +100,17 @@ function scan() {
       }
     }
   }
-  return { scanned, findings };
+  return { scanned, findings, unreadable };
 }
 
-const { scanned, findings } = scan();
+const { scanned, findings, unreadable } = scan();
+
+// PR #6 H2: surface unreadable files so security scanner gaps are visible.
+if (unreadable.length > 0 && !quiet) {
+  console.error(`⚠️  canary scan: ${unreadable.length} unreadable file(s) skipped`);
+  for (const u of unreadable.slice(0, 10)) console.error(`   ${u.file} [${u.error}]`);
+  if (unreadable.length > 10) console.error(`   ... and ${unreadable.length - 10} more`);
+}
 
 if (findings.length === 0) {
   if (!quiet) console.log(`✅ canary scan: 0 leaks in ${scanned} files`);

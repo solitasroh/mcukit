@@ -2,13 +2,15 @@
 /**
  * verify-policy.js
  *
- * Cycle 1.5 → Cycle 4 — gstack→rkit sync policy enforcement.
+ * Cycle 1.5 → Cycle 5 — gstack→rkit sync policy enforcement.
  * Nine checks ensure:
  *   body-neutrality, vocab-preservation, forbidden-tokens, eval-syntax,
  *   sot-schema (cycle 1.5 baseline)
- *   manifest-sync, decisions-matrix (cycle 2)
+ *   manifest-sync, decisions-matrix (cycle 2 onwards, manifest enumeration)
  *   network-egress, pii-in-logs (cycle 2)
  * cycle 3+ STRICT mode applies R1~R7 to decisions matrices.
+ * cycle 4+ enforces escalation_history + cascade_origin invariants.
+ * Active matrices: cycle{2,3,4,5}-matrix.json (see policies/manifest.json).
  *
  * Usage:
  *   node scripts/verify-policy.js                    # run all checks
@@ -32,6 +34,9 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const SOT_PATH = path.join(ROOT, 'policies/locked-vocab.json');
+// body-neutrality + vocab-preservation 검사 대상: cycle-1.5 4 SKILL.
+// Other 69 SKILLs use cycle3-body-neutral marker or grandfathered: true.
+// Scope limited by design — full coverage would require per-SKILL classification.
 const SKILLS = ['investigate', 'retro', 'security-review', 'code-review'];
 const FORBIDDEN_TOKENS = [
   'gstack-update-check',

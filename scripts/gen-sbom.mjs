@@ -67,6 +67,12 @@ function main() {
         metadata: {
           timestamp: new Date().toISOString(),
           component: { type: 'application', name: pkg.name || 'rkit', version: pkg.version || 'unknown' },
+          properties: [
+            // PR #6 H5: machine-readable warnings so supply-chain consumers
+            // can distinguish a zero-component product from a degraded scan.
+            { name: 'rkit:sbom:degraded', value: 'true' },
+            { name: 'rkit:sbom:reason', value: 'cyclonedx-npm unavailable — using fallback minimal SBOM' },
+          ],
         },
         components: [],
         note: 'fallback SBOM — install @cyclonedx/cyclonedx-npm for full inventory',

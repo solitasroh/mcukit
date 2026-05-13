@@ -11,11 +11,19 @@
  *   - sunset_cycle <= current_cycle: print FAIL line, exit 1
  *
  * Stop hook integration: hooks/hooks.json registers this script. Failure
- * surfaces in session-end output. Stop hook expected to non-block; warnings
- * are advisory until cycle 4 sunset of network_egress + regression_retention.
+ * surfaces in session-end output. Stop hook expected to non-block.
+ *
+ * Cycle 4 (commit cc8bb7f) promoted `network_egress` → permanent and removed
+ * `regression_retention` (CR4-1 reject cascade). Cycle 5 has no transitional
+ * items — warnings empty in steady state.
  *
  * Current cycle is read from `policies/decisions/cycle*-matrix.json`
  * (highest numbered matrix file).
+ *
+ * Exit codes (PR #6 H4):
+ *   0 — no sunset issues, or `RKIT_SUNSET_BOOTSTRAP=1` with missing inputs
+ *   1 — sunset_cycle reached (transitional item past its deadline)
+ *   2 — required policies missing without bootstrap flag
  */
 
 import fs from 'node:fs';
@@ -50,16 +58,30 @@ function parseCycleString(s) {
 }
 
 function main() {
+  // PR #6 H4: distinguish bootstrap (no policies yet — exit 0) from broken
+  // state (policies removed/reverted — exit 2). Set RKIT_SUNSET_BOOTSTRAP=1
+  // to accept missing inputs during initial repo setup.
+  const allowBootstrap = process.env.RKIT_SUNSET_BOOTSTRAP === '1';
   const ngPath = path.join(ROOT, 'policies/never-gate.json');
   if (!fs.existsSync(ngPath)) {
-    console.error('[check-sunset] policies/never-gate.json missing — skip');
-    process.exit(0);
+    if (allowBootstrap) {
+      console.error('[check-sunset] policies/never-gate.json missing — bootstrap mode, skip');
+      process.exit(0);
+    }
+    console.error('[check-sunset] FAIL: policies/never-gate.json missing. ' +
+      'If this is a fresh repo, set RKIT_SUNSET_BOOTSTRAP=1.');
+    process.exit(2);
   }
   const ng = JSON.parse(fs.readFileSync(ngPath, 'utf8'));
   const currentCycle = getCurrentCycle();
   if (currentCycle == null) {
-    console.error('[check-sunset] cannot detect current cycle from policies/decisions/ — skip');
-    process.exit(0);
+    if (allowBootstrap) {
+      console.error('[check-sunset] cannot detect current cycle — bootstrap mode, skip');
+      process.exit(0);
+    }
+    console.error('[check-sunset] FAIL: no policies/decisions/cycle*-matrix.json found. ' +
+      'If this is a fresh repo, set RKIT_SUNSET_BOOTSTRAP=1.');
+    process.exit(2);
   }
 
   const warnings = [];
