@@ -38,6 +38,6 @@
     "sbom": "node scripts/gen-sbom.mjs",
     "verify-policy": "node scripts/verify-policy.js",
     "check-sunset": "node scripts/check-sunset.js",
-    "test": "node --test \"tests/cycle2/*.test.js\" \"tests/cycle3/*.test.js\""
+    "test": "node --test \"tests/cycle2/*.test.js\" \"tests/cycle3/*.test.js\" \"tests/cycle4/*.test.js\" \"tests/cycle5/*.test.js\""
   }
 }

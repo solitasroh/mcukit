@@ -2,9 +2,13 @@
 /**
  * verify-policy.js
  *
- * Cycle 1.5 — gstack→rkit sync policy enforcement.
- * Five checks ensure body/appendix two-layer separation, vocab preservation,
- * forbidden token absence, eval syntax sanity, and SoT schema validity.
+ * Cycle 1.5 → Cycle 4 — gstack→rkit sync policy enforcement.
+ * Nine checks ensure:
+ *   body-neutrality, vocab-preservation, forbidden-tokens, eval-syntax,
+ *   sot-schema (cycle 1.5 baseline)
+ *   manifest-sync, decisions-matrix (cycle 2)
+ *   network-egress, pii-in-logs (cycle 2)
+ * cycle 3+ STRICT mode applies R1~R7 to decisions matrices.
  *
  * Usage:
  *   node scripts/verify-policy.js                    # run all checks
@@ -232,15 +236,28 @@ function checkDecisionsMatrix() {
     return errors;
   }
 
-  // Load escalation policy (cycle 3+)
+  // Load escalation policy. Required for cycle 3+ STRICT matrices.
+  // Silent skip would disable prohibit_at enforcement — security policy hole.
+  const escalationPath = path.join(ROOT, 'policies/escalation-policy.json');
   let escalation = null;
-  try {
-    escalation = JSON.parse(fs.readFileSync(path.join(ROOT, 'policies/escalation-policy.json'), 'utf8'));
-  } catch { /* optional in cycle 2 */ }
+  const escalationLoadError = (() => {
+    try {
+      escalation = JSON.parse(fs.readFileSync(escalationPath, 'utf8'));
+      return null;
+    } catch (e) { return e; }
+  })();
+  // Determine highest cycle in registered matrices to decide if escalation is required.
+  let maxCycleSeen = 0;
+  for (const entry of matrixEntries) {
+    const m = (entry.path.match(/cycle(\d+(?:\.\d+)?)-matrix\.json$/) || [])[1];
+    if (m) maxCycleSeen = Math.max(maxCycleSeen, parseFloat(m));
+  }
+  if (escalationLoadError && maxCycleSeen >= 3) {
+    errors.push(`policies/escalation-policy.json required for cycle ${maxCycleSeen} STRICT — ${escalationLoadError.message}`);
+  }
 
   const decisionEnum = new Set(['pending', 'adopt', 'partial_adopt', 'defer', 'reject']);
   const VAGUE_UNBLOCK = /^cycle-?\d+\s*(이월|carry.?over|defer|연기)\s*$/i;
-  const VERB_RE = /(implemented|completed|resolved|passes|adopted|written|exists|integrated|merged|verified)/i;
   const REVISIT_FMT = /^cycle-\d+(\.\d+)?$/;
   const expectedCounts = { '2': 11, '3': 8, '4': 7, '5': 1 };
 
@@ -354,8 +371,20 @@ function checkNetworkEgress() {
     return errors;
   }
   const a = JSON.parse(fs.readFileSync(allowlistPath, 'utf8'));
-  const blocked = a.blocked_patterns || [];
+  const blockedRaw = a.blocked_patterns || [];
   const exempt = new Set(a.exempt_paths || []);
+
+  // Compile blocked patterns once, fail loud on invalid regex (no silent skip).
+  // Invalid regex would silently disable enforcement of that egress pattern —
+  // a security policy hole. We surface compile errors as check failures.
+  const blocked = [];
+  for (const pattern of blockedRaw) {
+    try {
+      blocked.push({ src: pattern, re: new RegExp(pattern) });
+    } catch (e) {
+      errors.push(`policies/network-allowlist.json: invalid blocked_pattern "${pattern}" — ${e.message}`);
+    }
+  }
 
   function shouldCheck(filePath) {
     if (filePath.includes('node_modules/')) return false;
@@ -385,13 +414,10 @@ function checkNetworkEgress() {
   const files = ['lib', 'scripts', 'hooks'].flatMap((d) => walk(path.join(ROOT, d)));
   for (const f of files) {
     const txt = fs.readFileSync(path.join(ROOT, f), 'utf8');
-    for (const pattern of blocked) {
-      try {
-        const re = new RegExp(pattern);
-        if (re.test(txt)) {
-          errors.push(`${f}: blocked egress pattern matched "${pattern}"`);
-        }
-      } catch {}
+    for (const { src, re } of blocked) {
+      if (re.test(txt)) {
+        errors.push(`${f}: blocked egress pattern matched "${src}"`);
+      }
     }
   }
   return errors;
