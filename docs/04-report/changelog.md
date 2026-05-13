@@ -1,5 +1,104 @@
 # Changelog
 
+## [2026-05-13] - bkit-gstack-sync-v2 Cycle 2 Completion
+
+### Added
+- **Governance SoT**: 6 new policy files in `policies/`
+  - `manifest.json`: SoT registry with version + validator + since metadata
+  - `decisions/cycle2-matrix.json`: 11 candidates × 5-decision enum (adopt/partial_adopt/defer/reject/pending) with decided_by + evidence + reasoning
+  - `never-gate.json`: 8 NEVER_GATE checks (5 from cycle-1.5 + 3 new: network_egress, pii_in_logs, regression_retention) with sunset meta
+  - `network-allowlist.json`: egress=deny + 14 blocked patterns + 6 exempt paths
+  - `locked-vocab.json` (v1.1): scope field (neutral|domain) for word classification
+  - `version.json` (conditional CO-4): BKIT_VERSION SoT placeholder
+
+- **Policy Documents** (6 files in `docs/policy/`):
+  - `cycle2-decision-format.md`: decided_by schema + role/id semantics
+  - `pii-anonymization.md`: sha256(salt+path) 14-char fingerprint + O_EXCL race protection + win32 lowercase
+  - `gdpr-cc-regression.md`: hash-only + 90-day retention + opt-in prompt + purge command
+  - `network-egress.md`: 6+ egress patterns (http/https/fetch/axios/got/WebSocket/etc) + production node_modules exempt removed
+  - `supply-chain-sbom.md`: npm ci --ignore-scripts + npm audit signatures NFR
+  - `gstack-sync-policy.md` (updated): cycle-2 integration notes
+
+- **Verification Tools** (3 scripts):
+  - `scripts/check-sunset.js`: Stop hook for transitional gate sunset alert (30-day warning, fail on sunset)
+  - `scripts/pdca-regression-purge.mjs`: cc-regression cleanup with .lock + atomic write + isTTY check
+  - `scripts/verify-status-schema.js`: ARCHIVED_FEATURES dynamic parsing + forward compatibility
+
+- **Modules Adopted**:
+  - `lib/core/context-budget.js`: 8000-char cap + priorityPreserve for hook output
+  - `lib/core/worktree-detector.js`: .rkit/runtime/ flag advisory
+  - `lib/core/anonymize-fingerprint.js`: PII anonymization algorithm (FR-09)
+  - `lib/domain/ports/state-store.port.js`: Type-only interface
+  - `lib/domain/ports/audit-sink.port.js`: Type-only interface
+  - `lib/infra/docs-code-scanner.js`: Document-code consistency checker
+  - `lib/infra/cc-bridge.js`: Claude Code metadata bridge
+  - `lib/pdca/status.js` refactored: Facade pattern (61 lines) + 5 submodules (748 lines) for clean separation
+    - `lib/pdca/status/schema.js`
+    - `lib/pdca/status/store.js`
+    - `lib/pdca/status/feature-lifecycle.js`
+    - `lib/pdca/status/context.js`
+    - `lib/pdca/status/memory-io.js`
+
+- **Test Suite**: 78 smoke tests in `tests/cycle2/` (11 files)
+  - decisions-matrix (9 TC): Matrix schema, enum, completion gate
+  - lib-core-adopt (12 TC): context-budget, worktree-detector modules
+  - lib-domain-ports (3 TC): Port interfaces
+  - lib-infra-adopt (16 TC): docs-code-scanner, cc-bridge
+  - locked-vocab-scope (5 TC): v1.1 scope field
+  - manifest-sync (3 TC): Manifest ↔ policies/ consistency
+  - pii-anonymize (7 TC): Salt race + win32 case-sensitivity + 14-char length
+  - regression-retention (4 TC): 90-day purge + lock + TTY
+  - status-facade-split (11 TC): 27 exports preservation + backward compat
+  - status-schema-compat (3 TC): ARCHIVED dynamic parsing
+  - sunset-alert (5 TC): check-sunset behavior
+
+### Changed
+- **verify-policy.js**: Extended from 5 checks to 9 checks (+4)
+  - Added: pii_in_logs, network_egress, decisions-matrix, manifest-sync
+  - Preserved: body-neutrality, vocab-preservation, forbidden-tokens, eval-syntax, sot-schema
+- **locked-vocab.json**: Added `scope_enum` + `scope_policy` (v1.1)
+- **gen-locked-vocab.mjs**: Updated for scope field awareness
+- **hooks/hooks.json**: Added check-sunset Stop hook
+
+### Fixed
+- **Codex stop-hook findings** (3 commits):
+  - dead code (A unused export) resolved in PR-2 integration
+  - Instinct + PDCA Progress truncation (context-budget integration, f7f482d)
+  - scanVersions canonical SoT correction (package.json not rkit.config.json, 697ea3d)
+
+### Metrics
+- **Match Rate**: 96.4% (15 FRs: 13 complete + 2 intentional partial/defer, 13 DRs: 100%)
+- **Decision Coverage**: 11/11 candidates non-pending (1 adopt, 4 partial_adopt, 5 defer, 1 reject)
+- **Test Pass Rate**: 78/78 TC PASS (100%)
+- **Policy Validation**: 9/9 verify-policy checks PASS
+- **Codex Issues**: 3/3 resolved
+- **Governance**: cycle2-matrix.json 100% completion gate PASS
+- **Architecture Compliance**: 0 circular dependencies, 0 external egress violations
+- **Execution Time**: 1.5 days (Plan+Design 28 days prior, Do+Check+Act 1.5 days = 40% faster than cycle-1)
+
+### Decisions Made
+- **D-1 (Identity)**: (b) Common AI development base (not embedded-only)
+- **D-7 (Vocab Scope)**: locked-vocab scope field + domain-scoped: true grandfathered
+- **D-8 (GDPR)**: Hash-only + 90-day retention + purge + local-only + opt-in
+- **User-1 (Manifest)**: SoT registry with auto-enforcement
+- **User-2 (Sunset)**: check-sunset Stop hook + transitional sunset meta
+- **User-3 (SBOM)**: npm ci --ignore-scripts + audit signatures NFR
+
+### Carry-Over to Cycle 3
+- A remaining 3 modules (version.js, session-ctx-fp.js, session-title-cache.js)
+- B remaining 4 ports (cc-payload, docs-code-index, regression-registry, token-meter)
+- CO-4: version.json SoT (depends on A.version adoption)
+- FR-14: SBOM automation (policy document complete, CI integration cycle-3)
+- E + CO-2: cc-regression + canary tokens (opt-in + hash refactor cycle-3+)
+- CO-3: 28 SKILL body text application (classification table cycle-2 only)
+
+### Notes
+- rkit identity shift from "embedded-specific tool" to "common AI development foundation" — supporting any technical domain
+- Governance + auto-verification + decision tracking 3-tier structure fully operational
+- 3-PR decomposition: PR-1 governance (8 commits) → PR-2 implementation (8 commits) → PR-3 decisions (4 commits)
+- All deferred items intentionally specified in Design v0.2 (not gaps)
+- Ready for cycle-3 multi-track execution: A/B/CO-4 deep-dive + C/D/E/F scope clarification + CO-3 SKILL application
+
 ## [2026-04-03] - mcu-domain-v2 Completion
 
 ### Added
