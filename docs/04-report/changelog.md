@@ -1,5 +1,67 @@
 # Changelog
 
+## [2026-05-13] - bkit-gstack-sync-v2 Cycle 3 Completion
+
+### Added
+- **Decision Matrix Cycle 3**: `policies/decisions/cycle3-matrix.json`
+  - 8 candidates (CR-1~CR-8): 6 carry-over from cycle-2 + 2 new (CR-5 SBOM, CR-7 C orchestrator)
+  - 3 new fields: `cycle_origin`, `predecessor_decision`, `escalation_count`
+  - Decision enum: adopt (1) / partial_adopt (2) / defer (2) / reject (3)
+  - Permanent reject: CR-7 C orchestrator (cycle-4+ rediscussion blocked)
+  - Escalation Hybrid: warn@1 / fail@2 (override_reason >= 80char required) / prohibit@3 (defer forbidden)
+
+- **Escalation Policy**: `policies/escalation-policy.json`
+  - STRICT mode R1~R7 rules (reasoning >= 50char, unblock_condition >= 30char + verb + R3 pattern rejection)
+  - Max defer escalation: prohibit_at = 3
+  - Applies to cycle-3+ matrices with manifest registration
+
+- **SKILL Transformation** (42 total):
+  - Workflow (7): `/pdca`, `/mr`, `/ship`, `/rollback`, `/freeze`, `/skill-create`, `/skill-status` — marker pairs + section 0
+  - Capability Grandfathered (23): MCU 9 + MPU 11 + WPF 3 — frontmatter + body-neutrality exempt
+  - Neutral Phase (9): `/phase-1` ~ `/phase-9`
+  - Neutral Level (3): `/starter`, `/dynamic`, `/enterprise`
+  - Tool: `scripts/skill-body-extract.mjs` (scan/insert-markers/verify modes)
+
+- **Port Implementations**:
+  - `lib/domain/ports/cc-payload.port.js` (type-only) — JSDoc in `lib/infra/cc-bridge.js`
+  - `lib/domain/ports/docs-code-index.port.js` (type-only) — JSDoc in `lib/infra/docs-code-scanner.js`
+  - Hexagonal architecture: zero circular deps, port→infra one-way
+
+- **SBOM Automation** (CycloneDX):
+  - `scripts/gen-sbom.mjs`: `npm ci --ignore-scripts --prefer-offline` + @cyclonedx/cyclonedx-npm JSON output
+  - `.github/workflows/sbom.yml`: pull_request + push main + schedule weekly + workflow_dispatch
+  - CI: `npm audit signatures` on GitHub Actions (offline local + signature CI split)
+  - Output: `sbom/bom.json` (linguist-generated)
+
+- **Verification & Policy**:
+  - `scripts/verify-policy.js` enhanced: manifest enumeration + STRICT flag branching (cycle2 legacy exempt)
+  - `scripts/check-sunset.js` updated: current >= sunset FAIL, remaining <= 1 WARN
+  - `docs/policy/escalation.md`: Escalation policy documentation + final_revisit_by hard deadline mechanism
+
+- **Test Suite**: 46 smoke tests in `tests/cycle3/` (4 files, 153% target achievement)
+  - decisions-strict-gate (19 TC): R1~R7 rules, escalation_count, permanent_reject
+  - workflow-skill-conversion (6 TC): marker pairs, section 0, locked-vocab
+  - capability-skill-conversion (7 TC): grandfathered frontmatter, body-neutrality
+  - ports-and-sbom (14 TC): type-only isolation, cc-bridge/docs-code-scanner impl, SBOM generation
+  - Regression: cycle2 78/78 PASS maintained
+
+### Changed
+- **cycle2-matrix.json**: Legacy rules preserved (R1 >= 20char, R2 OR condition) via STRICT flag false
+- **manifest.json**: 2 new SoT entries (cycle3-matrix + escalation-policy) with since:cycle-3 metadata
+- **Governance**: D-3 gate strengthened — "cycle-N carryover" single reason now rejected, unblock_condition must be specific
+  
+### Deferred to Cycle 4
+- CR-6 E + CO-2: cc-regression hash-only + opt-in + retention + purge (escalation_count=2 → 3 at cycle-4 prohibits defer)
+- CR-8 CO-1 JSONL: Depends_on CR-6, cascade defer (escalation_count=2)
+- CR-2 regression-registry + token-meter (2 ports): Cascade unblock via CR-6
+
+### Rejected (Non-Negotiable for Future Cycles)
+- CR-1 A (3 modules): version.js / session-ctx-fp.js / session-title-cache.js
+- CR-4 CO-4 BKIT_VERSION SoT: Depends_on CR-1 (A.version reject)
+- CR-7 C orchestrator (permanent_reject=true): 4 responsibility overlaps + asymmetric architecture
+
+---
+
 ## [2026-05-13] - bkit-gstack-sync-v2 Cycle 2 Completion
 
 ### Added
