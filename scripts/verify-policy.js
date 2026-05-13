@@ -214,40 +214,115 @@ function checkManifestSync() {
   return errors;
 }
 
-// Cycle 2 new check: decisions-matrix — 11 candidates, pending count, required fields
+// Decisions-matrix check — manifest enumeration + STRICT flag (cycle >= 3 applies R1~R7).
+// Cycle 2 legacy: reasoning >= 20, R2 OR (revisit_by OR unblock_condition).
+// Cycle 3+ STRICT: R1 reasoning >= 50, R2 AND, R3 vague pattern reject, R4 unblock >= 30,
+//                  R5 verb (WARN), R6 revisit_by format, R7 evidence >= 2, escalation rules.
 function checkDecisionsMatrix() {
   const errors = [];
-  const matrixPath = path.join(ROOT, 'policies/decisions/cycle2-matrix.json');
-  if (!fs.existsSync(matrixPath)) {
-    errors.push('policies/decisions/cycle2-matrix.json missing');
+  const manifestPath = path.join(ROOT, 'policies/manifest.json');
+  if (!fs.existsSync(manifestPath)) {
+    errors.push('policies/manifest.json missing');
     return errors;
   }
-  const m = JSON.parse(fs.readFileSync(matrixPath, 'utf8'));
-  if (!Array.isArray(m.candidates) || m.candidates.length !== 11) {
-    errors.push(`decisions matrix: expected 11 candidates, got ${m.candidates?.length}`);
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const matrixEntries = (manifest.sots || []).filter((s) => /^decisions\/cycle\d+-matrix\.json$/.test(s.path));
+  if (matrixEntries.length === 0) {
+    errors.push('manifest: no decisions/cycle*-matrix.json entries registered');
+    return errors;
   }
+
+  // Load escalation policy (cycle 3+)
+  let escalation = null;
+  try {
+    escalation = JSON.parse(fs.readFileSync(path.join(ROOT, 'policies/escalation-policy.json'), 'utf8'));
+  } catch { /* optional in cycle 2 */ }
+
   const decisionEnum = new Set(['pending', 'adopt', 'partial_adopt', 'defer', 'reject']);
-  for (const c of m.candidates || []) {
-    if (!decisionEnum.has(c.decision)) {
-      errors.push(`candidate ${c.id}: invalid decision "${c.decision}"`);
+  const VAGUE_UNBLOCK = /^cycle-?\d+\s*(이월|carry.?over|defer|연기)\s*$/i;
+  const VERB_RE = /(implemented|completed|resolved|passes|adopted|written|exists|integrated|merged|verified)/i;
+  const REVISIT_FMT = /^cycle-\d+(\.\d+)?$/;
+  const expectedCounts = { '2': 11, '3': 8 };
+
+  for (const entry of matrixEntries) {
+    const matrixPath = path.join(ROOT, 'policies', entry.path);
+    if (!fs.existsSync(matrixPath)) {
+      errors.push(`${entry.path} missing (referenced by manifest)`);
       continue;
     }
-    if (c.decision === 'pending') continue;
-    // non-pending requires decided_by, evidence, reasoning
-    if (!c.decided_by || !c.decided_by.role) {
-      errors.push(`candidate ${c.id} (${c.decision}): decided_by.role required`);
+    const m = JSON.parse(fs.readFileSync(matrixPath, 'utf8'));
+    const cycleNum = Number(m.cycle);
+    const STRICT = cycleNum >= 3;
+    const minReasoningLen = STRICT ? 50 : 20;
+    const minEvidenceCount = STRICT ? 2 : 1;
+    const expected = expectedCounts[m.cycle];
+    if (expected && m.candidates?.length !== expected) {
+      errors.push(`${entry.path}: expected ${expected} candidates, got ${m.candidates?.length}`);
     }
-    if (!Array.isArray(c.evidence) || c.evidence.length === 0) {
-      errors.push(`candidate ${c.id} (${c.decision}): evidence array must have >= 1 entry`);
-    }
-    if (c.decision === 'adopt' || c.decision === 'partial_adopt') {
-      if (!c.reasoning || c.reasoning.length < 20) {
-        errors.push(`candidate ${c.id} (${c.decision}): reasoning >= 20 chars required (got ${c.reasoning?.length || 0})`);
+
+    for (const c of m.candidates || []) {
+      const id = `${entry.path}#${c.id}`;
+      if (!decisionEnum.has(c.decision)) {
+        errors.push(`${id}: invalid decision "${c.decision}"`);
+        continue;
       }
-    }
-    if (c.decision === 'defer') {
-      if (!c.revisit_by && !c.unblock_condition) {
-        errors.push(`candidate ${c.id} (defer): revisit_by or unblock_condition required`);
+      if (c.decision === 'pending') continue;
+      if (!c.decided_by || !c.decided_by.role) {
+        errors.push(`${id} (${c.decision}): decided_by.role required`);
+      }
+      if (!Array.isArray(c.evidence) || c.evidence.length < minEvidenceCount) {
+        errors.push(`${id} (${c.decision}): evidence >= ${minEvidenceCount} entries required (got ${c.evidence?.length || 0})`);
+      }
+
+      // R1: reasoning length (STRICT: all non-pending; legacy: adopt/partial only)
+      const reasoningTargets = STRICT
+        ? ['adopt', 'partial_adopt', 'defer', 'reject']
+        : ['adopt', 'partial_adopt'];
+      if (reasoningTargets.includes(c.decision)) {
+        if (!c.reasoning || c.reasoning.length < minReasoningLen) {
+          errors.push(`${id} (${c.decision}): reasoning >= ${minReasoningLen} chars required (got ${c.reasoning?.length || 0}) [R1${STRICT ? ' STRICT' : ' legacy'}]`);
+        }
+      }
+
+      if (c.decision === 'defer') {
+        if (STRICT) {
+          // R2: AND of unblock_condition AND revisit_by
+          if (!c.unblock_condition || !c.revisit_by) {
+            errors.push(`${id} (defer): unblock_condition AND revisit_by both required [R2 STRICT]`);
+          }
+          // R3: vague pattern reject
+          if (c.unblock_condition && VAGUE_UNBLOCK.test(c.unblock_condition.trim())) {
+            errors.push(`${id} (defer): unblock_condition matches vague pattern (cycle-N 이월 단독 거부) [R3]`);
+          }
+          // R4: unblock_condition length
+          if (c.unblock_condition && c.unblock_condition.length < 30) {
+            errors.push(`${id} (defer): unblock_condition >= 30 chars required (got ${c.unblock_condition.length}) [R4]`);
+          }
+          // R5: verb (WARN only — not pushed to errors)
+          // R6: revisit_by format
+          if (c.revisit_by && !REVISIT_FMT.test(c.revisit_by) && c.revisit_by !== 'cycle-3 or later') {
+            errors.push(`${id} (defer): revisit_by must match /^cycle-\\d+(\\.\\d+)?$/ (got "${c.revisit_by}") [R6]`);
+          }
+          // Escalation policy
+          if (escalation) {
+            const ec = typeof c.escalation_count === 'number' ? c.escalation_count : 0;
+            if (ec >= escalation.thresholds.prohibit_at) {
+              errors.push(`${id} (defer): escalation_count=${ec} >= prohibit_at (${escalation.thresholds.prohibit_at}) — defer prohibited, must be adopt/partial_adopt/reject`);
+            } else if (ec >= escalation.thresholds.fail_at) {
+              if (!c.override_reason || c.override_reason.length < 80) {
+                errors.push(`${id} (defer): escalation_count=${ec} requires override_reason >= 80 chars (got ${c.override_reason?.length || 0})`);
+              }
+              if (!c.final_revisit_by) {
+                errors.push(`${id} (defer): escalation_count=${ec} requires final_revisit_by (hard deadline)`);
+              }
+            }
+          }
+        } else {
+          // Legacy cycle 2: OR
+          if (!c.revisit_by && !c.unblock_condition) {
+            errors.push(`${id} (defer): revisit_by or unblock_condition required [legacy OR]`);
+          }
+        }
       }
     }
   }

@@ -1,0 +1,20 @@
+{
+  "version": "1.0",
+  "policy": "max_defer_escalation",
+  "since": "cycle-3",
+  "description": "Hybrid escalation policy for decisions matrix. Prevents indefinite defer chains by ratcheting requirements as escalation_count grows. Designed by rkit:design-validator (Cycle 3 council).",
+  "thresholds": {
+    "warn_at": 1,
+    "fail_at": 2,
+    "prohibit_at": 3
+  },
+  "rules": {
+    "count_0": "Standard. No additional requirements.",
+    "count_1": "WARN — override_reason recommended but not required.",
+    "count_2": "FAIL unless override_reason >= 80 chars AND final_revisit_by present.",
+    "count_3_plus": "Defer prohibited. decision must be adopt | partial_adopt | reject."
+  },
+  "applies_to": "policies/decisions/cycle*-matrix.json",
+  "applies_strict_from_cycle": 3,
+  "rationale": "Cycle 2 ended with 5 defer items (3 in transitional carry-over chain). Indefinite cycle-N escalation undermines governance — each defer must move toward resolution. count=2 (2 cycles deferred) demands explicit accountability (override_reason + hard deadline). count=3 (3 cycles deferred) forces a terminal decision."
+}

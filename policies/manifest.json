@@ -36,7 +36,21 @@
       "since": "cycle-2",
       "version": "1.0",
       "validator": "scripts/verify-policy.js --check decisions-matrix",
-      "description": "Cycle 2 candidate × decision tracking matrix (11 candidates × 5-enum)"
+      "description": "Cycle 2 candidate × decision tracking matrix (11 candidates × 5-enum). Legacy rules (R1 >= 20, R2 OR) — STRICT flag false."
+    },
+    {
+      "path": "decisions/cycle3-matrix.json",
+      "since": "cycle-3",
+      "version": "1.0",
+      "validator": "scripts/verify-policy.js --check decisions-matrix",
+      "description": "Cycle 3 candidate × decision tracking matrix (8 candidates × 5-enum). STRICT mode — R1~R7 + escalation policy enforced."
+    },
+    {
+      "path": "escalation-policy.json",
+      "since": "cycle-3",
+      "version": "1.0",
+      "validator": "scripts/verify-policy.js --check decisions-matrix",
+      "description": "Defer escalation thresholds (warn@1, fail@2, prohibit@3). Prevents indefinite carry-over chains."
     }
   ]
 }
