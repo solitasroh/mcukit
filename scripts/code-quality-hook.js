@@ -68,7 +68,10 @@ function runLinter(filePath) {
   try {
     const output = execSync(cmd, {
       encoding: 'utf-8',
-      timeout: 10000,
+      // 4s budget — fits under Edit hook 10s shared with cpp-static-analysis
+      // (3s) + handler overhead. Previously 10s starved the next analyzer.
+      // (PR #5 review C2)
+      timeout: 4000,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
     return { output: (output || '').trim(), skipped: false };
@@ -76,6 +79,15 @@ function runLinter(filePath) {
     // Some linters exit non-zero on findings
     const stderr = e.stderr ? e.stderr.toString().trim() : '';
     const stdout = e.stdout ? e.stdout.toString().trim() : '';
+    // Distinguish timeout/signal-kill (empty output) from finding-with-exit-nonzero.
+    // Empty output + ETIMEDOUT/SIGKILL means linter never produced findings —
+    // surface so it doesn't silently report "0 issues". (PR #5 review H3)
+    if (!stdout && !stderr && (e.code === 'ETIMEDOUT' || e.signal)) {
+      process.stderr.write(
+        `code-quality: ${tool} ${e.code === 'ETIMEDOUT' ? 'timed out (4s)' : `killed by ${e.signal}`} — skipping\n`
+      );
+      return { output: '', skipped: true };
+    }
     return { output: stdout || stderr, skipped: false };
   }
 }

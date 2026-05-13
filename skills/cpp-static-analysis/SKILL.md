@@ -14,10 +14,27 @@ description: |
   판정/suggestion 해석 (code-analyzer agent 담당).
 argument-hint: "[target-dir]"
 user-invocable: true
+classification: capability
+classification-reason: "C++ static analysis runner — domain-agnostic, no embedded vocabulary in body"
+deprecation-risk: none
 allowed-tools:
   - Bash(python ${CLAUDE_PLUGIN_ROOT}/scripts/cpp-static-analysis/rapp_review.py *)
   - Bash(python ${CLAUDE_PLUGIN_ROOT}/scripts/cpp-static-analysis/install.py)
   - Read
+---
+
+<!-- BEGIN: cycle3-body-neutral -->
+
+## 0. 문서 구조 (본 SKILL의 세 층)
+
+1. **도메인 본문 (§1 ~ §N)**: 이 SKILL의 프로토콜.
+   잠금 어휘 사용 0건이 `verify-policy --check body-neutrality`로 자동 검증됩니다.
+2. **방법론 본문 — 도메인 중립**: Cycle 3에서 `<!-- BEGIN: cycle3-body-neutral -->` ~ `<!-- END: cycle3-body-neutral -->` 마커로 감싸진 영역.
+3. **도메인 예시 부록 (§A)**: MCU/MPU/WPF 도메인별 사례.
+   SoT(`policies/locked-vocab.json`)에서 `scripts/gen-locked-vocab.mjs`가 자동 생성합니다.
+
+직접 부록을 편집하지 마세요 — `node scripts/gen-locked-vocab.mjs`로 재생성됩니다.
+
 ---
 
 # cpp-static-analysis Skill
@@ -87,3 +104,5 @@ cpp-static-analysis: <run_dir> (N findings)
 
 - `/cpp-static-analysis`: 결정론 센서만
 - `/code-review`: 센서 호출 + AI 판정 (code-analyzer agent)
+
+<!-- END: cycle3-body-neutral -->

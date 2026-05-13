@@ -27,7 +27,10 @@ sys.path.insert(0, str(Path(__file__).parent))
 from encoding import read_file_utf8_bytes, safe_print, write_file
 from models import xml_attr, XML_TAG_SUMMARY
 
-CPP_EXTENSIONS = {".h", ".hpp", ".hxx", ".cpp", ".cxx", ".cc"}
+CPP_EXTENSIONS = {".c", ".h", ".hpp", ".hxx", ".cpp", ".cxx", ".cc"}
+# `.c` added in PR #5 review fix (C6) for MCU domain coverage —
+# tree-sitter-cpp parses C99/C11 grammar correctly. Must stay aligned with
+# scripts/cpp-static-analysis-hook.js CPP_EXTENSIONS (the JS bridge).
 
 # ── tree-sitter field name / node type 상수 ──
 # child_by_field_name() 오타 시 조용히 None → 규칙 무력화 방지.

@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>bkit-gstack-sync-v2 Cycle 1 Review Slides</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --ink: #1f2937;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --panel: #ffffff;
+      --accent: #1769aa;
+      --accent-2: #168466;
+      --warn: #b45309;
+      --bad: #b42318;
+      --soft-blue: #e8f2fb;
+      --soft-green: #e8f6f0;
+      --soft-amber: #fff3d6;
+      --code: #243447;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", "Noto Sans KR", Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    .deck {
+      width: 100%;
+    }
+
+    .slide {
+      min-height: 100vh;
+      padding: 56px 64px 72px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 24px;
+      scroll-snap-align: start;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .slide:nth-child(even) {
+      background: #ffffff;
+    }
+
+    .kicker {
+      color: var(--accent);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 54px;
+      line-height: 1.08;
+      max-width: 1100px;
+    }
+
+    h2 {
+      font-size: 40px;
+      line-height: 1.15;
+    }
+
+    h3 {
+      font-size: 22px;
+    }
+
+    .lead {
+      max-width: 1050px;
+      color: var(--muted);
+      font-size: 22px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 128px;
+    }
+
+    .metric {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .metric.green {
+      color: var(--accent-2);
+    }
+
+    .metric.warn {
+      color: var(--warn);
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 22px;
+      font-size: 20px;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 17px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef4fa;
+      font-weight: 700;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    code {
+      background: #edf2f7;
+      color: var(--code);
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      margin: 0;
+      background: #172033;
+      color: #eef6ff;
+      border-radius: 8px;
+      padding: 18px;
+      overflow: auto;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: var(--soft-blue);
+      color: #174b73;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .pill.green {
+      background: var(--soft-green);
+      color: #116149;
+    }
+
+    .pill.amber {
+      background: var(--soft-amber);
+      color: #8a4b05;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: 14px;
+      font-size: 18px;
+    }
+
+    .box {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 8px;
+      padding: 18px;
+      min-height: 96px;
+    }
+
+    .arrow {
+      color: var(--accent);
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .note {
+      background: var(--soft-amber);
+      border-left: 5px solid var(--warn);
+      padding: 16px 18px;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+
+    .ok {
+      background: var(--soft-green);
+      border-left: 5px solid var(--accent-2);
+      padding: 16px 18px;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+
+    .small {
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .nav {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav button {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(31, 41, 55, 0.12);
+    }
+
+    .footer {
+      position: absolute;
+      left: 64px;
+      bottom: 28px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .slide {
+      position: relative;
+    }
+
+    @media (max-width: 900px) {
+      .slide {
+        padding: 36px 22px 72px;
+      }
+
+      h1 {
+        font-size: 38px;
+      }
+
+      h2 {
+        font-size: 30px;
+      }
+
+      .lead {
+        font-size: 18px;
+      }
+
+      .grid,
+      .grid.two,
+      .grid.four,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .arrow {
+        transform: rotate(90deg);
+        text-align: center;
+      }
+
+      table {
+        font-size: 14px;
+      }
+
+      th,
+      td {
+        padding: 9px;
+      }
+
+      .footer {
+        left: 22px;
+      }
+    }
+
+    @media print {
+      html {
+        scroll-snap-type: none;
+      }
+
+      .slide {
+        min-height: 100vh;
+        break-after: page;
+      }
+
+      .nav {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+    <section class="slide" id="slide-1">
+      <div class="kicker">rkit / bkit-gstack-sync-v2 / Cycle 1</div>
+      <h1>S1 작업 반영 검토 및 변경 요약</h1>
+      <p class="lead">bkit S1 cleanup 패턴을 rkit에 적용하면서 dead module 제거, 권한 정책 보존, audit 보안 강화, E2E 검증 보강까지 완료한 내용을 한눈에 보는 슬라이드입니다.</p>
+      <div class="grid four">
+        <div class="card">
+          <div class="metric green">정상</div>
+          <div class="label">핵심 구현 반영 상태</div>
+        </div>
+        <div class="card">
+          <div class="metric">-1,552</div>
+          <div class="label">code-only net LOC</div>
+        </div>
+        <div class="card">
+          <div class="metric">88</div>
+          <div class="label">신규 smoke/assert TC</div>
+        </div>
+        <div class="card">
+          <div class="metric green">0</div>
+          <div class="label">현재 테스트 실패</div>
+        </div>
+      </div>
+      <div class="footer">Generated: 2026-04-28 / Branch: feature/bkit-gstack-sync-v2</div>
+    </section>
+
+    <section class="slide" id="slide-2">
+      <div class="kicker">Executive Summary</div>
+      <h2>이번 S1의 목표는 “정리하되 rkit 안전 정책은 보존”입니다</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>무엇을 줄였나</h3>
+          <ul>
+            <li>bkit upstream에서 제거된 dead/live context 계열 파일을 rkit에서도 정리</li>
+            <li><code>context-init.js</code>의 silent no-op 초기화 블록 제거</li>
+            <li><code>lib/context/index.js</code>는 삭제하지 않고 bkit과 같은 facade로 축소</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>무엇을 보존했나</h3>
+          <ul>
+            <li><code>rkit.config.json</code> 기반 permission 정책</li>
+            <li>MCU/MPU 위험 명령 정책: <code>dd</code>, <code>mkfs</code>, flash erase, force push</li>
+            <li>rkit audit 경로와 <code>rkitVersion</code> schema</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ok">최종 판단: 핵심 코드 변경, 권한 정책, E2E assertion 보강은 정상 반영됐습니다.</div>
+      <div class="footer">Slide 2</div>
+    </section>
+
+    <section class="slide" id="slide-3">
+      <div class="kicker">Before / After</div>
+      <h2>구조 변경은 “삭제 + facade 축소 + broken bridge 수정”으로 정리됩니다</h2>
+      <div class="flow">
+        <div class="box">
+          <h3>Before</h3>
+          <p>context hierarchy, memory store, context fork 모듈이 hook과 일부 runtime에 남아 있었고, import resolver에는 <code>_common</code>/<code>core</code> 미정의 위험이 있었습니다.</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="box">
+          <h3>S1 적용</h3>
+          <p>사용처를 먼저 정리하고 dead/live 파일을 삭제했습니다. 권한 정책은 <code>core.getConfig('permissions')</code> 병합으로 보존했습니다.</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="box">
+          <h3>After</h3>
+          <p>context facade는 5 live module 기반 11 export만 제공하고, import resolver/permission manager는 smoke test로 보호됩니다.</p>
+        </div>
+      </div>
+      <div class="footer">Slide 3</div>
+    </section>
+
+    <section class="slide" id="slide-4">
+      <div class="kicker">Changed Areas</div>
+      <h2>변경 영역별 요약</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>영역</th>
+            <th>변경 방식</th>
+            <th>효과</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Context cleanup</td>
+            <td><code>self-healing</code>, <code>ops-metrics</code>, <code>decision-record</code> 삭제. <code>index.js</code>는 live facade로 축소.</td>
+            <td>dead export 제거, bkit S1 정합성 회복.</td>
+          </tr>
+          <tr>
+            <td>Hook startup</td>
+            <td><code>context-hierarchy</code>, <code>memory-store</code>, <code>context-fork</code> 초기화 블록 제거.</td>
+            <td>SessionStart에서 silent no-op 경로 제거, hook 정상 종료 유지.</td>
+          </tr>
+          <tr>
+            <td>Import resolver</td>
+            <td><code>getCore()</code> lazy barrel 도입, <code>getUserConfigDir()</code> 인라인.</td>
+            <td><code>_common</code>/<code>core</code> ReferenceError 위험 제거.</td>
+          </tr>
+          <tr>
+            <td>Permission manager</td>
+            <td>DEFAULT와 <code>rkit.config.json</code> permissions 병합.</td>
+            <td>rkit 도메인 안전 정책 유지.</td>
+          </tr>
+          <tr>
+            <td>Audit logger</td>
+            <td><code>sanitizeDetails()</code>, category 확장.</td>
+            <td>PII/token redaction 및 permission/checkpoint/trust/system 분류 보존.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="footer">Slide 4</div>
+    </section>
+
+    <section class="slide" id="slide-5">
+      <div class="kicker">Deleted / Preserved</div>
+      <h2>삭제한 것과 남긴 것을 분리해서 보면 명확합니다</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>삭제한 파일</h3>
+          <ul>
+            <li><code>lib/context/self-healing.js</code></li>
+            <li><code>lib/context/ops-metrics.js</code></li>
+            <li><code>lib/context/decision-record.js</code></li>
+            <li><code>lib/pdca/do-detector.js</code></li>
+            <li><code>lib/core/backup-scheduler.js</code></li>
+            <li><code>lib/context-fork.js</code>, <code>lib/context-hierarchy.js</code>, <code>lib/memory-store.js</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>의도적으로 남긴 것</h3>
+          <ul>
+            <li><code>lib/context/index.js</code>: external require 호환을 위해 facade 유지</li>
+            <li><code>rkit.config.json</code> permission 정책: core config merge로 유지</li>
+            <li><code>MCUKIT_VERSION</code>, <code>rkitVersion</code>, <code>.rkit/audit</code>: schema 호환 유지</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer">Slide 5</div>
+    </section>
+
+    <section class="slide" id="slide-6">
+      <div class="kicker">Review Findings Closure</div>
+      <h2>주요 review finding은 이렇게 닫혔습니다</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Finding</th>
+            <th>반영 내용</th>
+            <th>현재 상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>context/index 삭제 vs 보존 충돌</td>
+            <td>Plan/Design에서 보존으로 결정. 5 live module facade, 11 export로 축소.</td>
+            <td>닫힘</td>
+          </tr>
+          <tr>
+            <td>import-resolver runtime 결함</td>
+            <td><code>_common</code> 제거, <code>getCore()</code> 도입, smoke test 추가.</td>
+            <td>닫힘</td>
+          </tr>
+          <tr>
+            <td>permission default-only 회귀</td>
+            <td>DEFAULT + config permissions 병합으로 변경.</td>
+            <td>닫힘</td>
+          </tr>
+          <tr>
+            <td>self-healing deleted module 참조</td>
+            <td>strategy table을 agent markdown 안에 인라인.</td>
+            <td>닫힘</td>
+          </tr>
+          <tr>
+            <td>Architecture E2E assertion 없음</td>
+            <td><code>status</code> 대신 <code>verdict</code>를 검증하고 bad/good case assertion 추가.</td>
+            <td>닫힘</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="footer">Slide 6</div>
+    </section>
+
+    <section class="slide" id="slide-7">
+      <div class="kicker">Permission Safety</div>
+      <h2>가장 위험했던 권한 정책 회귀는 matrix test로 막았습니다</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>설계 변경</h3>
+          <pre><code>permissions = {
+  ...DEFAULT_PERMISSIONS,
+  ...core.getConfig('permissions', {})
+}</code></pre>
+        </div>
+        <div class="card">
+          <h3>검증한 위험 명령</h3>
+          <div class="pill-row">
+            <span class="pill amber">rm -rf</span>
+            <span class="pill amber">dd if=</span>
+            <span class="pill amber">mkfs</span>
+            <span class="pill amber">st-flash erase</span>
+            <span class="pill amber">STM32_Programmer_CLI -e all</span>
+            <span class="pill amber">git push --force</span>
+          </div>
+        </div>
+      </div>
+      <p class="lead">결과: <code>tests/permission-matrix.smoke.test.js</code> 27/27 PASS.</p>
+      <div class="footer">Slide 7</div>
+    </section>
+
+    <section class="slide" id="slide-8">
+      <div class="kicker">Audit Hardening</div>
+      <h2>audit log는 더 안전하게 기록됩니다</h2>
+      <div class="grid three">
+        <div class="card">
+          <div class="metric green">Redact</div>
+          <div class="label"><code>password</code>, <code>secret</code>, <code>token</code>, <code>api_key</code>, cookie 계열 값은 <code>[REDACTED]</code>.</div>
+        </div>
+        <div class="card">
+          <div class="metric green">Truncate</div>
+          <div class="label">문자열 값은 500자 초과 시 <code>...[truncated]</code> 처리.</div>
+        </div>
+        <div class="card">
+          <div class="metric green">Classify</div>
+          <div class="label"><code>permission</code>, <code>checkpoint</code>, <code>trust</code>, <code>system</code> category 보존.</div>
+        </div>
+      </div>
+      <p class="lead">결과: <code>tests/audit-sanitize.test.js</code> 37/37 PASS.</p>
+      <div class="footer">Slide 8</div>
+    </section>
+
+    <section class="slide" id="slide-9">
+      <div class="kicker">Architecture E2E Fix</div>
+      <h2>이제 E2E가 “실행만 성공”이 아니라 gate 결과를 검증합니다</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>Before</h3>
+          <ul>
+            <li><code>gateResult.status</code> 출력: 실제 필드가 아님</li>
+            <li>good case도 metric 누락으로 pass가 아니었음</li>
+            <li>assertion이 없어 항상 exit 0 가능</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>After</h3>
+          <ul>
+            <li><code>gateResult.verdict</code> 확인</li>
+            <li>bad case: <code>architectureCompliance=85</code>는 non-pass 검증</li>
+            <li>good case: 모든 design metric 충족 후 <code>pass</code> 검증</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ok">실행 결과: bad case verdict는 <code>retry</code>, good case verdict는 <code>pass</code>.</div>
+      <div class="footer">Slide 9</div>
+    </section>
+
+    <section class="slide" id="slide-10">
+      <div class="kicker">Verification</div>
+      <h2>현재 확인한 테스트 결과</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>명령</th>
+            <th>결과</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>node tests/test-architecture-e2e.js</code></td>
+            <td>exit 0, bad/retry + good/pass assertion 확인</td>
+          </tr>
+          <tr>
+            <td><code>node tests/audit-sanitize.test.js</code></td>
+            <td>37 passed, 0 failed</td>
+          </tr>
+          <tr>
+            <td><code>node tests/import-resolver.smoke.test.js</code></td>
+            <td>24 passed, 0 failed</td>
+          </tr>
+          <tr>
+            <td><code>node tests/permission-matrix.smoke.test.js</code></td>
+            <td>27 passed, 0 failed</td>
+          </tr>
+          <tr>
+            <td><code>node test-all.js</code></td>
+            <td>76 PASS, 0 FAIL</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="footer">Slide 10</div>
+    </section>
+
+    <section class="slide" id="slide-11">
+      <div class="kicker">Documentation Check</div>
+      <h2>문서 반영 상태</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>정상 반영</h3>
+          <ul>
+            <li>Report 본문 Related Documents는 archive 경로로 수정됨</li>
+            <li>commit ancestry는 post-rewrite hash 기준으로 업데이트됨</li>
+            <li>Design TC-3은 runtime reference 관점으로 sharpen됨</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>검토 메모</h3>
+          <ul>
+            <li>Report Appendix B에는 archive 이전 경로 3건이 아직 남아 있음</li>
+            <li>Plan 내부의 Design 링크 1건도 archive 이전 경로를 유지</li>
+            <li>기능 동작에는 영향 없지만, 재현성 문서까지 완결하려면 후속 정리 권장</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note">이 메모는 현재 repo grep 결과 기준입니다. 코드와 테스트 반영은 정상이고, 남은 항목은 문서 링크 정합성입니다.</div>
+      <div class="footer">Slide 11</div>
+    </section>
+
+    <section class="slide" id="slide-12">
+      <div class="kicker">Decision</div>
+      <h2>최종 판단</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>정상 반영된 것</h3>
+          <ul>
+            <li>S1 cleanup 구현</li>
+            <li>rkit permission safety 보존</li>
+            <li>audit hardening</li>
+            <li>self-healing prompt follow-up</li>
+            <li>Architecture E2E assertion 보강</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>남은 선택지</h3>
+          <ul>
+            <li>문서 링크 정합성까지 완전하게 맞춘 뒤 S1 종료</li>
+            <li>또는 기능 영향이 없으므로 현재 상태로 두고 Cycle 1.5에서 문서 sweep에 포함</li>
+          </ul>
+        </div>
+      </div>
+      <p class="lead">권장: S1을 장기 reference로 쓸 계획이면 Appendix B와 Plan 내부 링크를 archive 경로로 한 번 더 맞추는 편이 좋습니다.</p>
+      <div class="footer">Slide 12</div>
+    </section>
+  </main>
+
+  <div class="nav" aria-label="slide navigation">
+    <button type="button" onclick="moveSlide(-1)">Prev</button>
+    <button type="button" onclick="moveSlide(1)">Next</button>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+
+    function currentIndex() {
+      const y = window.scrollY;
+      let best = 0;
+      let distance = Infinity;
+      slides.forEach((slide, index) => {
+        const d = Math.abs(slide.offsetTop - y);
+        if (d < distance) {
+          distance = d;
+          best = index;
+        }
+      });
+      return best;
+    }
+
+    function moveSlide(delta) {
+      const next = Math.max(0, Math.min(slides.length - 1, currentIndex() + delta));
+      slides[next].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') {
+        event.preventDefault();
+        moveSlide(1);
+      }
+      if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+        event.preventDefault();
+        moveSlide(-1);
+      }
+      if (event.key === 'Home') {
+        event.preventDefault();
+        slides[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      if (event.key === 'End') {
+        event.preventDefault();
+        slides[slides.length - 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  </script>
+</body>
+</html>

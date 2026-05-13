@@ -1,6 +1,6 @@
 {
-  "$schema": "rapp-project-config-v3",
-  "_comment": ".claude/project-config.json으로 복사하여 사용 (install.py가 자동 수행)",
+  "$schema": "cpp-static-analysis-project-config-v1",
+  "_comment": ".rkit/cpp-static-analysis/project-config.json 으로 install.py가 자동 복사 (PROJECT_DIR 기준). 수동 복사 시 동일 경로 사용.",
 
   "paths": {
     "src": "src",

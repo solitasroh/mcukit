@@ -17,7 +17,7 @@ project-version: 0.9.13
 > **Analyst**: pdm87
 > **Date**: 2026-04-22
 > **Design Doc**: [cpp-static-analysis-integration.design.md](../02-design/features/cpp-static-analysis-integration.design.md)
-> **Do Doc**: [cpp-static-analysis-integration.do.md](../02-design/features/cpp-static-analysis-integration.do.md)
+> **Do**: Design §11.2 12-step implementation에 통합 (별도 .do.md 미작성, PR #5 리뷰 fix)
 
 ---
 

@@ -17,7 +17,7 @@ project-version: 0.9.13
 > **Author**: pdm87
 > **Date**: 2026-04-21
 > **Status**: Draft
-> **Base Document**: [docs/cpp-static-analysis-integration.md](../../cpp-static-analysis-integration.md) (경로 B 채택 기준)
+> **Base Document**: Design §1~§3 (경로 B 채택 근거 흡수, 별도 base 파일 없음 — PR #5 리뷰 fix)
 
 ---
 

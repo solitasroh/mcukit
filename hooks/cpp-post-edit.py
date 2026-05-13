@@ -48,12 +48,37 @@ def _extract_file_path(data: dict) -> str:
 
 
 def _collect_findings(file_path: Path) -> list | None:
+    """Run hard_check + patterns. Returns None on failure with diagnostics.
+
+    Previously `except Exception: return None` swallowed dependency errors
+    (tree-sitter missing → ImportError) and parse errors identically, so
+    users couldn't tell why analysis silently skipped. Now we surface the
+    exception class + repr to stderr. (PR #5 review C4)
+    """
     try:
         config = _load_config()
         hc = hc_run_all(file_path, config)
         pat = run_patterns(file_path, "all")
         return hc + pat.findings
-    except Exception:
+    except (ImportError, ModuleNotFoundError) as e:
+        safe_print(
+            f"hook(cpp-static-analysis): {file_path.name} dependency missing "
+            f"({type(e).__name__}: {e}) — run `python scripts/cpp-static-analysis/install.py`",
+            file=sys.stderr,
+        )
+        return None
+    except (OSError, PermissionError) as e:
+        safe_print(
+            f"hook(cpp-static-analysis): {file_path.name} file access failed ({e})",
+            file=sys.stderr,
+        )
+        return None
+    except Exception as e:  # noqa: BLE001 — surface type + repr instead of silent None
+        safe_print(
+            f"hook(cpp-static-analysis): {file_path.name} analysis failed "
+            f"({type(e).__name__}: {e!r})",
+            file=sys.stderr,
+        )
         return None
 
 
@@ -125,8 +150,17 @@ def main():
     """
     try:
         data = json.load(sys.stdin)
-    except (json.JSONDecodeError, ValueError):
-        return  # stdin 없거나 파싱 실패 — 조용히 종료
+    except (json.JSONDecodeError, ValueError) as e:
+        # Bridge stdin must be present + valid JSON. Empty stdin = direct CLI
+        # invocation (developer testing) → silent. Malformed JSON = bridge
+        # contract broken → surface so user can investigate. (PR #5 review C7)
+        if isinstance(e, json.JSONDecodeError):
+            safe_print(
+                f"hook(cpp-static-analysis): stdin JSON parse failed "
+                f"(line {e.lineno} col {e.colno}) — bridge contract broken",
+                file=sys.stderr,
+            )
+        return
 
     fp = _extract_file_path(data)
     if not fp:

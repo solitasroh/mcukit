@@ -64,10 +64,10 @@ project-version: 0.9.13
 |-------|----------|--------|
 | Plan | [cpp-static-analysis-integration.plan.md](../../01-plan/features/cpp-static-analysis-integration.plan.md) | ✅ Finalized |
 | Design | [cpp-static-analysis-integration.design.md](../../02-design/features/cpp-static-analysis-integration.design.md) | ✅ Finalized |
-| Do | [cpp-static-analysis-integration.do.md](../../02-design/features/cpp-static-analysis-integration.do.md) | ✅ Complete |
+| Do | Design §11.2 12-step에 통합 (별도 .do.md 미작성) | ✅ Complete |
 | Check | [cpp-static-analysis-integration.analysis.md](../../03-analysis/cpp-static-analysis-integration.analysis.md) | ✅ Complete (Match Rate 96%+) |
 | Act (Report) | Current document | ✅ Writing |
-| Base Integration Doc | [cpp-static-analysis-integration.md](../../cpp-static-analysis-integration.md) | ✅ Reference (경로 B 채택 기준) |
+| Base Integration Doc | Design §1~§3 (경로 B 채택 근거 흡수) | ✅ Reference |
 
 ---
 
