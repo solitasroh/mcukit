@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "description": "verify-policy.js NEVER_GATE checks — always-on regardless of hit rate statistics. Skip never permitted.",
+  "items": [
+    {
+      "id": "security",
+      "since": "cycle-1.5",
+      "scope": "permanent",
+      "reason": "Security threats may appear infrequently but must always be checked"
+    },
+    {
+      "id": "data_migration",
+      "since": "cycle-1.5",
+      "scope": "permanent",
+      "reason": "Data loss prevention takes priority over statistics"
+    },
+    {
+      "id": "skill_md_consistency",
+      "since": "cycle-1.5",
+      "scope": "permanent",
+      "reason": "Locked vocabulary preservation across 4 SKILL files"
+    },
+    {
+      "id": "vocab_sync",
+      "since": "cycle-1.5",
+      "scope": "permanent",
+      "reason": "SoT to appendix sync (gen-locked-vocab.mjs drift detection)"
+    },
+    {
+      "id": "eval_syntax",
+      "since": "cycle-1.5",
+      "scope": "permanent",
+      "reason": "eval.yaml structural validity (judge: regex_only enforcement)"
+    },
+    {
+      "id": "network_egress",
+      "since": "cycle-2",
+      "scope": "permanent",
+      "promoted_at": "cycle-4",
+      "promoted_from": "transitional",
+      "previous_sunset": "cycle-4",
+      "reason": "Module group F (telemetry/cc-bridge/docs-code-scanner) egress=deny enforcement. Promoted to permanent in cycle-4 (CR4-4) after cycle-3 verify-policy 9/9 PASS regression. Re-introduction of group F requires new candidate in cycle-5+."
+    },
+    {
+      "id": "pii_in_logs",
+      "since": "cycle-2",
+      "scope": "permanent",
+      "reason": "Username/HOME/hostname/git remote URL must not appear in .rkit/state/ logs (FR-09)"
+    }
+  ]
+}

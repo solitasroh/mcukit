@@ -1,0 +1,191 @@
+{
+  "version": "1.0",
+  "cycle": "4",
+  "lastUpdated": "2026-05-13T03:00:00.000Z",
+  "description": "Cycle 4 candidate × decision tracking matrix. 7 candidates (CR4-1~CR4-7) × 5 enum. STRICT + escalation prohibit_at terminal cycle for CR4-1/CR4-2. CO-2 separated from CR4-1 as CR4-7 adopt.",
+  "candidates": [
+    {
+      "id": "CR4-1",
+      "title": "E cc-regression — escalation_count=3 prohibit_at terminal",
+      "priority": "P0",
+      "decision": "reject",
+      "reasoning": "Council 결정 (security + enterprise + code-analyzer). cycle 3 council 비용 측정 18-25h vs cycle 4 16h 범위 112-156% 초과. escalation_count=3 prohibit_at 도래로 cycle-5 추가 defer 시 정책 임계 (prohibit_at=3) 위반. cc-regression core 가치 (hooks regression 탐지)는 CO-2 canary regex 5 패턴 분리 채택 (CR4-7)으로 70-80% 대체 가능. rkit 임베디드 plugin 도메인 부합도 낮음 — bkit과 달리 hooks 표면적 작음 (stop-hook 1종). sha256:14 hash collision 표면 (2^56) + opt-in prompt 우회 가능성 + raw text 회귀 리스크가 도입 가치 < 도입 비용 + 보안 표면. cycle 2 산출물 (gdpr-cc-regression.md + pdca-regression-purge.mjs)은 obsolete 마킹으로 결정 이력 보존. permanent_reject로 cycle-5+ 재논의 차단.",
+      "evidence": [
+        "docs/archive/2026-05/bkit-gstack-sync-v2-cycle3/bkit-gstack-sync-v2-cycle3.analysis.md (cycle 3 council 비용 측정)",
+        "policies/escalation-policy.json prohibit_at=3 (cycle 4 진입 시 count=3 도래)",
+        "lib/core/anonymize-fingerprint.js (sha256:14 알고리즘 evidence)",
+        "references/bkit-claude-code/lib/cc-regression/event-recorder.js (200자 truncate, hash 0건 — 재작성 evidence)",
+        "policies/decisions/cycle4-matrix.json CR4-7 (CO-2 canary 분리 채택 — 대체 경로)"
+      ],
+      "decided_by": { "role": "agent", "id": "rkit:security-architect + rkit:enterprise-expert + rkit:code-analyzer council" },
+      "decided_at": "2026-05-13T03:00:00.000Z",
+      "depends_on": [],
+      "unblock_condition": null,
+      "revisit_by": null,
+      "cycle_origin": "cycle-3-carryover",
+      "predecessor_decision": { "cycle": "3", "candidate_id": "CR-6", "decision": "defer" },
+      "escalation_count": 3,
+      "escalation_history": [
+        { "cycle": "2", "decision": "defer", "matrix_ref": "decisions/cycle2-matrix.json#E" },
+        { "cycle": "3", "decision": "defer", "matrix_ref": "decisions/cycle3-matrix.json#CR-6" },
+        { "cycle": "4", "decision": "reject", "matrix_ref": "decisions/cycle4-matrix.json#CR4-1" }
+      ],
+      "permanent_reject": true
+    },
+    {
+      "id": "CR4-2",
+      "title": "CO-1 JSONL rotation — CR4-1 cascade permanent_reject",
+      "priority": "P0",
+      "decision": "reject",
+      "reasoning": "Council 결정 (security + code-analyzer). CR4-1 cc-regression permanent reject로 회전 정책 통합 대상 부재 — cascade reject. cycle-2/3 cascade defer 사유 (depends_on [D reject, E defer]) cycle 4에서도 동일 상태이나 escalation_count=3 prohibit_at 도래. cycle-5 defer는 정책 임계 위반. rkit에 cc-regression.jsonl 외 회전 대상 jsonl 파일 부재 (audit/state 파일은 별도 도메인). 향후 jsonl 신설 시 별도 candidate 평가. docs/policy/network-egress.md 회전 권고 (5MB / 5000 entries / 1 backup)는 정책 문서로 보존.",
+      "evidence": [
+        "policies/decisions/cycle4-matrix.json CR4-1.decision === reject (cascade origin)",
+        "docs/policy/network-egress.md (회전 정책 권고 문서 cycle 2 보존)",
+        "policies/decisions/cycle2-matrix.json D.decision === reject (영구)",
+        "policies/decisions/cycle3-matrix.json CR-8.decision === defer (predecessor)"
+      ],
+      "decided_by": { "role": "agent", "id": "rkit:security-architect + rkit:code-analyzer council" },
+      "decided_at": "2026-05-13T03:00:00.000Z",
+      "depends_on": ["CR4-1"],
+      "unblock_condition": null,
+      "revisit_by": null,
+      "cycle_origin": "cycle-3-carryover",
+      "predecessor_decision": { "cycle": "3", "candidate_id": "CR-8", "decision": "defer" },
+      "escalation_count": 3,
+      "escalation_history": [
+        { "cycle": "2", "decision": "defer", "matrix_ref": "decisions/cycle2-matrix.json#CO-1" },
+        { "cycle": "3", "decision": "defer", "matrix_ref": "decisions/cycle3-matrix.json#CR-8" },
+        { "cycle": "4", "decision": "reject", "matrix_ref": "decisions/cycle4-matrix.json#CR4-2" }
+      ],
+      "permanent_reject": true
+    },
+    {
+      "id": "CR4-3",
+      "title": "CR-2 잔여 2 ports (regression-registry + token-meter) cascade permanent_reject",
+      "priority": "P1",
+      "decision": "reject",
+      "reasoning": "Council 결정 (code-analyzer + infra-architect). 두 ports 모두 cascade_origin true — cycle 4 신규 candidate 처리. (1) regression-registry.port: CR4-1 cc-regression permanent reject로 port 도입 의미 부재. (2) token-meter.port: rkit lib/cost / lib/metering / lib/telemetry 디렉토리 모두 부재 (Glob 검증 완료) — rkit 토큰 회계 도메인 자체 부재. cycle-5+ defer는 무한 사슬 형성 (CR-2 carry-over → cycle 5 again). permanent_reject 명시로 영구 차단. 향후 rkit에 토큰 측정 또는 cc-regression 도입 시 신규 candidate 경로로 평가.",
+      "evidence": [
+        "policies/decisions/cycle4-matrix.json CR4-1.decision === reject (regression-registry cascade)",
+        "lib/cost/ 부재 + lib/metering/ 부재 + lib/telemetry/ 부재 (Glob 검증)",
+        "references/bkit-claude-code/lib/domain/ports/regression-registry.port.js (단일 구현체 의미 — DIP 형식주의 위험)",
+        "references/bkit-claude-code/lib/domain/ports/token-meter.port.js (bkit 고유 도메인 evidence)",
+        "policies/decisions/cycle3-matrix.json CR-2 (predecessor partial_adopt, 2 ports 잔여)"
+      ],
+      "decided_by": { "role": "agent", "id": "rkit:code-analyzer + rkit:infra-architect council" },
+      "decided_at": "2026-05-13T03:00:00.000Z",
+      "depends_on": ["CR4-1"],
+      "unblock_condition": null,
+      "revisit_by": null,
+      "cycle_origin": "cycle-3-carryover",
+      "predecessor_decision": { "cycle": "3", "candidate_id": "CR-2", "decision": "partial_adopt" },
+      "cascade_origin": true,
+      "cascade_parent": "CR-2",
+      "escalation_count": 0,
+      "permanent_reject": true
+    },
+    {
+      "id": "CR4-4",
+      "title": "network_egress NEVER_GATE — transitional → permanent 전환",
+      "priority": "P1",
+      "decision": "adopt",
+      "reasoning": "Council 결정 (infra-architect). cycle 3 verify-policy 9/9 PASS 회귀 검증으로 14 blocked patterns + exempt_paths + allowed_egress 구조 안정성 확인. 모듈 그룹 F (telemetry/cc-bridge/docs-code-scanner)는 cycle 2~3 영구 미도입 결론 — 부활 가능성은 cycle 5+ 신규 candidate 평가. transitional 유지 시 cycle 5/6에서 동일 결정 부담 재발 (escalation prohibit_at 사슬과 충돌). registry.npmjs.org allowlist 추가 금지 제약 일관성 유지 위해 정책 영구 적용. sunset 필드 삭제 + promoted_at/promoted_from/previous_sunset 이력 보존.",
+      "evidence": [
+        "policies/never-gate.json network_egress (cycle 4 promoted)",
+        "policies/network-allowlist.json (14 blocked patterns)",
+        "docs/archive/2026-05/bkit-gstack-sync-v2-cycle3/bkit-gstack-sync-v2-cycle3.analysis.md (verify-policy 9/9 PASS 회귀)",
+        "scripts/check-sunset.js (scope === 'permanent' skip 분기)"
+      ],
+      "decided_by": { "role": "agent", "id": "rkit:infra-architect council" },
+      "decided_at": "2026-05-13T03:00:00.000Z",
+      "depends_on": [],
+      "unblock_condition": null,
+      "revisit_by": null,
+      "cycle_origin": "cycle-4-new",
+      "predecessor_decision": null,
+      "escalation_count": 0
+    },
+    {
+      "id": "CR4-5",
+      "title": "regression_retention NEVER_GATE — CR4-1 cascade 항목 제거",
+      "priority": "P1",
+      "decision": "reject",
+      "reasoning": "Council 결정 (security + infra). CR4-1 cc-regression permanent reject로 90일 retention 정책 검사 대상 부재 (dead policy). never-gate.json regression_retention 항목 삭제. 정책 유지 시 verify-policy 무의미 PASS 누적 → 신호 노이즈. docs/policy/gdpr-cc-regression.md는 obsolete 헤더 마킹으로 결정 이력 보존 (CR4-1 reject 후속 FR-03). retention 검사 도구 (scripts/check-retention.mjs) 미신설 — cycle 4 16h 범위 절감 효과.",
+      "evidence": [
+        "policies/decisions/cycle4-matrix.json CR4-1.decision === reject (cascade origin)",
+        "policies/never-gate.json regression_retention 제거 evidence",
+        "docs/policy/gdpr-cc-regression.md (obsolete 마킹 후속 처리)"
+      ],
+      "decided_by": { "role": "agent", "id": "rkit:security-architect + rkit:infra-architect council" },
+      "decided_at": "2026-05-13T03:00:00.000Z",
+      "depends_on": ["CR4-1"],
+      "unblock_condition": null,
+      "revisit_by": null,
+      "cycle_origin": "cycle-4-new",
+      "predecessor_decision": null,
+      "escalation_count": 0
+    },
+    {
+      "id": "CR4-6",
+      "title": "미변환 27 SKILL P3 — explicit defer cycle-5+",
+      "priority": "P3",
+      "decision": "defer",
+      "reasoning": "Council 결정 (frontend-architect). 27 SKILL 대부분 classification frontmatter 이미 보유 — 미변환 실체는 body marker 미삽입뿐으로 런타임 영향 없음. cycle 4 critical path는 CR4-1 강제 결정 + sunset 처리 + obsolete 마킹. P3 + Plan §6 위-8 (일정 초과 High) 리스크로 본 cycle 범위 밖 명시. 분류 권고: grandfathered 7 (op-* 5 + mr-conventions + project-workspace), neutral 20. cycle 5+ 신규 candidate 진입으로 평가.",
+      "evidence": [
+        "scripts/skill-body-extract.mjs (변환 도구 cycle 3 신설)",
+        "policies/decisions/cycle3-matrix.json CR-3 (cycle 3 partial_adopt 46/73 변환 완료)",
+        "docs/archive/2026-05/bkit-gstack-sync-v2-cycle3/bkit-gstack-sync-v2-cycle3.report.md (cycle 3 SKILL 변환 통계)"
+      ],
+      "decided_by": { "role": "agent", "id": "rkit:frontend-architect council" },
+      "decided_at": "2026-05-13T03:00:00.000Z",
+      "depends_on": [],
+      "unblock_condition": "skill-body-extract.mjs --apply-markers + --apply-grandfathered batch executed for 27 remaining SKILLs AND verify-policy body-neutrality PASS",
+      "revisit_by": "cycle-5",
+      "cycle_origin": "cycle-4-new",
+      "predecessor_decision": null,
+      "escalation_count": 0
+    },
+    {
+      "id": "CR4-7",
+      "title": "CO-2 canary regex 분리 채택 — CR4-1 reject 후속 보안 가치 확보",
+      "priority": "P1",
+      "decision": "adopt",
+      "reasoning": "Council 결정 (security-architect). CR4-1 cc-regression reject 후 hooks regression 탐지 가치 (70-80%)를 canary regex로 직접 대체. policies/canary-tokens.md SoT + scripts/security/canary-patterns.json (5+ 패턴: AWS / GitHub PAT / OpenAI / OpenAI Project / Slack / Google) + scripts/security/scan-canary.mjs 스캐너. False positive 제외 (*.test, *.mock, fixtures/, docs/example). /security-review SKILL 통합. 비용 4-6h cycle 4 16h 범위 내 수용. egress 외부 호출 0 (offline scan).",
+      "evidence": [
+        "scripts/security/canary-patterns.json (5+ 패턴 SoT)",
+        "scripts/security/scan-canary.mjs (offline 스캐너)",
+        "policies/decisions/cycle4-matrix.json CR4-1 (CR4-7 신설 evidence)",
+        "skills/security-review/SKILL.md (canary 통합 evidence)"
+      ],
+      "decided_by": { "role": "agent", "id": "rkit:security-architect council" },
+      "decided_at": "2026-05-13T03:00:00.000Z",
+      "depends_on": [],
+      "unblock_condition": null,
+      "revisit_by": null,
+      "cycle_origin": "cycle-4-new",
+      "predecessor_decision": { "cycle": "3", "candidate_id": "CR-6", "decision": "defer" },
+      "escalation_count": 0
+    }
+  ],
+  "decision_enum": ["pending", "adopt", "partial_adopt", "defer", "reject"],
+  "decided_by_schema": {
+    "role_enum": ["human", "agent"],
+    "id_format": "human: git email | agent: rkit:<agent-name>"
+  },
+  "strict_mode": true,
+  "strict_rules": {
+    "R1": "reasoning.length >= 50 (all non-pending)",
+    "R2": "defer requires unblock_condition AND revisit_by",
+    "R3": "unblock_condition rejects vague pattern /^cycle-?\\d+\\s*(이월|carry.?over|defer|연기)\\s*$/i",
+    "R4": "unblock_condition.length >= 30",
+    "R5": "unblock_condition should contain action verb (WARN only)",
+    "R6": "revisit_by matches /^cycle-\\d+(\\.\\d+)?$/",
+    "R7": "adopt/partial_adopt requires evidence.length >= 2"
+  },
+  "escalation_policy_ref": "policies/escalation-policy.json",
+  "expected_candidate_count": 7,
+  "completion_gate": {
+    "rule": "All 7 candidates non-pending. STRICT R1~R7. CR4-1 escalation_count=3 prohibit_at applied — reject decision satisfies prohibit_at constraint. CR4-3 cascade_origin=true with escalation_count=0.",
+    "check": "scripts/verify-policy.js --check decisions-matrix"
+  }
+}

@@ -1,0 +1,39 @@
+name: investigate-cycle15
+classification: capability
+domain: all
+judge: regex_only
+description: |
+  Cycle 1.5 evaluation — verify Confusion Protocol (위험 결정 멈춤) and AskUserQuestion 5-element format
+  are present in /investigate skill responses. Body-neutrality enforced (no embedded vocab in cycle15
+  body-neutral region). LLM judge NOT invoked — pure regex assertions only.
+tests:
+  - id: cycle15-before
+    prompt: cycle15-before.prompt.md
+    expected: cycle15-before.expected.md
+    assertions:
+      - type: regex_negative
+        description: "before-state should NOT have stop-and-ask trigger language"
+        patterns:
+          - "🛑 멈춤"
+          - "^추천안?:"
+  - id: cycle15-after
+    prompt: cycle15-after.prompt.md
+    expected: cycle15-after.expected.md
+    assertions:
+      - type: regex_positive
+        description: "after-state must show stop-and-ask + recommendation + pros/cons"
+        patterns:
+          - "🛑 멈춤"
+          - "^추천안?:"
+          - "✅"
+          - "❌"
+      - type: count
+        pattern: "✅"
+        per_option_min: 2
+      - type: count
+        pattern: "❌"
+        per_option_min: 1
+      - type: min_length
+        target: each_pros_con_item
+        min: 40
+        unit: codepoints

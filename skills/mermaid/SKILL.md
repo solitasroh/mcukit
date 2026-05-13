@@ -11,6 +11,20 @@ allowed-tools: [Read, Write, Edit]
 pdca-phase: design
 ---
 
+<!-- BEGIN: cycle3-body-neutral -->
+
+## 0. 문서 구조 (본 SKILL의 세 층)
+
+1. **도메인 본문 (§1 ~ §N)**: 이 SKILL의 프로토콜.
+   잠금 어휘 사용 0건이 `verify-policy --check body-neutrality`로 자동 검증됩니다.
+2. **방법론 본문 — 도메인 중립**: Cycle 3에서 `<!-- BEGIN: cycle3-body-neutral -->` ~ `<!-- END: cycle3-body-neutral -->` 마커로 감싸진 영역.
+3. **도메인 예시 부록 (§A)**: MCU/MPU/WPF 도메인별 사례.
+   SoT(`policies/locked-vocab.json`)에서 `scripts/gen-locked-vocab.mjs`가 자동 생성합니다.
+
+직접 부록을 편집하지 마세요 — `node scripts/gen-locked-vocab.mjs`로 재생성됩니다.
+
+---
+
 # Mermaid 작성 규칙 (v8.8.0)
 
 가이드 문서에서 Mermaid 다이어그램 생성 시 **반드시** 따른다.
@@ -469,3 +483,5 @@ stateDiagram-v2
 10. subgraph 중첩이 3단계를 넘지 않는가? → 넘으면 분할
 11. subgraph ID끼리 직접 연결하지 않고 **내부 노드끼리** 연결하는가?
 12. `stateDiagram-v2`에서 상태 ID에 underscore(`_`)가 없는가? → PascalCase 사용
+
+<!-- END: cycle3-body-neutral -->

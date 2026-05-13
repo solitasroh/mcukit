@@ -18,11 +18,23 @@
 
 const { MCUKIT_PLATFORM } = require('../lib/core/platform');
 const { debugLog } = require('../lib/core/debug');
+const { applyBudget } = require('../lib/core/context-budget');
+const { detectAndWarn: detectWorktree } = require('../lib/core/worktree-detector');
 
 debugLog('SessionStart', 'Hook executed', {
   cwd: process.cwd(),
   platform: MCUKIT_PLATFORM
 });
+
+// --- 0a. Worktree Detection (Cycle 2 A partial_adopt) ---
+// Advisory only — emits stderr warning + .rkit/runtime/worktree-warning.flag
+// when running inside a linked git worktree (CC hooks may not fire, #46808).
+// Paths anonymized via FR-09 anonymizeFingerprint (no raw PII persisted).
+try {
+  detectWorktree();
+} catch (e) {
+  debugLog('SessionStart', 'Worktree detection failed (non-fatal)', { error: e.message });
+}
 
 // --- 0. Required Plugins (devkit extensions) ---
 try {
@@ -185,6 +197,30 @@ if (domainResult.domain !== 'unknown') {
     `- SDK: ${domainResult.platform ? domainResult.platform.sdk : 'unknown'}\n` +
     `- Confidence: ${(domainResult.confidence * 100).toFixed(0)}%\n`;
   additionalContext += domainInfo;
+}
+
+// --- Context Budget Guard (Cycle 2 A partial_adopt) ---
+// CC hooks cap additionalContext at 10,000 chars per spec. Apply pre-emptive
+// 8,000-char budget with priority section preservation.
+//
+// rkit-specific priorities (extend bkit defaults): preserve Instinct,
+// PDCA progress, stale warnings, domain info — these contain learned
+// patterns and live state the LLM must see every session.
+try {
+  additionalContext = applyBudget(additionalContext, {
+    priorityPreserve: [
+      'MANDATORY',
+      'Previous Work Detected',
+      'Previous Work',
+      'AskUserQuestion',
+      'Project Instinct',          // ## Project Instinct (auto-learned patterns)
+      'PDCA Progress',              // ## PDCA Progress: ...
+      'Stale Feature Warning',      // ## Stale Feature Warning
+      'Detected Domain',            // ## Detected Domain: ...
+    ],
+  });
+} catch (e) {
+  debugLog('SessionStart', 'Context budget failed (passthrough)', { error: e.message });
 }
 
 // --- Output ---

@@ -15,9 +15,13 @@ cmake-build-*/
 # IDE
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 
 # OS
 .DS_Store
 Thumbs.db
+
+# External reference clones (upstream bkit / gstack, analysis-only)
+references/

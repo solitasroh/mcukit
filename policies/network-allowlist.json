@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "description": "External network egress allowlist. Deny by default. Adding entries requires Plan + Design + security review.",
+  "policy": "Module group F (telemetry/cc-bridge/docs-code-scanner) and cc-regression (group E) must produce zero matches against blocked_patterns outside exempt_paths.",
+  "blocked_patterns": [
+    "import http",
+    "import https",
+    "require\\('http'\\)",
+    "require\\('https'\\)",
+    "fetch\\(",
+    "axios\\.",
+    "got\\.",
+    "node-fetch",
+    "undici",
+    "require\\('node:net'\\)",
+    "require\\('node:dgram'\\)",
+    "require\\('node:http2'\\)",
+    "new WebSocket\\(",
+    "new EventSource\\("
+  ],
+  "exempt_paths": [
+    "tests/",
+    "test/",
+    "scripts/op-"
+  ],
+  "allowed_egress": [
+    {
+      "host": "openproject.local",
+      "scripts": ["scripts/op-standup.js", "scripts/op-sync-time.js"],
+      "rationale": "Pre-existing OpenProject MCP integration (cycle-1 feature). Documented external dependency.",
+      "since": "cycle-1"
+    }
+  ],
+  "exempt_rationale": "Test fixtures may mock external transport. Production node_modules NOT exempt (supply-chain risk, council security HIGH-2). OpenProject integration scripts (scripts/op-*) documented in allowed_egress."
+}
