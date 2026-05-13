@@ -26,10 +26,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          # No `cache: npm` — rkit is a plugin with zero npm dependencies
+          # (deps: [] / devDeps: []), so there's no lockfile to cache.
       - name: Generate SBOM
         env:
           CI: 'true'
+        # gen-sbom.mjs uses fallback minimal SBOM when cyclonedx-npm is
+        # unavailable (logged as rkit:sbom:degraded=true property).
+        # continue-on-error: true tolerates the fallback path; upload step
+        # still publishes the resulting bom.json.
         run: npm run sbom
         continue-on-error: true
       - name: Upload SBOM artifact
