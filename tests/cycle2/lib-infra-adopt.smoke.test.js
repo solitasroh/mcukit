@@ -31,12 +31,19 @@ test('docs-code-scanner: countMCPTools uses rkit_ prefix (not bkit_)', () => {
   assert.ok(count > 0, `expected rkit_ prefix to match >= 1 tool, got ${count}`);
 });
 
-test('docs-code-scanner: scanVersions canonical from rkit.config.json', async () => {
+test('docs-code-scanner: scanVersions canonical from package.json', async () => {
   const v = await scanner.scanVersions();
   assert.ok('canonical' in v);
-  assert.ok('rkitConfig' in v, 'should expose rkitConfig field (not bkitConfig)');
+  assert.ok('packageJson' in v, 'canonical SoT must be package.json:version');
   assert.ok(!('bkitConfig' in v), 'must NOT expose bkitConfig field');
+  assert.ok(!('rkitConfig' in v), 'rkit.config.json is subsystem version, not canonical');
   assert.ok(Array.isArray(v.mismatches));
+});
+
+test('docs-code-scanner: canonical === package.json version (matches session-start.js)', async () => {
+  const v = await scanner.scanVersions();
+  const pkg = JSON.parse(require_('node:fs').readFileSync('package.json', 'utf8'));
+  assert.equal(v.canonical, pkg.version, 'canonical must match package.json — same source hooks/session-start.js uses');
 });
 
 test('cc-bridge: parseHookInput handles null/empty', () => {
