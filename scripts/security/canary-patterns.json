@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "since": "cycle-4",
+  "description": "Canary regex patterns for secret leak detection (CR4-7). Sourced from cycle 4 security council. False positive exclusion paths included.",
+  "patterns": [
+    {
+      "id": "CK-001",
+      "service": "AWS Access Key",
+      "regex": "AKIA[0-9A-Z]{16}",
+      "severity": "high",
+      "source": "AWS official docs"
+    },
+    {
+      "id": "CK-002",
+      "service": "GitHub Personal Access Token",
+      "regex": "gh[ps]_[A-Za-z0-9]{36}",
+      "severity": "high",
+      "source": "GitHub official prefix convention"
+    },
+    {
+      "id": "CK-003",
+      "service": "OpenAI API Key (classic)",
+      "regex": "sk-[A-Za-z0-9]{48}",
+      "severity": "high",
+      "source": "OpenAI public docs"
+    },
+    {
+      "id": "CK-003a",
+      "service": "OpenAI Project Key",
+      "regex": "sk-proj-[A-Za-z0-9_-]{40,}",
+      "severity": "high",
+      "source": "OpenAI 2024 project-scoped key format"
+    },
+    {
+      "id": "CK-004",
+      "service": "Slack Bot Token",
+      "regex": "xoxb-[0-9]{11,13}-[0-9]{11,13}-[A-Za-z0-9]{24}",
+      "severity": "high",
+      "source": "Slack API docs"
+    },
+    {
+      "id": "CK-005",
+      "service": "Google API Key",
+      "regex": "AIza[0-9A-Za-z\\-_]{35}",
+      "severity": "high",
+      "source": "Google Cloud SDK docs"
+    }
+  ],
+  "exclusion_globs": [
+    "**/*.test.js",
+    "**/*.test.ts",
+    "**/*.test.mjs",
+    "**/*.mock.*",
+    "**/fixtures/**",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "docs/**/example*",
+    "tests/**/*.test.js",
+    "tests/**/*.smoke.test.js",
+    "scripts/security/canary-patterns.json",
+    "scripts/security/scan-canary.mjs"
+  ]
+}
