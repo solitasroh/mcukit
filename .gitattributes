@@ -1,0 +1,3 @@
+# SBOM generated artifact — collapsed in PR diffs (Cycle 3 CR-5).
+sbom/bom.json linguist-generated=true
+sbom/bom.json -diff

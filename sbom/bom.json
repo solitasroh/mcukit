@@ -1,0 +1,15 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-05-13T02:09:44.687Z",
+    "component": {
+      "type": "application",
+      "name": "rkit",
+      "version": "0.9.13"
+    }
+  },
+  "components": [],
+  "note": "fallback SBOM — install @cyclonedx/cyclonedx-npm for full inventory"
+}

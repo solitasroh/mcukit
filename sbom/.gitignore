@@ -1,0 +1,4 @@
+# SBOM output directory — bom.json tracked, intermediate files ignored.
+*
+!.gitignore
+!bom.json

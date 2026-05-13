@@ -33,5 +33,11 @@
   "engines": {
     "claude-code": ">=2.1.78"
   },
-  "outputStyles": "./output-styles/"
+  "outputStyles": "./output-styles/",
+  "scripts": {
+    "sbom": "node scripts/gen-sbom.mjs",
+    "verify-policy": "node scripts/verify-policy.js",
+    "check-sunset": "node scripts/check-sunset.js",
+    "test": "node --test \"tests/cycle2/*.test.js\" \"tests/cycle3/*.test.js\""
+  }
 }
