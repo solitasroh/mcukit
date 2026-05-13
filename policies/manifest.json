@@ -58,6 +58,13 @@
       "version": "1.0",
       "validator": "scripts/verify-policy.js --check decisions-matrix",
       "description": "Cycle 4 candidate × decision tracking matrix (7 candidates × 5-enum). STRICT + escalation prohibit_at terminal cycle for CR4-1/CR4-2. CO-2 split from CR4-1 as CR4-7 adopt."
+    },
+    {
+      "path": "decisions/cycle5-matrix.json",
+      "since": "cycle-5",
+      "version": "1.0",
+      "validator": "scripts/verify-policy.js --check decisions-matrix",
+      "description": "Cycle 5 candidate × decision tracking matrix (1 candidate × 5-enum). Mechanical small cycle — CR4-6 unblock conversion."
     }
   ]
 }

@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "cycle": "5",
+  "lastUpdated": "2026-05-13T04:00:00.000Z",
+  "description": "Cycle 5 candidate × decision tracking matrix. Single candidate (CR5-1) — CR4-6 unblock mechanical conversion. STRICT.",
+  "candidates": [
+    {
+      "id": "CR5-1",
+      "title": "27 SKILL conversion — CR4-6 unblock 충족 (20 neutral + 7 grandfathered)",
+      "priority": "P3",
+      "decision": "adopt",
+      "reasoning": "Cycle 4 CR4-6 defer cycle-5 unblock_condition (skill-body-extract.mjs --apply-markers + --apply-grandfathered batch executed for 27 remaining SKILLs AND verify-policy body-neutrality PASS) 충족. Mechanical batch 변환 — council 불필요. 20 neutral (arch-lock, audit, benchmark, btw, cc-version-analysis, claude-code-learning, control, deploy, desktop-app, development-pipeline, do-reverse-spec, guard, mermaid, mobile-app, pdca-batch, plan-plus, pm-discovery, reframe, rkit-rules, zero-script-qa) + 7 grandfathered (op-* 5 + mr-conventions + project-workspace). 결과: 73 SKILL 전체 변환 완료 — untouched 0. verify-policy 9/9 + 통합 smoke 147/147 회귀 PASS. CR4-6 unblock_condition R3~R5 통과 검증 (cycle-N 이월 단독 사유 거부 정책의 메커니즘 실증).",
+      "evidence": [
+        "scripts/skill-body-extract.mjs --apply-markers 20 SKILLs (cycle 5 작업 evidence)",
+        "scripts/skill-body-extract.mjs --apply-grandfathered 7 SKILLs (cycle 5 작업 evidence)",
+        "scripts/skill-body-extract.mjs --scan untouched=0 (검증 evidence)",
+        "policies/decisions/cycle4-matrix.json CR4-6 (predecessor unblock_condition)",
+        "verify-policy 9/9 PASS (회귀 검증)",
+        "tests/cycle*/ 통합 147/147 PASS (회귀 검증)"
+      ],
+      "decided_by": { "role": "agent", "id": "rkit:claude (mechanical)" },
+      "decided_at": "2026-05-13T04:00:00.000Z",
+      "depends_on": [],
+      "unblock_condition": null,
+      "revisit_by": null,
+      "cycle_origin": "cycle-4-carryover",
+      "predecessor_decision": { "cycle": "4", "candidate_id": "CR4-6", "decision": "defer" },
+      "escalation_count": 1,
+      "escalation_history": [
+        { "cycle": "4", "decision": "defer", "matrix_ref": "decisions/cycle4-matrix.json#CR4-6" }
+      ]
+    }
+  ],
+  "decision_enum": ["pending", "adopt", "partial_adopt", "defer", "reject"],
+  "decided_by_schema": {
+    "role_enum": ["human", "agent"],
+    "id_format": "human: git email | agent: rkit:<agent-name>"
+  },
+  "strict_mode": true,
+  "strict_rules": {
+    "R1": "reasoning.length >= 50 (all non-pending)",
+    "R2": "defer requires unblock_condition AND revisit_by",
+    "R3": "unblock_condition rejects vague pattern",
+    "R4": "unblock_condition.length >= 30",
+    "R5": "unblock_condition should contain action verb (WARN only)",
+    "R6": "revisit_by matches /^cycle-\\d+(\\.\\d+)?$/",
+    "R7": "adopt/partial_adopt requires evidence.length >= 2"
+  },
+  "escalation_policy_ref": "policies/escalation-policy.json",
+  "expected_candidate_count": 1,
+  "completion_gate": {
+    "rule": "Single candidate CR5-1 must be adopt. CR4-6 unblock conditions verified.",
+    "check": "scripts/verify-policy.js --check decisions-matrix"
+  }
+}

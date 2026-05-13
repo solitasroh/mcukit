@@ -64,6 +64,20 @@ hooks:
       timeout: 10000
 ---
 
+<!-- BEGIN: cycle3-body-neutral -->
+
+## 0. 문서 구조 (본 SKILL의 세 층)
+
+1. **도메인 본문 (§1 ~ §N)**: 이 SKILL의 프로토콜.
+   잠금 어휘 사용 0건이 `verify-policy --check body-neutrality`로 자동 검증됩니다.
+2. **방법론 본문 — 도메인 중립**: Cycle 3에서 `<!-- BEGIN: cycle3-body-neutral -->` ~ `<!-- END: cycle3-body-neutral -->` 마커로 감싸진 영역.
+3. **도메인 예시 부록 (§A)**: MCU/MPU/WPF 도메인별 사례.
+   SoT(`policies/locked-vocab.json`)에서 `scripts/gen-locked-vocab.mjs`가 자동 생성합니다.
+
+직접 부록을 편집하지 마세요 — `node scripts/gen-locked-vocab.mjs`로 재생성됩니다.
+
+---
+
 # CC Version Analysis — Claude Code CLI 버전 영향 분석 워크플로우
 
 > CC CLI 버전 업그레이드 시 rkit plugin에 대한 영향을 체계적으로 조사, 분석하고
@@ -337,3 +351,5 @@ Always read previous reports first to maintain consistency in:
 - Report structure and depth
 - Consecutive compatible release tracking
 - GitHub issues monitoring continuity
+
+<!-- END: cycle3-body-neutral -->

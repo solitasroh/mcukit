@@ -242,7 +242,7 @@ function checkDecisionsMatrix() {
   const VAGUE_UNBLOCK = /^cycle-?\d+\s*(이월|carry.?over|defer|연기)\s*$/i;
   const VERB_RE = /(implemented|completed|resolved|passes|adopted|written|exists|integrated|merged|verified)/i;
   const REVISIT_FMT = /^cycle-\d+(\.\d+)?$/;
-  const expectedCounts = { '2': 11, '3': 8, '4': 7 };
+  const expectedCounts = { '2': 11, '3': 8, '4': 7, '5': 1 };
 
   for (const entry of matrixEntries) {
     const matrixPath = path.join(ROOT, 'policies', entry.path);
