@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.9.14] - 2026-05-13
+
+### Released
+
+- **bkit-gstack-sync-v2 5-cycle 사슬 종결** (PR #6, merge `67bb2d8`):
+  - cycle 1.5 / 2 / 3 / 4 / 5 archived, 평균 Match Rate **99.28%**
+  - 73 SKILL 100% 변환 (cycle15 4 + cycle3 neutral 19 + grandfathered 23 + cycle5 neutral 20 + grandfathered 7)
+  - 8 SoT: `policies/{manifest, never-gate, network-allowlist, locked-vocab v1.1, decisions/cycle2~5-matrix, escalation-policy}.json`
+  - 9 verify-policy checks (body-neutrality / vocab-preservation / forbidden-tokens / eval-syntax / sot-schema / manifest-sync / decisions-matrix / network-egress / pii-in-logs)
+  - 무한 defer 메커니즘적 차단 — D-3 STRICT R1~R7 + escalation_count prohibit_at=3 작동 검증 (cycle 4)
+  - permanent_reject 플래그 (CR-7 / CR4-1 / CR4-2 / CR4-3 / CR4-5)
+  - cascade_origin + escalation_history (cycle 4 신규 필드)
+
+- **cpp-static-analysis 통합** (PR #5, merge `a711b64`):
+  - `scripts/cpp-static-analysis/` 22 Python 파일 (rapp_review 흡수)
+  - `hooks/cpp-post-edit.py` PostToolUse non-blocking hook (stderr only)
+  - `scripts/cpp-static-analysis-hook.js` Node ↔ Python bridge (3s timeout)
+  - `skills/cpp-static-analysis/` SKILL (capability, cycle3-body-neutral)
+  - `/code-review` C/C++ Pre-Analysis 자동 통합
+  - PR review 통합 fix: timeout 예산 / silent failure 차단 / 확장자 통일 (`.c` 포함) / POSIX `python3` fallback / canary 6 패턴 분리 채택
+
+### Added
+
+- **Decision Matrix Cycle 3 (cycle3-matrix.json)** — 8 candidates, 3 신규 필드, STRICT mode
+- **Escalation Policy (escalation-policy.json)** — Hybrid warn@1 fail@2 prohibit@3
+- **SBOM Automation** — CycloneDX JSON via `scripts/gen-sbom.mjs` + `.github/workflows/sbom.yml`
+- **Canary Token Scanner** — `scripts/security/scan-canary.mjs` (6 regex: AWS / GitHub PAT / OpenAI / OpenAI Project / Slack / Google)
+- **Audit Logger nested PII sanitization** — `sanitizeDetails` depth-3 재귀 + 배열 sanitize
+- **PII Anonymization** — `lib/core/anonymize-fingerprint.js` (sha256:14 + salt + O_EXCL, Windows ACL hardening)
+- **Context Budget Guard** — `lib/core/context-budget.js` (8000-char cap + priority preserve)
+- **Worktree Advisory** — `lib/core/worktree-detector.js` (Git worktree #46808 회피)
+- **PDCA Status Facade Split** — `lib/pdca/status.js` 863 lines → 5 submodules (schema/store/feature-lifecycle/context/memory-io)
+- **Domain Ports** — `lib/domain/ports/{state-store, audit-sink, cc-payload, docs-code-index}.port.js` (type-only)
+- **Infra Adapters** — `lib/infra/{cc-bridge, docs-code-scanner}.js` with `@implements` JSDoc
+- **Tools** — `scripts/{verify-policy, check-sunset, skill-body-extract, gen-sbom, gen-locked-vocab, pdca-regression-purge, verify-status-schema}.{js,mjs}`
+- **Policy Docs** — `docs/policy/{gdpr-cc-regression, pii-anonymization, network-egress, supply-chain-sbom, escalation, cycle2-decision-format, canary-tokens, gstack-sync-policy}.md`
+
+### Tests
+
+- **214 smoke TC PASS** (cycle 2 78 + cycle 3 46 + cycle 4 56 + cycle 5 6 + cpp-static-analysis 19 + audit-sanitize / 등)
+- Multi-cycle STRICT 분기 검증 + cycle 2 legacy 면제
+- escalation_count prohibit_at 자기 강제력 자동 검증
+- canary scan 0 leaks / 1745 files
+
+### Deprecated
+
+- `scripts/pdca-regression-purge.mjs` — `@deprecated cycle-4 CR4-1 reject`. lib/cc-regression/ 영구 미도입, standalone jsonl purge 도구로 격하.
+- `docs/policy/gdpr-cc-regression.md` — `Status: OBSOLETE` banner. cycle 4 CR4-1 permanent_reject로 신규 코드 도입 기준 제외 (결정 이력 보존).
+
+---
+
 ## [2026-05-13] - bkit-gstack-sync-v2 Cycle 3 Completion
 
 ### Added
