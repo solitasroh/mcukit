@@ -44,7 +44,7 @@ MR 전체 라이프사이클을 관리하는 통합 스킬. `glab` CLI + GitLab 
 
 | Argument | 역할 | 사용자 | 예시 |
 |----------|------|:------:|------|
-| `create [feature]` | Draft MR 생성 + 리뷰어 지정 | 개발자 | `/mr create uart-dma` |
+| `create [feature]` | Draft MR 생성 + 리뷰어/담당자 지정 | 개발자 | `/mr create uart-dma` |
 | `review [MR-IID]` | AI 코드 리뷰 + discussion 생성 | 리뷰어 | `/mr review 42` |
 | `feedback [MR-IID]` | 리뷰 comment 조회 + 수정 + reply | 개발자 | `/mr feedback 42` |
 | `verify [MR-IID]` | 수정 확인 + resolve | 리뷰어 | `/mr verify 42` |
@@ -56,7 +56,7 @@ MR 전체 라이프사이클을 관리하는 통합 스킬. `glab` CLI + GitLab 
 
 ## create [feature]
 
-Draft MR 생성. AI가 description을 자동 생성하고 리뷰어를 지정한다.
+Draft MR 생성. AI가 description을 자동 생성하고 리뷰어와 담당자를 지정한다.
 
 ### 절차
 
@@ -97,7 +97,12 @@ Draft MR 생성. AI가 description을 자동 생성하고 리뷰어를 지정한
 - `glab api "projects/:id/members"`로 프로젝트 멤버를 조회한다.
 - AskUserQuestion으로 리뷰어 선택 (필수, 최소 1명).
 
-#### Step 5: Push + Draft MR 생성
+#### Step 5: 담당자(Assignee) 지정
+
+- Reviewer(리뷰 수행자)와 Assignee(머지까지 책임지는 담당자)는 역할이 다르므로 별도로 지정한다.
+- AskUserQuestion으로 담당자를 선택한다. 기본값(추천)은 **작성자 본인**이며, 그 외 리뷰어와 동일 인물 지정, 미지정도 선택 가능하게 한다.
+
+#### Step 6: Push + Draft MR 생성
 
 - `git push -u origin {branch}`
 - MR 제목: `[OP#N] type: description`
@@ -107,6 +112,7 @@ Draft MR 생성. AI가 description을 자동 생성하고 리뷰어를 지정한
     --title "{title}" \
     --description "{description}" \
     --reviewer "{reviewer}" \
+    --assignee "{assignee}" \
     --target-branch main
   ```
 - 결과 출력: MR URL, IID.
